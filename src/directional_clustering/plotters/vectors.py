@@ -38,8 +38,8 @@ def plot_colored_vectors(centers, cluster_labels, angles, name, base_vector=[1, 
 
         rcenter = round(center, 2)
         rdegcenter = round(degrees(center), 2)
-
         msg = "{} rad / {} deg".format(rcenter, rdegcenter)
+
         plt.scatter(x, y, c=kcolor, alpha=0.3, label=msg, s=scales[idx])
 
         kvector = vector_from_angle(center, base_vector)

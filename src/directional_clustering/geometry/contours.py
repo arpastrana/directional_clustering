@@ -9,6 +9,8 @@ from numpy import sort
 
 from scipy.interpolate import griddata
 
+from directional_clustering.geometry import polygon_list_to_dict
+
 
 __all__ = [
     "scalarfield_contours_numpy",

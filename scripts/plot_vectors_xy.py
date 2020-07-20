@@ -1,9 +1,15 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
 from math import degrees
 from math import fabs
+
+from sklearn.cluster import SpectralClustering
 
 from directional_clustering.geometry import clockwise
 from directional_clustering.geometry import smoothed_angles
 from directional_clustering.geometry import laplacian_smoothed
+from directional_clustering.geometry import cosine_similarity
 
 from directional_clustering.clusters import faces_angles
 from directional_clustering.clusters import faces_labels
@@ -17,6 +23,11 @@ from directional_clustering.plotters import plot_colored_vectors
 
 from compas.datastructures import Mesh
 from compas.datastructures import mesh_unify_cycles
+
+from compas.geometry import dot_vectors
+from compas.geometry import scale_vector
+from compas.geometry import normalize_vector
+from compas.geometry import length_vector
 
 from compas.utilities import geometric_key
 
@@ -41,45 +52,8 @@ tags = [
 
 HERE = "../data/json_files/two_point_wall"
 
-THERE = HERE.replace("json_files", "images")
-
-base_vector_tag = "n_1"
-
-transformable_vector_tags = ["n_1", "n_2"]
-vector_cluster_tags = ["n_1_k", "n_2_k"]
-vector_display_tags = ["n_1"]
-
-x_lim = -100.0  # faces stay if x coord of their centroid is larger than x_lim
-
-smooth_iters = 10
-damping = 0.5  # inversely proportional
-
-vector_display_colors = [(0, 0, 0), (255, 0, 0)]  # blue and red
-perp_flags = [False, True]
-line_width = 1.0
-
-ref_vector = [1.0, 0.0, 0.0]
-mode = clockwise  # clockwise or cos_angle, angle calculation
-
-n_clusters = 4  # "auto"  # int or auto
-max_cl_iters = 20  # for auto mode
-early_stopping = True
-eps = 1.0
-
-draw_kmeans_colors = False  # 2d representation
-
-show_mesh = True
-save_fig = False
-
-data_to_color_tag = "angles"  # angles, clusters, uncolored
-
-draw_contours = True
-
-draw_vector_field = True
-uniform_length = False
-vector_length = 0.02  # 0.005 if not uniform, 0.05 otherwise
-
-export_json = False
+tag = "n_1"
+x_lim = 0.0  # faces stay if x coord of their centroid is larger than x_lim
 
 # =============================================================================
 # Import mesh
@@ -97,7 +71,7 @@ centroids = {}
 vectors = {}
 for fkey in mesh.faces():
     centroids[geometric_key(mesh.face_centroid(fkey))] = fkey
-    vectors[fkey] = mesh.face_attribute(fkey, base_vector_tag)
+    vectors[fkey] = mesh.face_attribute(fkey, tag)
 
 # ==========================================================================
 # Rebuild mesh
@@ -111,111 +85,184 @@ for fkey in mesh.faces():
     gkey = geometric_key(mesh.face_centroid(fkey))
     ofkey = centroids[gkey]
     vector = vectors[ofkey]
-    mesh.face_attribute(fkey, base_vector_tag, vector)
+    mesh.face_attribute(fkey, tag, vector)
 
 # =============================================================================
 # Process PS vectors
 # =============================================================================
 
-angles = faces_angles(mesh, base_vector_tag, ref_vector, func=mode)
+align = True
+# align_ref = [0.0, 1.0, 0.0]
+align_ref = [1.0, 0.0, 0.0]
+normalize = True
+
+rescale = False
+vec_scale = 1.0  # for rescaling, max length
+
+# =============================================================================
+# Align vectors
+# =============================================================================
+
+vectors = {}
+for fkey in mesh.faces():
+    vector = mesh.face_attribute(fkey, tag) 
+    if align:
+        if dot_vectors(align_ref, vector) < 0:
+            vector = scale_vector(vector, -1)
+    if normalize:
+        vector = normalize_vector(vector)
+    vectors[fkey] = vector
+
+# =============================================================================
+# Scale and normalize vectors
+# =============================================================================
+
+plot_vectors_2d = False
+
+if plot_vectors_2d:
+    lengths = [length_vector(vec) for k, vec in vectors.items()]
+    max_length = max(lengths)
+    min_length = min(lengths)
+
+    x = np.zeros(mesh.number_of_faces())
+    y = np.zeros(mesh.number_of_faces())
+
+    for fkey, vector in vectors.items():
+
+        if rescale:
+            length = length_vector(vector)
+            centered_val = (length - min_length)  # in case min is not 0
+            ratio = centered_val / max_length
+            vector = scale_vector(vector, ratio * vec_scale)
+
+        x[fkey] = vector[0]
+        y[fkey] = vector[1]
+
+    plt.scatter(x, y, alpha=0.3)
+    plt.grid(b=None, which='major', axis='both', linestyle='--')
+
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.show()
+
+# =============================================================================
+# Cosine similarity
+# =============================================================================
+
+ref_cosim = [0.0, 1.0, 0.0]
+# ref_cosim = [1.0, 0.0, 0.0]
+
+cosim = {}
+for fkey, vector in vectors.items():
+    cosim[fkey] = cosine_similarity(ref_cosim, vector)
+
+# =============================================================================
+# Smoothen vectors
+# =============================================================================
+
+smooth_iters = 20
+damping = 0.5
 
 if smooth_iters:
-    angles = laplacian_smoothed(mesh, angles, smooth_iters, damping)
+    cosim = laplacian_smoothed(mesh, cosim, smooth_iters, damping)
 
-# ============================================================================
-# Auto Kmeans angles
-# =============================================================================
-
-if n_clusters == "auto":
-    shape = (-1, 1)
-    a = angles
-    errors = kmeans_errors(mesh, a, max_cl_iters, early_stopping, shape, eps)
-    n_clusters = len(errors) + 1  # double check if + 1 later
+min_cosim = min(cosim.values())
+max_cosim = max(cosim.values())
 
 # =============================================================================
-# Kmeans angles
+# Print stuff
 # =============================================================================
 
-labels, centers = kmeans_clustering(angles, n_clusters, shape=(-1, 1))
-print("centers", centers.shape)
-for idx, c in enumerate(centers):
-    print(idx, degrees(c), "deg")
-print("labels", labels.shape)
+print("max cosim: {}".format(max_cosim))
+print("min cosim: {}".format(min_cosim))
 
 # =============================================================================
-# Quantized Colors
+# Dict to array
 # =============================================================================
 
-cluster_labels = faces_labels(mesh, labels, centers)
-
-for fkey, label in cluster_labels.items():
-    mesh.face_attribute(fkey, name="k_label", value=label)
-
-# =============================================================================
-# Register clustered field
-# =============================================================================
-
-# for ref_tag, target_tag, perp in zip(transformable_vector_tags, vector_cluster_tags, perp_flags):
-#     faces_clustered_field(mesh, cluster_labels, ref_tag, target_tag, perp=perp, func=mode)
+values = np.zeros(mesh.number_of_faces())
+for fkey, cs in cosim.items():
+    values[fkey] = cs
 
 # =============================================================================
-# data to plot
+# Plot 3d - Data as Z
 # =============================================================================
 
-data_to_color = {
-    "clusters": rgb_colors(cluster_labels),
-    "angles": rgb_colors(angles),
-    "uncolored": {}
-    }
+D = np.zeros((mesh.number_of_faces(), 3))
 
-datacolors = data_to_color[data_to_color_tag]
-
-# =============================================================================
-# Kmeans plot 2d
-# =============================================================================
-
-if draw_kmeans_colors:
-    plot_colored_vectors(centers, cluster_labels, angles, name)
+for fkey in mesh.faces():
+    x, y, z = mesh.face_centroid(fkey)
+    
+    D[fkey, 0] = x
+    D[fkey, 1] = y
+    D[fkey, 2] = values[fkey]
 
 # =============================================================================
-# Set up Plotter
+# Kmeans cosim
+# =============================================================================
+
+n_clusters = 10
+do_kmeans = False
+
+if do_kmeans:
+
+    km = KMeans(n_clusters=n_clusters, random_state=0)
+    km.fit(values)
+
+    labels = km.labels_
+    centers = km.cluster_centers_
+
+# =============================================================================
+# Kmeans cosim
+# =============================================================================
+
+n_clusters = 10
+do_sc = True
+
+if do_sc:  # problem with SC is that it is already slow with small n_clusters
+    sc = SpectralClustering(n_clusters, eigen_solver="arpack", affinity="rbf", n_neighbors=5, assign_labels="kmeans", random_state=0)
+    
+    _values = np.reshape(values, (-1, 1))
+    # _values = D
+
+    sc.fit(_values)
+    labels = sc.labels_
+    print("labels shape", labels.shape)
+
+# =============================================================================
+# Plotter
 # =============================================================================
 
 plotter = ClusterPlotter(mesh, figsize=(12, 9))
 plotter.draw_edges(keys=list(mesh.edges_on_boundary()))
-plotter.draw_faces(facecolor=datacolors)
+plotter.draw_vector_field(tag, (0, 0, 0), True, 0.05, 1.0)
 
 # =============================================================================
-# Scalar Contouring
+# Color Faces
 # =============================================================================
 
-if draw_contours:
-    plotter.draw_clusters_contours(centers, cluster_labels, 100, "nearest")
+collection = plotter.draw_faces()
 
-# =============================================================================
-# Create PS vector lines
-# =============================================================================
+values = labels
 
-if draw_vector_field:
-    for tag, color in zip(vector_display_tags, vector_display_colors):
-        plotter.draw_vector_field(tag, color, uniform_length, vector_length, line_width)
+"""
+Divergent colormaps
+luminance highest at midpoint
 
-# =============================================================================
-# Export json
-# =============================================================================
+RdBu      red, white, blue (ok)
+RdYlBu    red, yellow, blue (ok)
+RdYlGn    red, yellow, green (ok)
+Spectral  red, orange, yellow, green, blue (ok)
+"""
 
-if export_json:
-    out = HERE + "_k_{}.json".format(n_clusters)
-    mesh.to_json(out)
-    print("Exported mesh to: {}".format(out))
-
-if save_fig:
-    out = THERE + "_field_{}.png".format(n_clusters)
-    plotter.save(out, bbox_inches="tight")
+collection.set(array=values, cmap='RdBu')
+# collection.set_clim(vmin=round(min_cosim, 2), vmax=round(max_cosim, 2))
+colorbar = plotter.figure.colorbar(collection)
+# ticks = [min_cosim] + colorbar.get_ticks().tolist() + [max_cosim]
+# colorbar.set_ticks([round(t, 2) for t in ticks])
 
 # =============================================================================
 # Show
 # =============================================================================
 
-if show_mesh:
-    plotter.show()
+plotter.show()

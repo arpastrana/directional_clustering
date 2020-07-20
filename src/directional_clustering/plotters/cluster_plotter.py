@@ -19,7 +19,7 @@ class ClusterPlotter(MeshPlotter):
         polygons = contour_polygons(mesh, centers, labels, density, method)
         self.draw_polylines(polygons)
 
-    def draw_vector_field(self, tag, color, uniform, scale, width):
+    def draw_vector_field(self, tag, color, uniform, scale, width=0.5):
         mesh = self.mesh
         lines = []
 
