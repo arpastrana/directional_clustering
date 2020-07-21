@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from math import degrees
 from math import fabs
 
+from sklearn.cluster import KMeans
 from sklearn.cluster import SpectralClustering
 
 from directional_clustering.geometry import clockwise
@@ -50,10 +51,10 @@ tags = [
     "custom_2"
     ]
 
-HERE = "../data/json_files/two_point_wall"
+HERE = "../data/json_files/four_point_slab"
 
-tag = "n_1"
-x_lim = 0.0  # faces stay if x coord of their centroid is larger than x_lim
+tag = "m_1"
+x_lim = -10.0  # faces stay if x coord of their centroid is larger than x_lim
 
 # =============================================================================
 # Import mesh
@@ -94,7 +95,7 @@ for fkey in mesh.faces():
 align = True
 # align_ref = [0.0, 1.0, 0.0]
 align_ref = [1.0, 0.0, 0.0]
-normalize = True
+normalize = False
 
 rescale = False
 vec_scale = 1.0  # for rescaling, max length
@@ -154,80 +155,86 @@ ref_cosim = [0.0, 1.0, 0.0]
 
 cosim = {}
 for fkey, vector in vectors.items():
-    cosim[fkey] = cosine_similarity(ref_cosim, vector)
+    # cosim[fkey] = cosine_similarity(ref_cosim, vector)
+    cosim[fkey] = normalize_vector(vector)  # cluster based on normalized and aligned vectors
 
 # =============================================================================
 # Smoothen vectors
 # =============================================================================
 
-smooth_iters = 20
+smooth_iters = 0
 damping = 0.5
 
 if smooth_iters:
     cosim = laplacian_smoothed(mesh, cosim, smooth_iters, damping)
 
-min_cosim = min(cosim.values())
-max_cosim = max(cosim.values())
+# min_cosim = min(cosim.values())
+# max_cosim = max(cosim.values())
 
 # =============================================================================
 # Print stuff
 # =============================================================================
 
-print("max cosim: {}".format(max_cosim))
-print("min cosim: {}".format(min_cosim))
+# print("max cosim: {}".format(max_cosim))
+# print("min cosim: {}".format(min_cosim))
 
 # =============================================================================
 # Dict to array
 # =============================================================================
 
-values = np.zeros(mesh.number_of_faces())
+# values = np.zeros((mesh.number_of_faces(), 1))
+# for fkey, cs in cosim.items():
+#     values[fkey] = cs
+
+values = np.zeros((mesh.number_of_faces(), 3))
 for fkey, cs in cosim.items():
-    values[fkey] = cs
+    values[fkey,:] = normalize_vector(cs)
 
 # =============================================================================
-# Plot 3d - Data as Z
-# =============================================================================
+# # Plot 3d - Data as Z
+# # =============================================================================
 
-D = np.zeros((mesh.number_of_faces(), 3))
+# D = np.zeros((mesh.number_of_faces(), 3))
 
-for fkey in mesh.faces():
-    x, y, z = mesh.face_centroid(fkey)
+# for fkey in mesh.faces():
+#     x, y, z = mesh.face_centroid(fkey)
     
-    D[fkey, 0] = x
-    D[fkey, 1] = y
-    D[fkey, 2] = values[fkey]
+#     D[fkey, 0] = x
+#     D[fkey, 1] = y
+#     D[fkey, 2] = values[fkey, :]
 
 # =============================================================================
-# Kmeans cosim
+# Kmeans Clustering
 # =============================================================================
 
-n_clusters = 10
-do_kmeans = False
+n_clusters = 5
+do_kmeans = True
 
 if do_kmeans:
 
-    km = KMeans(n_clusters=n_clusters, random_state=0)
+    km = KMeans(n_clusters=n_clusters, init="random", random_state=0)
     km.fit(values)
 
     labels = km.labels_
     centers = km.cluster_centers_
 
 # =============================================================================
-# Kmeans cosim
+# Spectral Clustering
 # =============================================================================
 
-n_clusters = 10
-do_sc = True
+n_clusters = 4
+do_sc = False
 
-if do_sc:  # problem with SC is that it is already slow with small n_clusters
-    sc = SpectralClustering(n_clusters, eigen_solver="arpack", affinity="rbf", n_neighbors=5, assign_labels="kmeans", random_state=0)
-    
-    _values = np.reshape(values, (-1, 1))
-    # _values = D
+if do_sc:  # problem with SC is that it is very slow with n_clusters>=5
+    sc = SpectralClustering(n_clusters, eigen_solver="arpack", affinity="rbf", n_neighbors=5, assign_labels="discretize", random_state=0)
 
-    sc.fit(_values)
+    sc.fit(values)
     labels = sc.labels_
     print("labels shape", labels.shape)
+
+# =============================================================================
+# Spectral Clustering
+# =============================================================================
 
 # =============================================================================
 # Plotter
@@ -255,7 +262,7 @@ RdYlGn    red, yellow, green (ok)
 Spectral  red, orange, yellow, green, blue (ok)
 """
 
-collection.set(array=values, cmap='RdBu')
+collection.set(array=values, cmap='jet')
 # collection.set_clim(vmin=round(min_cosim, 2), vmax=round(max_cosim, 2))
 colorbar = plotter.figure.colorbar(collection)
 # ticks = [min_cosim] + colorbar.get_ticks().tolist() + [max_cosim]
