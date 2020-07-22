@@ -52,11 +52,12 @@ tags = [
     "custom_2"
     ]
 
-HERE = "../data/json_files/two_point_wall"  # leonhardt
-HERE = "../data/json_files/wall_with_hole"  # schlaich
+
+HERE = "../data/json_files/four_point_slab"  # leonhardt
+# HERE = "../data/json_files/wall_with_hole"  # schlaich
 
 
-tag = "n_2"
+tag = "m_1"
 x_lim = -10.0  # faces stay if x coord of their centroid is larger than x_lim
 
 # =============================================================================
@@ -73,12 +74,13 @@ mesh_unify_cycles(mesh)
 
 centroids = {}
 vectors = {}
+
 for fkey in mesh.faces():
     centroids[geometric_key(mesh.face_centroid(fkey))] = fkey
     vectors[fkey] = mesh.face_attribute(fkey, tag)
 
 # ==========================================================================
-# Rebuild mesh
+# Rebuild mesh - necessary to match ordering of collection.set(array)! 
 # ==========================================================================
 
 polygons = [mesh.face_coordinates(fkey) for fkey in mesh.faces() if mesh.face_centroid(fkey)[0] >= x_lim]
@@ -100,7 +102,7 @@ align_ref = [1.0, 0.0, 0.0]  # global x
 
 vectors = {}
 for fkey in mesh.faces():
-    vector = mesh.face_attribute(fkey, tag) 
+    vector = mesh.face_attribute(fkey, tag)
     
     if align:
         if dot_vectors(align_ref, vector) < 0:
@@ -128,7 +130,7 @@ if plot_vectors_2d:
     for fkey, vector in vectors.items():
 
         if normalize:
-            vectros = normalize_vector(vector)
+            vector = normalize_vector(vector)
 
         if rescale:
             length = length_vector(vector)
@@ -158,7 +160,7 @@ for fkey, vec in vectors.items():
 # Smoothen vectors
 # =============================================================================
 
-smooth_iters = 1
+smooth_iters = 0
 damping = 0.5
 
 if smooth_iters:
@@ -226,7 +228,7 @@ for fkey, vec in vectors.items():
 # Kmeans Clustering
 # =============================================================================
 
-n_clusters = 6
+n_clusters = 5
 do_kmeans = True
 
 if do_kmeans:
@@ -276,6 +278,17 @@ for fkey in mesh.faces():
     magnitudes[fkey] = np.linalg.norm(vec)
 
 # =============================================================================
+# Set clustered vectors as attributes
+# =============================================================================
+
+base = clustered_values
+name = tag + "_k_{}".format(n_clusters)
+
+for fkey in mesh.faces():
+    vec = base[fkey, :].tolist()
+    mesh.face_attribute(key=fkey, name=name, value=vec)
+
+# =============================================================================
 # Calculate resulting deviation
 # =============================================================================
 
@@ -304,7 +317,7 @@ plotter.draw_edges(keys=list(mesh.edges_on_boundary()))
 # Data to color
 # =============================================================================
 
-dataset = "magnitudes"
+dataset = "labels"
 
 data_collection = {
     "labels": {"values": labels, "cmap": "jet"},
@@ -336,3 +349,14 @@ colorbar = plotter.figure.colorbar(collection)
 # =============================================================================
 
 plotter.show()
+
+# =============================================================================
+# Show
+# =============================================================================
+
+export_json = True
+
+if export_json:
+    out = HERE + "_k_{}.json".format(n_clusters)
+    mesh.to_json(out)
+    print("Exported mesh to: {}".format(out))
