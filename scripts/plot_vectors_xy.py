@@ -14,6 +14,8 @@ from directional_clustering.geometry import cosine_similarity
 from directional_clustering.geometry import contour_polygons
 
 from directional_clustering.clusters import kmeans_fit
+from directional_clustering.clusters import init_kmeans_farthest
+from directional_clustering.clusters import _kmeans
 
 from directional_clustering.plotters import ClusterPlotter
 from directional_clustering.plotters import rgb_colors
@@ -27,6 +29,8 @@ from compas.geometry import scale_vector
 from compas.geometry import normalize_vector
 from compas.geometry import length_vector
 from compas.geometry import angle_vectors
+from compas.geometry import length_vector_sqrd
+from compas.geometry import subtract_vectors
 
 from compas.utilities import geometric_key
 
@@ -55,7 +59,7 @@ tags = [
 # HERE = "../data/json_files/cantilever_wall_3_1"  # rozvany?
 # HERE = "../data/json_files/square_wall_cantilever"  # michell
 # HERE = "../data/json_files/square_wall_down_res_005"  # schlaich
-HERE = "../data/json_files/four_point_slab"  # schlaich
+HERE = "../data/json_files/perimeter_supported_slab"  # schlaich
 
 
 tag = "m_1"
@@ -106,6 +110,7 @@ for fkey in mesh.faces():
 
 align = True
 align_ref = [1.0, 0.0, 0.0]  # global x
+# align_ref = [0.0, 1.0, 0.0]  # global y
 
 vectors = {}
 for fkey in mesh.faces():
@@ -229,33 +234,44 @@ values = np.zeros((mesh.number_of_faces(), 3))
 
 for fkey, vec in vectors.items():
     smoothed_values[fkey,:] = vec
-    values[fkey,:] = normalize_vector(vec)
     values[fkey,:] = vec
 
 # =============================================================================
 # Kmeans Clustering
 # =============================================================================
 
-n_clusters = 10
+n_clusters = 8
 do_kmeans = True
 
 if do_kmeans:
     print("Clustering started...")
 
-    km = KMeans(n_clusters=n_clusters)
-    km.fit(values)
-
-    labels = km.labels_
-    centers = km.cluster_centers_
+    # sklearn solution, uses euclidean distance
+    # km = KMeans(n_clusters=n_clusters)
+    # km.fit(values)
+    # labels = km.labels_
+    # centers = km.cluster_centers_
 
     # suffers from initialization!
-    km = kmeans_fit(values, n_clusters, dist="cosim", epochs=20, eps=1e-3, early_stopping=True, verbose=True)
+    # km = kmeans_fit(values, n_clusters, dist="cosine", epochs=20, eps=1e-3, early_stopping=True, verbose=True)
+
+    # furthest seed initialization
+    mode = "euclidean"  # euclidean or cosine
+    eps = 1e-3
+    epochs = 20
+    seeds = init_kmeans_farthest(values, n_clusters, mode, epochs, eps)
+    km = _kmeans(values, seeds, mode, epochs, eps, early_stopping=False, verbose=True)
+    
     labels, centers, losses = km
+
     print("loss kmeans", losses[-1])
+    print("Clustering ended!")
+
+# =============================================================================
+# Assign clusters
+# =============================================================================
 
     clustered_values = centers[labels]
-
-    print("Clustering ended!")
 
 # =============================================================================
 # Recalibrate centers to account for raw magnitudes
@@ -313,12 +329,17 @@ target = recalibrated_values
 
 deviations = np.zeros(mesh.number_of_faces())
 for fkey in mesh.faces():
-    # deviations[fkey] = fabs(cosine_similarity(base[fkey], target[fkey]))
     deviations[fkey] = angle_vectors(base[fkey], target[fkey], deg=True)
 
-# deviations = 1.0 - deviations  # invert results
+# =============================================================================
+# Compute MSE Loss
+# =============================================================================
 
-print("Loss: {}".format(np.sum(deviations)))
+losses = np.zeros(mesh.number_of_faces())
+for fkey in mesh.faces():    
+    losses[fkey] = length_vector_sqrd(subtract_vectors(base[fkey], target[fkey]))
+
+print("MSE Loss: {}".format(np.mean(deviations)))
 
 # =============================================================================
 # Plotter
@@ -335,13 +356,13 @@ draw_vector_fields = True
 
 if draw_vector_fields:
     plotter.draw_vector_field_array(target, (0, 0, 0), True, 0.07, width=1.0)
-    # plotter.draw_vector_field_array(base, (50, 50, 50), True, 0.07, width=0.5)
+    plotter.draw_vector_field_array(base, (50, 50, 50), True, 0.07, width=0.5)
 
 # =============================================================================
 # Data to color
 # =============================================================================
 
-dataset = "deviations"
+dataset = "labels"
 
 data_collection = {
     "labels": {"values": labels, "cmap": "jet"},
@@ -358,15 +379,8 @@ cmap = data_collection[dataset]["cmap"]
 # =============================================================================
 
 collection = plotter.draw_faces()
-
-# plt.colormaps()
-
-collection.set(array=data, cmap=cmap)  # deviations
+collection.set(array=data, cmap=cmap)
 colorbar = plotter.figure.colorbar(collection)
-
-# collection.set_clim(vmin=round(min_cosim, 2), vmax=round(max_cosim, 2))
-# ticks = [min_cosim] + colorbar.get_ticks().tolist() + [max_cosim]
-# colorbar.set_ticks([round(t, 2) for t in ticks])
 
 # =============================================================================
 # Draw cluster contours

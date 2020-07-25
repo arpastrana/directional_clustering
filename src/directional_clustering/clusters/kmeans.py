@@ -13,6 +13,7 @@ from numpy import mean
 from numpy import zeros
 from numpy import reshape
 from numpy import argmin
+from numpy import argmax
 from numpy import dot
 from numpy import min
 from numpy import abs
@@ -21,6 +22,7 @@ from numpy import exp
 from numpy import sum
 from numpy import hstack
 from numpy import vstack
+from numpy import diagonal
 
 from numpy.linalg import norm
 
@@ -34,7 +36,9 @@ from time import time
 
 __all__ = [
     "kmeans_clustering",
-    "kmeans_fit"
+    "kmeans_fit",
+    "init_kmeans_farthest",
+    "_kmeans"
     ]
 
 
@@ -99,7 +103,7 @@ def init_kmeans(X, k, replace=False):
     return X[indices]
 
 
-def init_kmeans_farthest(X, k, dist="euclidean", replace=False, epochs=20, eps=1e-3):
+def init_kmeans_farthest(X, k, dist="euclidean", epochs=20, eps=1e-3, replace=False):
     """
     Initialize k-means with a farthest-point strategy.
 
@@ -121,23 +125,18 @@ def init_kmeans_farthest(X, k, dist="euclidean", replace=False, epochs=20, eps=1
 
     W = init_kmeans(X, 1, replace)
 
-    for i in range(k):
-        labels, centers, _ = _kmeans(X, W, dist, epochs, eps, False, False)
+    for i in range(k-1):
+        labels, W, _ = _kmeans(X, W, dist, epochs, eps, False, False)
 
-        values = centers[labels]
+        values = W[labels]
 
         distances = pairwise_distances(X, values, metric=dist)
-        distances = np.diagonal(distances).reshape(-1, 1)
-        
-        print()
-        print("values", values)
-        print("dists", distances)
-        index = np.argmax(distances, axis=0)
+        distances = diagonal(distances).reshape(-1, 1)
+    
+        index = argmax(distances, axis=0)
         farthest = X[index, :]
         W = vstack([W, farthest])
 
-    print("X", X)
-    print("W ", W)
     return W
 
 
@@ -176,7 +175,7 @@ def associate_centroids_euclidean(X, W):
     return mean(sq_dist), closest_k
 
 
-def associate_centroids_cosim(X, W):
+def associate_centroids_cosine(X, W):
     """
     Input
     -----
@@ -204,10 +203,10 @@ def associate_centroids_cosim(X, W):
     W /= wn
     W[nonzero(isnan(W))] = 0.0
 
-    cosim = dot(X, W.T)
-    angular_distance = 1 - cosim
-    # distance = square(angular_distance)
-    distance = abs(angular_distance)
+    cos_similarity = dot(X, W.T)
+    cos_distance = 1 - cos_similarity
+    # distance = square(cosine_distance)
+    distance = abs(cos_distance)
 
     closest_k = argmin(distance, axis=1)
     loss = mean(min(distance, axis=1))
@@ -254,10 +253,10 @@ def kmeans_fit(X, k, dist="euclidean", epochs=20, eps=1e-3, early_stopping=True,
     """
     W = init_kmeans(X, k)  # initialize centroids
 
-    return _kmeans(X, W, dist="euclidean", epochs=20, eps=1e-3, early_stopping=True, verbose=True)
+    return _kmeans(X, W, dist, epochs, eps, early_stopping, verbose)
 
 
-def _kmeans(X, W, dist="euclidean", epochs=20, eps=1e-3, early_stopping=True, verbose=True):
+def _kmeans(X, W, dist, epochs, eps, early_stopping, verbose):
     """
     """
     k, d = W.shape
@@ -266,7 +265,7 @@ def _kmeans(X, W, dist="euclidean", epochs=20, eps=1e-3, early_stopping=True, ve
 
     func_map = {
         "euclidean": associate_centroids_euclidean,
-        "cosim": associate_centroids_cosim
+        "cosine": associate_centroids_cosine
     }
 
     for i in range(epochs):
@@ -314,16 +313,16 @@ if __name__ == "__main__":
 
     W = init_kmeans_farthest(X, k, dist="euclidean", replace=False, epochs=20, eps=1e-3)
 
-    # for _ in range(10):
-    #     sq_dist, closest_k = associate_centroids_cosim(X, W)    
-    #     W = estimate_centroids(X, k, closest_k)
+    for _ in range(10):
+        sq_dist, closest_k = associate_centroids_cosine(X, W)    
+        W = estimate_centroids(X, k, closest_k)
     
-    # assoc, W, losses = kmeans(X, k, epochs=20, eps=1e-3, early_stopping=False)
+    assoc, W, losses = kmeans_fit(X, k, epochs=20, eps=1e-3, early_stopping=False)
 
-    # for loss in losses:
-    #      print(loss)
+    for loss in losses:
+         print(loss)
     
-    # print("Tests passed!")
+    print("Tests passed!")
 
     # ====
 
@@ -387,25 +386,25 @@ if __name__ == "__main__":
         return C, X
 
 
-    # n, d, k = 10000, 20, 5
-    # mog = generate_mixture_params(k, d, iso=False, sep=np.sqrt(k/d))
-    # C, X = sample_from_mog(mog, n)
-    # plot_sample(X, C)
-    # plt.show()
+    n, d, k = 10000, 20, 5
+    mog = generate_mixture_params(k, d, iso=False, sep=np.sqrt(k/d))
+    C, X = sample_from_mog(mog, n)
+    plot_sample(X, C)
+    plt.show()
 
-    # assoc, W1, loss = kmeans(X, 1, verbose=False)
-    # print('[{:-2}/{:-2}] {:7.0}'.format(1, 1, loss[-1]))
+    assoc, W1, loss = kmeans_fit(X, 1, verbose=False)
+    print('[{:-2}/{:-2}] {:7.0}'.format(1, 1, loss[-1]))
 
-    # bl = loss[-1] * np.ones(3 * k)
-    # nz = np.zeros(3 * k, dtype=int)
+    bl = loss[-1] * np.ones(3 * k)
+    nz = np.zeros(3 * k, dtype=int)
 
-    # for test_k in np.arange(2, 2 * k + 1):
+    for test_k in np.arange(2, 2 * k + 1):
         
-    #     for e in range(100):
-    #         assoc, W, loss = kmeans(X, test_k, verbose=False)
+        for e in range(100):
+            assoc, W, loss = kmeans_fit(X, test_k, verbose=False)
         
-    #         if loss[-1] < bl[test_k]:
-    #             bl[test_k] = loss[-1]
-    #             nz[test_k] = (rows_squared_norm(W) != 0).sum().item()
+            if loss[-1] < bl[test_k]:
+                bl[test_k] = loss[-1]
+                nz[test_k] = (rows_squared_norm(W) != 0).sum().item()
         
-    #     print('[{:-2}/{:-2}] {:-7.4}'.format(nz[test_k], test_k, bl[test_k].round(4)))
+        print('[{:-2}/{:-2}] {:-7.4}'.format(nz[test_k], test_k, bl[test_k].round(4)))
