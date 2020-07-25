@@ -13,11 +13,7 @@ from directional_clustering.geometry import laplacian_smoothed
 from directional_clustering.geometry import cosine_similarity
 from directional_clustering.geometry import contour_polygons
 
-from directional_clustering.clusters import faces_angles
-from directional_clustering.clusters import faces_labels
-from directional_clustering.clusters import kmeans_clustering
-from directional_clustering.clusters import kmeans_errors
-from directional_clustering.clusters import faces_clustered_field
+from directional_clustering.clusters import kmeans_fit
 
 from directional_clustering.plotters import ClusterPlotter
 from directional_clustering.plotters import rgb_colors
@@ -54,14 +50,17 @@ tags = [
     ]
 
 
-# HERE = "../data/json_files/two_point_wall"  # leonhardt
+# HERE = "../data/json_files/two_point_wall"  # leonhardt
 # HERE = "../data/json_files/wall_with_hole"  # schlaich
-HERE = "../data/json_files/cantilever_wall_3_1"  # rozvany?
+# HERE = "../data/json_files/cantilever_wall_3_1"  # rozvany?
+# HERE = "../data/json_files/square_wall_cantilever"  # michell
+# HERE = "../data/json_files/square_wall_down_res_005"  # schlaich
+HERE = "../data/json_files/four_point_slab"  # schlaich
 
 
-tag = "n_1"
+tag = "m_1"
 x_lim = -10.0  # faces stay if x coord of their centroid is larger than x_lim
-y_lim = 0.0  # faces stay if y coord of their centroid is larger than y_lim
+y_lim = -10.0  # faces stay if y coord of their centroid is larger than y_lim
 
 # =============================================================================
 # Import mesh
@@ -231,23 +230,32 @@ values = np.zeros((mesh.number_of_faces(), 3))
 for fkey, vec in vectors.items():
     smoothed_values[fkey,:] = vec
     values[fkey,:] = normalize_vector(vec)
+    values[fkey,:] = vec
 
 # =============================================================================
 # Kmeans Clustering
 # =============================================================================
 
-n_clusters = 4
+n_clusters = 10
 do_kmeans = True
 
 if do_kmeans:
+    print("Clustering started...")
 
-    km = KMeans(n_clusters=n_clusters, init="random", random_state=0)
+    km = KMeans(n_clusters=n_clusters)
     km.fit(values)
 
     labels = km.labels_
     centers = km.cluster_centers_
 
+    # suffers from initialization!
+    km = kmeans_fit(values, n_clusters, dist="cosim", epochs=20, eps=1e-3, early_stopping=True, verbose=True)
+    labels, centers, losses = km
+    print("loss kmeans", losses[-1])
+
     clustered_values = centers[labels]
+
+    print("Clustering ended!")
 
 # =============================================================================
 # Recalibrate centers to account for raw magnitudes
@@ -319,14 +327,21 @@ print("Loss: {}".format(np.sum(deviations)))
 plotter = ClusterPlotter(mesh, figsize=(12, 9))
 plotter.draw_edges(keys=list(mesh.edges_on_boundary()))
 
-# plotter.draw_vector_field_array(target, (0, 0, 0), True, 0.10, width=0.8)
-# plotter.draw_vector_field_array(base, (0, 0, 0), True, 0.07, width=0.8)
+# =============================================================================
+# Draw vector fields
+# =============================================================================
+
+draw_vector_fields = True
+
+if draw_vector_fields:
+    plotter.draw_vector_field_array(target, (0, 0, 0), True, 0.07, width=1.0)
+    # plotter.draw_vector_field_array(base, (50, 50, 50), True, 0.07, width=0.5)
 
 # =============================================================================
 # Data to color
 # =============================================================================
 
-dataset = "cosim"
+dataset = "deviations"
 
 data_collection = {
     "labels": {"values": labels, "cmap": "jet"},
@@ -357,11 +372,14 @@ colorbar = plotter.figure.colorbar(collection)
 # Draw cluster contours
 # =============================================================================
 
-centers_cosim = np.array([cosine_similarity(ref_cosim, vec) for vec in centers])
-labels_cosim = np.array([cosine_similarity(ref_cosim, vec) for vec in clustered_values])
+draw_cluster_contours = True
 
-cluster_contours = contour_polygons(mesh, centers_cosim, labels_cosim)
-# plotter.draw_polylines(cluster_contours)
+if draw_cluster_contours:
+    centers_cosim = np.array([cosine_similarity(ref_cosim, vec) for vec in centers])
+    labels_cosim = np.array([cosine_similarity(ref_cosim, vec) for vec in clustered_values])
+
+    cluster_contours = contour_polygons(mesh, centers_cosim, labels_cosim)
+    plotter.draw_polylines(cluster_contours)
 
 # =============================================================================
 # Show
