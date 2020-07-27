@@ -19,7 +19,7 @@ from directional_clustering.clusters import _kmeans
 
 from directional_clustering.plotters import ClusterPlotter
 from directional_clustering.plotters import rgb_colors
-from directional_clustering.plotters import plot_colored_vectors
+from directional_clustering.plotters import plot_kmeans_vectors
 
 from compas.datastructures import Mesh
 from compas.datastructures import mesh_unify_cycles
@@ -54,9 +54,9 @@ tags = [
     ]
 
 
-# HERE = "../data/json_files/two_point_wall"  # leonhardt
+# HERE = "../data/json_files/two_point_wall"  # leonhardt
 # HERE = "../data/json_files/wall_with_hole"  # schlaich
-# HERE = "../data/json_files/cantilever_wall_3_1"  # rozvany?
+# HERE = "../data/json_files/cantilever_wall_3_1"  # rozvany?
 # HERE = "../data/json_files/square_wall_cantilever"  # michell
 # HERE = "../data/json_files/square_wall_down_res_005"  # schlaich
 HERE = "../data/json_files/perimeter_supported_slab"  # schlaich
@@ -108,9 +108,14 @@ for fkey in mesh.faces():
 # Align vectors
 # =============================================================================
 
+# convexity of the resulting distribution seems to be beneficial. 
+# in other words, single mode distributions produce nicer results than double
+# mode. double mode distributions arise aligning with global y, whereas the good
+# former one, with global x alignment.
+
 align = True
 align_ref = [1.0, 0.0, 0.0]  # global x
-# align_ref = [0.0, 1.0, 0.0]  # global y
+# align_ref = [0.0, 1.0, 0.0]  # global y
 
 vectors = {}
 for fkey in mesh.faces():
@@ -126,8 +131,8 @@ for fkey in mesh.faces():
 # Plot vectors 2d
 # =============================================================================
 
-plot_vectors_2d = False
-normalize = True
+plot_vectors_2d = True
+normalize = False
 rescale = False
 vec_scale = 1.0  # for rescaling, max length
 
@@ -172,7 +177,7 @@ for fkey, vec in vectors.items():
 # Smoothen vectors
 # =============================================================================
 
-smooth_iters = 0
+smooth_iters = 10
 damping = 0.5
 
 if smooth_iters:
@@ -187,13 +192,7 @@ ref_cosim = [0.0, 1.0, 0.0]  # global y - for full systems
 
 cosim = np.zeros(mesh.number_of_faces())
 for fkey, vec in vectors.items():
-    cs = cosine_similarity(ref_cosim, vec)
-
-    # helps clustering in a good way
-    # square cosim values and keep sign
-    # s = np.sign(cs)
-    # cs = s * (cs ** 2)
-
+    cs = cosine_similarity(ref_cosim, vec) 
     cosim[fkey] = cs
 
 # =============================================================================
@@ -204,7 +203,6 @@ plot_points_3d = False
 
 if plot_points_3d:
 
-    # plot in 3d
     D = np.zeros((mesh.number_of_faces(), 3))
     for fkey in mesh.faces():
         x, y, z = mesh.face_centroid(fkey)
@@ -231,10 +229,14 @@ if plot_points_3d:
 
 smoothed_values = np.zeros((mesh.number_of_faces(), 3))
 values = np.zeros((mesh.number_of_faces(), 3))
+normalized_values = np.zeros((mesh.number_of_faces(), 3))
+squared_values = np.zeros((mesh.number_of_faces(), 3))
 
 for fkey, vec in vectors.items():
     smoothed_values[fkey,:] = vec
     values[fkey,:] = vec
+    normalized_values[fkey,:] = normalize_vector(vec)
+    squared_values[fkey,:] = scale_vector(vec, length_vector_sqrd(vec))
 
 # =============================================================================
 # Kmeans Clustering
@@ -242,25 +244,18 @@ for fkey, vec in vectors.items():
 
 n_clusters = 8
 do_kmeans = True
+data = values
 
 if do_kmeans:
     print("Clustering started...")
 
-    # sklearn solution, uses euclidean distance
-    # km = KMeans(n_clusters=n_clusters)
-    # km.fit(values)
-    # labels = km.labels_
-    # centers = km.cluster_centers_
-
-    # suffers from initialization!
-    # km = kmeans_fit(values, n_clusters, dist="cosine", epochs=20, eps=1e-3, early_stopping=True, verbose=True)
-
     # furthest seed initialization
-    mode = "euclidean"  # euclidean or cosine
+    mode = "cosine"  # euclidean or cosine
     eps = 1e-3
+    epochs = 10
+    seeds = init_kmeans_farthest(data, n_clusters, mode, epochs, eps)
     epochs = 20
-    seeds = init_kmeans_farthest(values, n_clusters, mode, epochs, eps)
-    km = _kmeans(values, seeds, mode, epochs, eps, early_stopping=False, verbose=True)
+    km = _kmeans(data, seeds, mode, epochs, eps, early_stopping=False, verbose=True)
     
     labels, centers, losses = km
 
@@ -284,19 +279,6 @@ if do_kmeans:
         face_indices = np.nonzero(labels==i)
         new_vector = np.mean(base[face_indices], axis=0)
         recalibrated_values[face_indices] = new_vector
-    
-# =============================================================================
-# Spectral Clustering - (deprecated)
-# =============================================================================
-
-# n_clusters = 3
-# do_sc = False
-
-# if do_sc:  # problem with SC is that it is very slow with n_clusters>=5
-#     sc = SpectralClustering(n_clusters, eigen_solver="arpack", affinity="rbf", n_neighbors=5, assign_labels="discretize", random_state=0)
-
-#     sc.fit(values)
-#     labels = sc.labels_
 
 # =============================================================================
 # Calculate magnitudes
@@ -340,6 +322,15 @@ for fkey in mesh.faces():
     losses[fkey] = length_vector_sqrd(subtract_vectors(base[fkey], target[fkey]))
 
 print("MSE Loss: {}".format(np.mean(deviations)))
+
+# =============================================================================
+# Draw kmeans vectors
+# =============================================================================
+
+draw_kmeans_vectors = True
+
+if draw_kmeans_vectors:
+    plot_kmeans_vectors(values, labels, centers, normalize=False, draw_centroids=False)
 
 # =============================================================================
 # Plotter
@@ -402,7 +393,7 @@ if draw_cluster_contours:
 plotter.show()
 
 # =============================================================================
-# Show
+# Export json
 # =============================================================================
 
 export_json = False
