@@ -50,7 +50,7 @@ def kmeans_clustering(data, n_clusters, shape=None, normalize=False, random_stat
     np_data = array(np_data, dtype=float64)
 
     if normalize:
-        np_data /= amax(np_data)
+        np_data = np_data / amax(np_data)
 
     if reshape:
         np_data = reshape(np_data, shape)
@@ -198,15 +198,14 @@ def associate_centroids_cosine(X, W):
     if isnan(wn).any():
         raise Exception("There's a NaN in wn: {}".format(wn))
 
-    X /= xn
+    X = X / xn
 
-    W /= wn
+    W = W / wn
     W[nonzero(isnan(W))] = 0.0
 
     cos_similarity = dot(X, W.T)
-    cos_distance = 1 - cos_similarity
-    # distance = square(cosine_distance)
-    distance = abs(cos_distance)
+    distance = 1 - cos_similarity
+    distance = square(distance)
 
     closest_k = argmin(distance, axis=1)
     loss = mean(min(distance, axis=1))
