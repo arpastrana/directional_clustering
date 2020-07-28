@@ -7,6 +7,8 @@ from matplotlib.patches import Polygon
 from matplotlib.collections import PatchCollection
 from matplotlib.collections import PolyCollection
 
+from mpl_toolkits.axes_grid1 import AxesGrid
+
 from math import acos
 from math import degrees
 from math import fabs
@@ -65,8 +67,8 @@ tags = [
 # HERE = "../data/json_files/cantilever_wall_3_1"  # rozvany?
 # HERE = "../data/json_files/square_wall_cantilever"  # michell
 # HERE = "../data/json_files/square_wall_down"  # schlaich
-HERE = "../data/json_files/perimeter_supported_slab"
-# HERE = "../data/json_files/four_point_slab"
+# HERE = "../data/json_files/perimeter_supported_slab"
+HERE = "../data/json_files/four_point_slab"
 
 
 tag = "m_1"
@@ -197,19 +199,33 @@ eps = 1e-3
 data = values
 
 name = HERE.split("/")[-1]
-title = "{}-{}-sm-{}_{}_farthest".format(name, tag, smooth_iters, mode)
-fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(10, 10), dpi=100)
+title = "{}-{}-smooth_{}_{}_farthest".format(name, tag, smooth_iters, mode)
+
+# fig, axes = plt.subplots(nrows=2, ncols=4, figsize=(16, 9), dpi=100)
+
+fig = plt.figure(figsize=(16, 9), dpi=100)
+axes = AxesGrid(
+    fig,
+    111,
+    nrows_ncols=(2, 4),
+    axes_pad=0.30,
+    cbar_mode="single",
+    cbar_location="left",
+    cbar_pad=0.1,
+    label_mode="all",
+    share_all=True
+)
 
 i = 0
 for n_clusters in range(3, 5):
 
-    row_names.append("K {}".format(n_clusters))
+    row_names.append("k {}".format(n_clusters))
 
     data_collection[i] = {}
 
     j = 0
-    for epochs in range(5, 15, 5):
-        col_names.append("{} Epochs".format(epochs))
+    for epochs in range(5, 25, 5):
+        col_names.append("{} epochs".format(epochs))
 
         print("***")
         print("Clustering began. k={} - epochs={}.".format(n_clusters, epochs))
@@ -268,9 +284,9 @@ for n_clusters in range(3, 5):
 # =============================================================================
 
         data_collection[i][j] = {
-            "magnitudes": magnitudes,
-            "deviations": deviations,
-            "labels": clustered_values,
+            "magnitudes": [magnitudes, "Blues"],
+            "deviations": [deviations, "RdPu"],
+            "labels": [labels, "jet"],
             "mse_loss": mse_loss,
             "contours": contour_coords
         }
@@ -282,17 +298,29 @@ for n_clusters in range(3, 5):
 # Draw subplots
 # =============================================================================
 
-for ax, col in zip(axes[0], col_names):
-    ax.set_title(col)
+to_plot = "deviations"
 
-for ax, row in zip(axes[:,0], row_names):
-    ax.set_ylabel(row, rotation=0, size="large", labelpad=20)
-    # ax.set_ylabel_position("left")
+# for ax, col in zip(axes[0], col_names):
+#    ax.set_title(col)
+
+# for ax, row in zip(axes[:,0], row_names):
+#     ax.set_ylabel(row, rotation=0, size="large", labelpad=20)
+
+# for ax_col, col in zip(axes.axes_column, col_names):
+#     for ax in ax_col:
+#         ax.set_title(col)
+
+# for ax_row, row in zip(axes.axes_row, row_names):
+#     for ax in ax_row:
+#         ax.set_ylabel(row, rotation=0, size="large", labelpad=20)
+
+faces = []
 
 for a in range(i):
     for b in range(j):
 
-        ax = axes[a, b]
+        # ax = axes[a, b]
+        ax = axes.axes_row[a][b]
 
         ax.set_xticks([])
         ax.set_yticks([])
@@ -301,36 +329,39 @@ for a in range(i):
         collection = PatchCollection([Polygon(face) for face in face_coords])
         ax.add_collection(collection)
 
-        deviations = data_collection[a][b]["deviations"]
+        deviations, cmap = data_collection[a][b][to_plot]
 
-        collection.set(array=deviations, cmap="RdPu")
-
-        # fig.colorbar(collection, label="deviations - deg", aspect=50)
+        collection.set(array=deviations, cmap=cmap)
 
         contours = data_collection[a][b]["contours"]
 
-        contours = PolyCollection(contours, closed=False, linewidth=1.0, facecolors='none')
+        contours = PolyCollection(contours, closed=False, linewidth=1.0, facecolors='none', edgecolor="black")
         ax.add_collection(contours)
 
         mse_loss = data_collection[a][b]["mse_loss"]
 
-        xlabel = "MSE: {}".format(round(mse_loss, 2))
+        xlabel = "loss: {}".format(round(mse_loss, 2))
         ax.set_xlabel(xlabel)
         
         ax.set_aspect("equal")
         ax.autoscale(tight=True)
 
-        
 
-# fig.colorbar()
 
-fig.tight_layout()
-# fig.suptitle(title)
+
+
+cb = ax.cax.colorbar(collection)
+cb.aspect = 50
+
+# from matplotlib.cm import ScalarMappable
+
+# fig.colorbar(ScalarMappable(cmap=cmap))
+
+fig.tight_layout(rect=[0.0, 0.03, 1.0, 0.95])
+fig.suptitle(title)
 
 # =============================================================================
 # Show
 # =============================================================================
 
-
 plt.show()
-
