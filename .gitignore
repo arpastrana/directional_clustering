@@ -112,3 +112,6 @@ temp/**
 !temp/PLACEHOLDER
 
 .DS_Store
+
+# temporary
+/data
