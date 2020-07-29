@@ -199,7 +199,7 @@ eps = 1e-3
 data = values
 
 name = HERE.split("/")[-1]
-title = "{}-{}-smooth_{}_{}_farthest".format(name, tag, smooth_iters, mode)
+title = "{}-{}-smooth_{}-{}-farthest".format(name, tag, smooth_iters, mode)
 
 # fig, axes = plt.subplots(nrows=2, ncols=4, figsize=(16, 9), dpi=100)
 

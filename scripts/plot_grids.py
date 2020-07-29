@@ -278,12 +278,12 @@ contour_coords = []
 for contour in cluster_contours:
     contour_coords.append(contour.get("points"))
 
-fig = plt.figure(figsize=(10, 10), dpi=100)
+fig = plt.figure(figsize=(16, 9), dpi=100)
 
 data_keys = list(data_collection.keys())
 
 for i in range(1, len(data_collection) + 1):
-    ax = fig.add_subplot(2, 2, i)
+    ax = fig.add_subplot(1, 4, i)
 
     ax.set_xticks([])
     ax.set_yticks([])
@@ -304,19 +304,20 @@ for i in range(1, len(data_collection) + 1):
 
     collection.set(array=data, cmap=cmap)
     
-    if bins:
-        fig.colorbar(collection, label=dataset, ticks=ticks, aspect=50)
-    else: 
-        fig.colorbar(collection, label=dataset, aspect=50)
+    # if bins:
+    #     fig.colorbar(collection, label=dataset, ticks=ticks, aspect=50)
+    # else: 
+    #     fig.colorbar(collection, label=dataset, aspect=50)
 
     # add contour plots
-    contours = PolyCollection(contour_coords, closed=False, linewidth=1.0, facecolors='none')
-    ax.add_collection(contours)
+    # contours = PolyCollection(contour_coords, closed=False, linewidth=1.0, facecolors='none')
+    # ax.add_collection(contours)
 
 
     title = "K: {}/ Epochs: {} / MSE: {}".format(n_clusters, epochs, round(mse_loss, 2))
 
     ax.set_title(title)
+    ax.set_aspect("equal")
 
     ax.set_frame_on(False)
     ax.autoscale()
