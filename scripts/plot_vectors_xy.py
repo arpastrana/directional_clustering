@@ -60,6 +60,10 @@ tags = [
 # HERE = "../data/json_files/square_wall_cantilever"  # michell
 # HERE = "../data/json_files/square_wall_down_res_005"  # schlaich
 HERE = "../data/json_files/perimeter_supported_slab"  # schlaich
+# HERE = "../data/json_files/perimeter_supported_vault_z500mm"  #vault
+# !p
+# 
+# HERE = "../data/json_files/four_point_slab"  #vault
 
 
 tag = "m_1"
@@ -177,7 +181,7 @@ for fkey, vec in vectors.items():
 # Smoothen vectors
 # =============================================================================
 
-smooth_iters = 10
+smooth_iters = 0
 damping = 0.5
 
 if smooth_iters:
@@ -199,7 +203,7 @@ for fkey, vec in vectors.items():
 # Plot cosim as heights
 # =============================================================================
 
-plot_points_3d = False
+plot_points_3d = True
 
 if plot_points_3d:
 
@@ -242,7 +246,7 @@ for fkey, vec in vectors.items():
 # Kmeans Clustering
 # =============================================================================
 
-n_clusters = 8
+n_clusters = 5
 do_kmeans = True
 data = values
 
@@ -330,7 +334,7 @@ print("MSE Loss: {}".format(np.mean(deviations)))
 draw_kmeans_vectors = True
 
 if draw_kmeans_vectors:
-    plot_kmeans_vectors(values, labels, centers, normalize=False, draw_centroids=False)
+    plot_kmeans_vectors(values, labels, centers, normalize=False, draw_centroids=True)
 
 # =============================================================================
 # Plotter

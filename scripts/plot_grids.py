@@ -64,10 +64,11 @@ tags = [
 # HERE = "../data/json_files/square_wall_cantilever"  # michell
 # HERE = "../data/json_files/square_wall_down"  # schlaich
 # HERE = "../data/json_files/perimeter_supported_slab"
-HERE = "../data/json_files/four_point_slab"
+# HERE = "../data/json_files/four_point_slab"
+HERE = "../data/json_files/perimeter_supported_vault_z500mm"
 
 
-tag = "m_1"
+tag = "ps_1_mid"
 x_lim = -10.0  # faces stay if x coord of their centroid is larger than x_lim
 y_lim = -10.0  # faces stay if y coord of their centroid is larger than y_lim
 
@@ -177,7 +178,7 @@ for fkey, vec in vectors.items():
 # Kmeans Clustering
 # =============================================================================
 
-n_clusters = 5
+n_clusters = 3
 
 data = values
 
@@ -252,7 +253,7 @@ print("MSE Loss: {}".format(mse_loss))
 
 data_collection = {
     "labels": {"values": labels, "cmap": "jet", "bins": True},
-    "deviations": {"values": deviations, "cmap": "RdPu"},
+    "deviations_deg": {"values": deviations, "cmap": "RdPu"},
     "cosine similarity to X": {"values": cosim, "cmap": "RdBu"},
     "magnitudes": {"values": magnitudes, "cmap": "Blues"}
 }
@@ -302,17 +303,16 @@ for i in range(1, len(data_collection) + 1):
 
     cmap = plt.get_cmap(cmap, lut=bins)
 
-    collection.set(array=data, cmap=cmap)
+    collection.set(array=data, cmap=cmap, edgecolor=None)
     
-    # if bins:
-    #     fig.colorbar(collection, label=dataset, ticks=ticks, aspect=50)
-    # else: 
-    #     fig.colorbar(collection, label=dataset, aspect=50)
+    if bins:
+        plt.colorbar(collection, label=dataset, ticks=ticks, aspect=50)
+    else: 
+        plt.colorbar(collection, label=dataset, aspect=50)
 
     # add contour plots
     # contours = PolyCollection(contour_coords, closed=False, linewidth=1.0, facecolors='none')
     # ax.add_collection(contours)
-
 
     title = "K: {}/ Epochs: {} / MSE: {}".format(n_clusters, epochs, round(mse_loss, 2))
 
