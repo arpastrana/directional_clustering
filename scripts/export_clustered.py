@@ -62,10 +62,11 @@ tags = [
 # HERE = "../data/json_files/cantilever_wall_3_1"  # rozvany?
 # HERE = "../data/json_files/square_wall_cantilever"  # michell
 # HERE = "../data/json_files/square_wall_down_res_005"  # schlaich
-# HERE = "../data/json_files/perimeter_supported_slab"  # schlaich
+
 # HERE = "../data/json_files/perimeter_supported_vault_z500mm"  #vault
  
 HERE = "../data/json_files/four_point_slab"
+HERE = "../data/json_files/perimeter_supported_slab"
 
 tag = "m_1"
 x_lim = -10.0  # faces stay if x coord of their centroid is larger than x_lim
@@ -182,7 +183,7 @@ for fkey, vec in vectors.items():
 # Smoothen vectors
 # =============================================================================
 
-smooth_iters = 0
+smooth_iters = 1
 damping = 0.5
 
 if smooth_iters:
@@ -257,9 +258,9 @@ if do_kmeans:
     # furthest seed initialization
     mode = "cosine"  # euclidean or cosine
     eps = 1e-3
-    epochs = 100
+    epochs = 200
     seeds = init_kmeans_farthest(data, n_clusters, mode, epochs, eps)
-    epochs = 100
+    epochs = 200
     km = _kmeans(data, seeds, mode, epochs, eps, early_stopping=False, verbose=True)
     
     labels, centers, losses = km
@@ -310,8 +311,6 @@ for fkey in mesh.faces():
     mesh.face_attribute(key=fkey, name=name_1, value=vec)
 
     vec_2 = cross_vectors(vec, [0.0, 0.0, 1.0])
-    # vec_2 = rotate_points([vec], radians(90.0), origin=mesh.face_centroid(fkey))
-    # vec_2 = vec_2[0]
     mesh.face_attribute(key=fkey, name=name_2, value=vec_2)
     recalibrated_perp[fkey, :] = vec_2
 
