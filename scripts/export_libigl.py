@@ -78,16 +78,16 @@ THERE = "/Users/arpj/code/libraries/libigl/tutorial/508_ARP_MIQ/"
 # HERE = "../data/json_files/perimeter_supported_slab"
 
 HERE = "../data/json_files/four_point_slab"
-HERE = "../data/json_files/four_point_slab_k_7"
-HERE = "../data/json_files/perimeter_supported_slab_k_5"
+# HERE = "../data/json_files/four_point_slab_k_7"
+# HERE = "../data/json_files/perimeter_supported_slab_k_5"
 # HERE = "../data/json_files/perimeter_supported_slab"
+HERE = "../data/json_files/perimeter_supported_vault_z500mm_k_3"  #vault
 
+tag = "n_1_k"
+tag_2 = "n_2_k"
 
-tag = "m_1"
-tag_2 = "m_2"
-
-tag = "m_1_k"
-tag_2 = "m_2_k"
+# tag = "m_1_k"
+# tag_2 = "m_2_k"
 
 x_lim = -10.0  # faces stay if x coord of their centroid is larger than x_lim
 y_lim = -10.0  # faces stay if y coord of their centroid is larger than y_lim
