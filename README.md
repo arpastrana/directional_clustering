@@ -42,18 +42,20 @@ The best way to install `directional_clustering` is to build it from source
 after cloning this repo.
 
 First, we would need to install the latest version of
-[Anaconda](https://www.continuum.io/).
+[Anaconda](https://www.continuum.io/). Anaconda will take care, among many other
+things, of installing scientific computing packages like `numpy` and
+`matplotlib` for us.
 
-Next, create a new `conda` environment from your command line interface
+Next, let's create a new `conda` environment from your command line interface
 (your terminal on macOS or from the anaconda prompt on windows).
-The only required dependencies are `python` version and `compas`.
+The only required dependencies are `python`, `numpy`, `sklearn`, and `compas`.
 
 ```bash
-conda create -n clusters python=3.7 COMPAS=0.16.9
+conda create -n clusters python=3.7 COMPAS=0.16.9 scikit-learn
 conda activate clusters
 ```
 
-We need to clone `directional_clustering` from this repository.
+We should clone `directional_clustering` from this repository.
 If you are a macOS user and want to put it in your home folder:
 
 ```bash
@@ -61,7 +63,7 @@ cd ~
 git clone https://github.com/arpastrana/directional_clustering.git
 ```
 
-Next, Move into the the repository's folder (the one you've just cloned) and
+Next, let's move into the the repository's folder (the one we've just cloned) and
 install `directional_clustering` as an editable package from source using `pip`:
 
 ```bash
@@ -70,7 +72,7 @@ pip install -e .
 ```
 
 To double-check that everything is up and running, still in your command line
-interface, type the following and hit enter:
+interface, let's type the following and hit enter:
 
 ```bash
 python -c "import directional_clustering"

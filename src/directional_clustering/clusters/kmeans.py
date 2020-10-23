@@ -68,12 +68,14 @@ def kmeans_clustering(data, n_clusters, shape=None, normalize=False, random_stat
 
 def rows_squared_norm(M, keepdims=False):
     """
+    Calculate the squared norm of the rows of a 2d matrix.
     """
     return square(rows_norm(M, keepdims))
 
 
 def rows_norm(M, keepdims=False):
     """
+    Calculate the norm of the rows of a 2d matrix.
     """
     return norm(M, ord=2, axis=1, keepdims=keepdims)
 
