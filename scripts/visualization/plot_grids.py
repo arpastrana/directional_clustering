@@ -1,19 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# plt.style.use("dark_background")
-
 from matplotlib.patches import Polygon
 from matplotlib.collections import PatchCollection
 from matplotlib.collections import PolyCollection
-
-from mpl_toolkits.axes_grid1 import AxesGrid
-
-# import mpl_toolkits
-
-# = mpl_toolkits.legacy_colorbar
-
-# legacy_colorbar.rcParam = False
 
 from math import acos
 from math import degrees
@@ -74,10 +64,11 @@ tags = [
 # HERE = "../data/json_files/square_wall_cantilever"  # michell
 # HERE = "../data/json_files/square_wall_down"  # schlaich
 # HERE = "../data/json_files/perimeter_supported_slab"
-HERE = "../data/json_files/four_point_slab"
+# HERE = "../data/json_files/four_point_slab"
+HERE = "../../data/json_files/perimeter_supported_vault_z500mm"
 
 
-tag = "m_1"
+tag = "ps_1_mid"
 x_lim = -10.0  # faces stay if x coord of their centroid is larger than x_lim
 y_lim = -10.0  # faces stay if y coord of their centroid is larger than y_lim
 
@@ -184,7 +175,99 @@ for fkey, vec in vectors.items():
     squared_values[fkey,:] = scale_vector(vec, length_vector_sqrd(vec))
 
 # =============================================================================
-# Plotting stuff
+# Kmeans Clustering
+# =============================================================================
+
+n_clusters = 3
+
+data = values
+
+print("Clustering started...")
+
+# furthest seed initialization
+mode = "cosine"  # euclidean or cosine
+eps = 1e-3
+epochs = 50
+seeds = init_kmeans_farthest(data, n_clusters, mode, epochs, eps)
+km = _kmeans(data, seeds, mode, epochs, eps, early_stopping=False, verbose=True)
+
+labels, centers, losses = km
+
+print("loss kmeans", losses[-1])
+print("Clustering ended!")
+
+# =============================================================================
+# Assign clusters
+# =============================================================================
+
+clustered_values = centers[labels]
+
+# =============================================================================
+# Recalibrate centers to account for raw magnitudes
+# =============================================================================
+
+base = values
+
+recalibrated_values = np.zeros(clustered_values.shape)
+for i in range(n_clusters):
+    face_indices = np.nonzero(labels==i)
+    new_vector = np.mean(base[face_indices], axis=0)
+    recalibrated_values[face_indices] = new_vector
+
+# =============================================================================
+# Calculate magnitudes
+# =============================================================================
+
+base = values
+
+magnitudes = np.zeros(mesh.number_of_faces())
+for fkey in mesh.faces():
+    vec = base[fkey, :]
+    magnitudes[fkey] = np.linalg.norm(vec)
+
+# =============================================================================
+# Calculate resulting deviation
+# =============================================================================
+
+base = values
+target = clustered_values
+
+deviations = np.zeros(mesh.number_of_faces())
+for fkey in mesh.faces():
+    deviations[fkey] = angle_vectors(base[fkey], target[fkey], deg=True)
+
+# =============================================================================
+# Compute MSE Loss
+# =============================================================================
+
+losses = np.zeros(mesh.number_of_faces())
+for fkey in mesh.faces():    
+    losses[fkey] = length_vector_sqrd(subtract_vectors(base[fkey], target[fkey]))
+mse_loss = np.mean(deviations)
+
+print("MSE Loss: {}".format(mse_loss))
+
+# =============================================================================
+# Data to color
+# =============================================================================
+
+data_collection = {
+    "labels": {"values": labels, "cmap": "jet", "bins": True},
+    "deviations_deg": {"values": deviations, "cmap": "RdPu"},
+    "cosine similarity to X": {"values": cosim, "cmap": "RdBu"},
+    "magnitudes": {"values": magnitudes, "cmap": "Blues"}
+}
+
+# =============================================================================
+# Draw cluster contours
+# =============================================================================
+
+centers_cosim = np.array([cosine_similarity(ref_cosim, vec) for vec in centers])
+labels_cosim = np.array([cosine_similarity(ref_cosim, vec) for vec in clustered_values]) 
+cluster_contours = contour_polygons(mesh, centers_cosim, labels_cosim)
+
+# =============================================================================
+# Draw subplots
 # =============================================================================
 
 face_coords = []
@@ -192,167 +275,59 @@ for fkey in mesh.faces():
     f_coords = [point[0:2] for point in mesh.face_coordinates(fkey)]
     face_coords.append(f_coords)
 
-# =============================================================================
-# Kmeans Clustering
-# =============================================================================
-
-data_collection = {}
-row_names = []
-col_names = []
-
-mode = "cosine"  # euclidean or cosine
-eps = 1e-3
-data = values
-
-name = HERE.split("/")[-1]
-title = "{}-{}-smooth_{}-{}-farthest".format(name, tag, smooth_iters, mode)
-
-# fig, axes = plt.subplots(nrows=2, ncols=4, figsize=(16, 9), dpi=100)
+contour_coords = []
+for contour in cluster_contours:
+    contour_coords.append(contour.get("points"))
 
 fig = plt.figure(figsize=(16, 9), dpi=100)
-axes = AxesGrid(
-    fig,
-    111,
-    nrows_ncols=(1, 4),
-    axes_pad=0.60,
-    cbar_mode="each",  # single, each, edge
-    cbar_location="left",
-    cbar_pad=0.1,
-    label_mode="all",
-    share_all=True
-)
 
-i = 0
-for n_clusters in range(3, 4):
+data_keys = list(data_collection.keys())
 
-    row_names.append("k {}".format(n_clusters))
+for i in range(1, len(data_collection) + 1):
+    ax = fig.add_subplot(1, 4, i)
 
-    data_collection[i] = {}
+    ax.set_xticks([])
+    ax.set_yticks([])
 
-    j = 0
-    for epochs in range(5, 25, 5):
-        col_names.append("{} epochs".format(epochs))
+    collection = PatchCollection([Polygon(face) for face in face_coords])
+    ax.add_collection(collection)
 
-        print("***")
-        print("Clustering began. k={} - epochs={}.".format(n_clusters, epochs))
+    dataset = data_keys[i-1]
+    data = data_collection[dataset]["values"]
+    cmap = data_collection[dataset]["cmap"]
+    bins = data_collection[dataset].get("bins")
 
-        seeds = init_kmeans_farthest(data, n_clusters, mode, epochs, eps)
-        km = _kmeans(data, seeds, mode, epochs, eps, early_stopping=False, verbose=True)
-        labels, centers, losses = km
+    if bins:
+        bins = np.amax(data) + 1
+        ticks = range(bins)
 
-        print("loss kmeans", losses[-1])
-        print("Clustering complete!")
+    cmap = plt.get_cmap(cmap, lut=bins)
 
-# =============================================================================
-# Assign clusters
-# =============================================================================
+    collection.set(array=data, cmap=cmap, edgecolor=None)
+    
+    if bins:
+        plt.colorbar(collection, label=dataset, ticks=ticks, aspect=50)
+    else: 
+        plt.colorbar(collection, label=dataset, aspect=50)
 
-        clustered_values = centers[labels]
-        base = values
-        target = clustered_values
+    # add contour plots
+    # contours = PolyCollection(contour_coords, closed=False, linewidth=1.0, facecolors='none')
+    # ax.add_collection(contours)
 
-# =============================================================================
-# Calculate magnitudes
-# =============================================================================
+    title = "K: {}/ Epochs: {} / MSE: {}".format(n_clusters, epochs, round(mse_loss, 2))
 
-        magnitudes = np.zeros(mesh.number_of_faces())
-        deviations = np.zeros(mesh.number_of_faces())
-        losses = np.zeros(mesh.number_of_faces())
+    ax.set_title(title)
+    ax.set_aspect("equal")
 
-        for fkey in mesh.faces():
-            # magnitudes
-            vec = base[fkey, :]
-            magnitudes[fkey] = np.linalg.norm(vec)
+    ax.set_frame_on(False)
+    ax.autoscale()
 
-            # deviations
-            deviations[fkey] = angle_vectors(base[fkey], target[fkey], deg=True)
-
-            # losses
-            losses[fkey] = length_vector_sqrd(subtract_vectors(base[fkey], target[fkey]))
-        
-        mse_loss = np.mean(losses)
-        print("MSE Loss: {}".format(mse_loss))
-
-# =============================================================================
-# Draw cluster contours
-# =============================================================================
-
-        centers_cosim = np.array([cosine_similarity(ref_cosim, vec) for vec in centers])
-        labels_cosim = np.array([cosine_similarity(ref_cosim, vec) for vec in clustered_values]) 
-        cluster_contours = contour_polygons(mesh, centers_cosim, labels_cosim)
-
-        contour_coords = []
-        for contour in cluster_contours:
-            contour_coords.append(contour.get("points"))
-
-# =============================================================================
-# Increase count and append data
-# =============================================================================
-
-        data_collection[i][j] = {
-            "magnitudes": [magnitudes, "Blues"],
-            "deviations": [deviations, "RdPu"],
-            "labels": [labels, "jet"],
-            "mse_loss": mse_loss,
-            "contours": contour_coords
-        }
-
-        j += 1
-    i += 1
-
-# =============================================================================
-# Draw subplots
-# =============================================================================
-
-to_plot = "deviations"
-
-# for ax_row, row in zip(axes.axes_row, row_names):
-#     for ax in ax_row:
-#         ax.set_ylabel(row, rotation=0, size="large", labelpad=20)
-
-faces = []
-
-for a in range(i):
-    for b in range(j):
-
-        ax = axes.axes_row[a][b]
-
-        ax.set_xticks([])
-        ax.set_yticks([])
-        ax.set_frame_on(False)
-
-        collection = PatchCollection([Polygon(face) for face in face_coords])
-        ax.add_collection(collection)
-
-        deviations, cmap = data_collection[a][b][to_plot]
-
-        collection.set(array=deviations, cmap=cmap)
-
-        ax.cax.colorbar(collection)
-
-        contours = data_collection[a][b]["contours"]
-
-        contours = PolyCollection(contours, closed=False, linewidth=1.0, facecolors='none', edgecolor="black")
-        ax.add_collection(contours)
-
-        mse_loss = data_collection[a][b]["mse_loss"]
-
-        xlabel = "loss: {}".format(round(mse_loss, 2))
-        ax.set_xlabel(xlabel)
-        
-        ax.set_aspect("equal")
-        ax.autoscale(tight=True)
-
-
-# cb = ax.cax.colorbar(collection)
-# cb.aspect = 50
-
-fig.tight_layout(rect=[0.0, 0.03, 1.0, 0.95])
-
-fig.suptitle(title)
+plt.tight_layout()
+plt.show()
 
 # =============================================================================
 # Show
 # =============================================================================
 
 plt.show()
+
