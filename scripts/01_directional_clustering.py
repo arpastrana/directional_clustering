@@ -13,7 +13,7 @@ from compas.geometry import length_vector_sqrd
 # which you can find in the src/directional_clustering folder
 from directional_clustering.geometry import laplacian_smoothed
 from directional_clustering.clusters import init_kmeans_farthest
-from directional_clustering.clusters import _kmeans
+from directional_clustering.clusters import kmeans
 from directional_clustering.plotters import ClusterPlotter
 from directional_clustering.plotters import rgb_colors
 
@@ -200,7 +200,7 @@ seeds = init_kmeans_farthest(vectors_array, n_clusters, mode, epochs_seeds, eps)
 # every vector and the centroid of the cluster it is assigned to
 # the goal of kmeans is to minimize this loss function
 
-labels, centers, losses = _kmeans(vectors_array, seeds, mode, epochs_kmeans, eps, early_stopping=True, verbose=True)
+labels, centers, losses = kmeans(vectors_array, seeds, mode, epochs_kmeans, eps, early_stopping=True, verbose=True)
 
 print("loss kmeans", losses[-1])
 print("Clustering ended!")
