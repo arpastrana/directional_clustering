@@ -2,10 +2,7 @@ from math import fabs
 
 from numpy import array
 from numpy import arange
-from numpy import amax
 from numpy import random
-from numpy import reshape
-from numpy import float64
 from numpy import isnan
 from numpy import square
 from numpy import nonzero
@@ -16,8 +13,6 @@ from numpy import argmin
 from numpy import argmax
 from numpy import dot
 from numpy import min
-from numpy import abs
-from numpy import log
 from numpy import exp
 from numpy import sum
 from numpy import hstack
@@ -26,44 +21,15 @@ from numpy import diagonal
 
 from numpy.linalg import norm
 
-from sklearn.cluster import KMeans
-from sklearn.metrics.pairwise import cosine_distances
-from sklearn.metrics.pairwise import euclidean_distances
 from sklearn.metrics.pairwise import pairwise_distances
 
 from time import time
 
 
 __all__ = [
-    "kmeans_clustering",
-    "kmeans_fit",
     "init_kmeans_farthest",
-    "_kmeans"
+    "kmeans"
     ]
-
-
-def kmeans_clustering(data, n_clusters, shape=None, normalize=False, random_state=0, n_jobs=-1):
-
-    assert isinstance(data, dict)
-
-    np_data = [x[1] for x in data.items()]
-    np_data = array(np_data, dtype=float64)
-
-    if normalize:
-        np_data = np_data / amax(np_data)
-
-    if reshape:
-        np_data = reshape(np_data, shape)
-
-    print()
-    print("fitting {} clusters".format(n_clusters))
-    t0 = time()
-
-    km = KMeans(n_clusters=n_clusters, random_state=random_state, n_jobs=n_jobs)
-    km.fit(np_data)
-
-    print("done in {} s, number of iterations: {}".format((time() - t0), km.n_iter_))
-    return km.labels_, km.cluster_centers_
 
 
 def rows_squared_norm(M, keepdims=False):
@@ -128,7 +94,7 @@ def init_kmeans_farthest(X, k, dist="euclidean", epochs=20, eps=1e-3, replace=Fa
     W = init_kmeans(X, 1, replace)
 
     for i in range(k-1):
-        labels, W, _ = _kmeans(X, W, dist, epochs, eps, False, False)
+        labels, W, _ = kmeans(X, W, dist, epochs, eps, False, False)
 
         values = W[labels]
 
@@ -248,17 +214,9 @@ def estimate_centroids(X, k, assoc):
 
     return W
 
-
-def kmeans_fit(X, k, dist="euclidean", epochs=20, eps=1e-3, early_stopping=True, verbose=True):
+def kmeans(X, W, dist, epochs, eps, early_stopping, verbose):
     """
-    """
-    W = init_kmeans(X, k)  # initialize centroids
-
-    return _kmeans(X, W, dist, epochs, eps, early_stopping, verbose)
-
-
-def _kmeans(X, W, dist, epochs, eps, early_stopping, verbose):
-    """
+    Main kmeans method
     """
     k, d = W.shape
 
@@ -289,6 +247,7 @@ def _kmeans(X, W, dist, epochs, eps, early_stopping, verbose):
 
 
 if __name__ == "__main__":
+
     import numpy as np
     import math
 
@@ -324,88 +283,3 @@ if __name__ == "__main__":
          print(loss)
     
     print("Tests passed!")
-
-    # ====
-
-    import matplotlib.pyplot as plt
-    from numpy import random as R
-    import numpy as np
-
-    def norm_rows(M):
-        return M / np.sqrt(np.sum(M * M, axis=1, keepdims=True))
-
-
-    def plot_sample(X, C, bb=[], ms=10, colors='bgrcmk'):
-        if X.shape[1] > 2: # if there is more than 2 columns, project
-            _, v = np.linalg.eig(X.T @ X)
-            v = np.array(v, dtype=np.float32)
-            # v[:,0:2] is the two most significant eigenvectors
-            # X @ v[:,0:2] projects X onto these two eigenvectors
-            Xplot = X @ v[:,0:2]
-        else:  # otherwise, just plot the data as it is
-            Xplot = X
-        from itertools import cycle
-        k = int(C.max()) + 1
-        fig = plt.figure('Sample (Projected)', figsize=(8,8))
-        if bb != []:
-            plt.xlim(bb[0]), plt.ylim(bb[1])
-        cycol = cycle(colors)
-        for i in range(k):
-            ind = C == i
-            col = next(cycol)
-            plt.scatter(Xplot[ind,0], Xplot[ind,1], s=ms, c=col)
-
-
-    def generate_mixture_params(k, d, iso=True, sep=1):
-        Pi = np.exp(R.randn(k) / np.sqrt(k))
-        Pi = Pi / sum(Pi)
-        Mu = sep * norm_rows(R.randn(k, d))
-        Si  = [] 
-        for i in range(k):
-            A = R.randn(d, 3 * d) 
-            A = A @ A.T
-            A = np.linalg.det(A) ** (-1/k) * A # To prevent spikiness
-            if iso:
-                A = np.diag(np.diag(A))
-            Si.append(A)
-        Si = np.array(Si)
-        return (Pi, Mu, Si)
-    
-
-    def sample_from_mog(mog, n):
-        Pi, Mu, Si = mog
-        k, d = Mu.shape
-        s = R.multinomial(n, Pi)
-        X = np.zeros((n, d))
-        C = np.zeros(n)
-        po = 0
-        for i in range(k):
-            pn = po + s[i]
-            X[po:pn,:] = R.multivariate_normal(Mu[i], Si[i], s[i])
-            C[po:pn] = i
-            po = pn
-        return C, X
-
-
-    n, d, k = 10000, 20, 5
-    mog = generate_mixture_params(k, d, iso=False, sep=np.sqrt(k/d))
-    C, X = sample_from_mog(mog, n)
-    plot_sample(X, C)
-    plt.show()
-
-    assoc, W1, loss = kmeans_fit(X, 1, verbose=False)
-    print('[{:-2}/{:-2}] {:7.0}'.format(1, 1, loss[-1]))
-
-    bl = loss[-1] * np.ones(3 * k)
-    nz = np.zeros(3 * k, dtype=int)
-
-    for test_k in np.arange(2, 2 * k + 1):
-        
-        for e in range(100):
-            assoc, W, loss = kmeans_fit(X, test_k, verbose=False)
-        
-            if loss[-1] < bl[test_k]:
-                bl[test_k] = loss[-1]
-                nz[test_k] = (rows_squared_norm(W) != 0).sum().item()
-        
-        print('[{:-2}/{:-2}] {:-7.4}'.format(nz[test_k], test_k, bl[test_k].round(4)))
