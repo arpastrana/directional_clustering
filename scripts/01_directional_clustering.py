@@ -55,7 +55,7 @@ vectorfield_tags= [
 # The JSON files are stored in the data/json_files folder
 # I am working on MacOS, so the format might be slightly different on Windows
 JSON_IN = "../data/json_files/perimeter_supported_slab.json"
-JSON_OUT = "../data/json_files/perimeter_supported_slab.json"
+JSON_OUT = "../data/json_files/perimeter_supported_slab_k_5.json"
 
 # vector field
 vectorfield_tag = "m_1"  # the vector field to base the clustering on
@@ -81,7 +81,7 @@ export_json = False
 
 # plotter flags
 draw_faces = True
-draw_vector_fields = True
+draw_vector_fields = False
 
 # ==============================================================================
 # Import a COMPAS mesh
