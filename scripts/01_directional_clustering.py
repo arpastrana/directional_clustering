@@ -285,7 +285,7 @@ if draw_vector_fields:
     va = vectors_array  # shorthand
     plotter.draw_vector_field_array(va, (50, 50, 50), True, 0.07, 0.5)
     # clustered vector field
-    plotter.draw_vector_field_array(clusters, (0, 0, 255), True, 0.07, 1.0)
+    # plotter.draw_vector_field_array(clusters, (0, 0, 255), True, 0.07, 1.0)
 
 #  show to screen
 plotter.show()
