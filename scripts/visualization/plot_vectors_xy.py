@@ -8,14 +8,11 @@ from math import fabs
 from sklearn.cluster import KMeans
 from sklearn.cluster import SpectralClustering
 
-from directional_clustering.geometry import clockwise
 from directional_clustering.geometry import laplacian_smoothed
 from directional_clustering.geometry import cosine_similarity
-from directional_clustering.geometry import contour_polygons
 
-from directional_clustering.clusters import kmeans_fit
 from directional_clustering.clusters import init_kmeans_farthest
-from directional_clustering.clusters import _kmeans
+from directional_clustering.clusters import kmeans
 
 from directional_clustering.plotters import ClusterPlotter
 from directional_clustering.plotters import rgb_colors
@@ -259,7 +256,7 @@ if do_kmeans:
     epochs = 10
     seeds = init_kmeans_farthest(data, n_clusters, mode, epochs, eps)
     epochs = 20
-    km = _kmeans(data, seeds, mode, epochs, eps, early_stopping=False, verbose=True)
+    km = kmeans(data, seeds, mode, epochs, eps, early_stopping=False, verbose=True)
     
     labels, centers, losses = km
 
