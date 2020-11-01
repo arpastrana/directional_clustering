@@ -1,8 +1,9 @@
 language: python
 
+# python versions to test in
 python:
 - "2.7"
-- "3.6"
+- "3.7"
 
 before_install:
 - pip install --upgrade pip
@@ -11,5 +12,13 @@ before_install:
 install:
 - pip install --process-dependency-links --no-cache-dir -r requirements-dev.txt
 
+# this will run all tests in the ./tests folder 
 script:
 - invoke test
+
+# safe list (specifies what branches to build on github)
+branches:
+  only:
+  - master
+  - apc524
+  - travis
