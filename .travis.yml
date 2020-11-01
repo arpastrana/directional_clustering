@@ -10,7 +10,7 @@ before_install:
 - pip install Cython --install-option="--no-cython-compile"
 
 install:
-- pip install --process-dependency-links --no-cache-dir -r requirements-dev.txt
+- pip install --no-cache-dir -r requirements-dev.txt
 
 # this will run all tests in the ./tests folder 
 script:
