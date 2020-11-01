@@ -1,3 +1,6 @@
+# os
+import os
+
 # good ol' numpy and matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,6 +17,7 @@ from compas.geometry import length_vector
 
 # this are custom-written functions part of this library
 # which you can find in the src/directional_clustering folder
+from directional_clustering import JSON
 from directional_clustering.geometry import laplacian_smoothed
 from directional_clustering.geometry import cosine_similarity
 from directional_clustering.clusters import init_kmeans_farthest
@@ -59,7 +63,8 @@ vectorfield_tags= [
 # Relative path to the JSON file stores the vector fields and the mesh info
 # The JSON files are stored in the data/json_files folder
 # I am working on MacOS, so the format might be slightly different on Windows
-JSON_IN = "../data/json_files/perimeter_supported_slab.json"
+name_in = "perimeter_supported_slab.json"
+JSON_IN = os.path.abspath(os.path.join(JSON, name_in))
 
 # vector field
 vectorfield_tag = "m_1"  # the vector field to base the clustering on
