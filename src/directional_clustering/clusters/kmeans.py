@@ -28,7 +28,12 @@ from time import time
 
 __all__ = [
     "init_kmeans_farthest",
-    "kmeans"
+    "kmeans",
+    "rows_squared_norm",
+    "rows_norm",
+    "init_kmeans",
+    "associate_centroids_cosine",
+    "estimate_centroids"
     ]
 
 
@@ -213,6 +218,7 @@ def estimate_centroids(X, k, assoc):
         W[i] = centroid
 
     return W
+
 
 def kmeans(X, W, dist, epochs, eps, early_stopping, verbose):
     """
