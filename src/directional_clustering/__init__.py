@@ -30,7 +30,10 @@ HERE = os.path.dirname(__file__)
 HOME = os.path.abspath(os.path.join(HERE, "../../"))
 DATA = os.path.abspath(os.path.join(HOME, "data"))
 DOCS = os.path.abspath(os.path.join(HOME, "docs"))
+JSON = os.path.abspath(os.path.join(HOME, 'data/json_files/'))
+SCRIPTS = os.path.abspath(os.path.join(HOME, 'scripts'))
 TEMP = os.path.abspath(os.path.join(HOME, "temp"))
+TESTS = os.path.abspath(os.path.join(HOME, 'tests'))
 
 # Check if package is installed from git
 # If that's the case, try to append the current head's hash to __version__
@@ -53,4 +56,4 @@ try:
 except Exception:
     pass
 
-__all__ = ["HOME", "DATA", "DOCS", "TEMP"]
+__all__ = ["HOME", "DATA", "DOCS", "TEMP", "TESTS"]

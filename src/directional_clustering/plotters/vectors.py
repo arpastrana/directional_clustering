@@ -84,13 +84,13 @@ def plot_kmeans_vectors(data, labels, centroids, normalize=False, scale_to_max=F
         x = X[:, 0]
         y = X[:, 1]
 
-        # kcolor = array([[i/255.0 for i in i_to_rgb(center / max_angle)]])
+        # kcolor = array([[i/255.0 for i in i_to_rgb(center / max_angle)]])
 
         # rcenter = round(center, 2)
         # rdegcenter = round(degrees(center), 2)
         # msg = "{} rad / {} deg".format(rcenter, rdegcenter)
 
-        # plt.scatter(x, y, c=kcolor, alpha=0.3, label=msg, s=scales[idx])
+        # plt.scatter(x, y, c=kcolor, alpha=0.3, label=msg, s=scales[idx])
         plt.scatter(x, y, alpha=0.3)
 
         if draw_centroids:
@@ -108,7 +108,7 @@ def plot_kmeans_vectors(data, labels, centroids, normalize=False, scale_to_max=F
 
     plt.xlabel("x")
     plt.ylabel("y")
-    # plt.title("{}".format(name))
+    # plt.title("{}".format(name))
 
     # plt.legend()
     plt.show()

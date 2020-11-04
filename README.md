@@ -2,9 +2,6 @@
 
 Directional clustering of vector fields on meshes.
 
-**Warning**: Major refactoring in progress! Check the apc524 branch for the
-latest updates.
-
 ## Introduction
 
 The initial motivation of this work revolved around principal stress fields.
