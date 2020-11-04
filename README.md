@@ -2,8 +2,7 @@
 
 Directional clustering of vector fields on meshes.
 
-**Warning**: Major refactoring in progress! Check the apc524 branch for the
-latest updates.
+**Warning**: Major refactoring in progress! Check the `develop` branch for the latest updates.
 
 ## Introduction
 
