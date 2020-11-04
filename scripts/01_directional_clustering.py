@@ -21,8 +21,6 @@ from directional_clustering.clusters import kmeans
 from directional_clustering.plotters import ClusterPlotter
 from directional_clustering.plotters import rgb_colors
 
-from directional_clustering.clustering import CosineKMeans
-
 # =============================================================================
 # Available Vector Fields
 # =============================================================================
@@ -195,12 +193,13 @@ print("Clustering started...")
 # i use here another heuristic which iteratively to find the initial seeds
 # using a furthest point strategy, which basically picks as a new seed the
 # vector which is the "most distant" at a given iteration using kmeans itself
+#
 # These seeds will be used later on as input to start the final kmeans run.
- 
-# Create an instance of Cosine K-Means
-kmeans = CosineKMeans(vectors_array, n_clusters, epochs_seeds, epochs_kmeans, eps)
+
+seeds = init_kmeans_farthest(vectors_array, n_clusters, mode, epochs_seeds, eps)
 
 # do kmeans clustering
+# what this method returns are three numpy arrays
 # labels contains the cluster index assigned to every vector in the vector field
 # centers contains the centroid of every cluster (the average of all vectors in
 # a cluster), and losses stores the losses generated per epoch. 
@@ -208,14 +207,13 @@ kmeans = CosineKMeans(vectors_array, n_clusters, epochs_seeds, epochs_kmeans, ep
 # every vector and the centroid of the cluster it is assigned to
 # the goal of kmeans is to minimize this loss function
 
-kmeans.cluster()
+labels, centers, losses = kmeans(vectors_array, seeds, mode, epochs_kmeans, eps, early_stopping=True, verbose=True)
 
-print("Loss Clustering: {}".format(kmeans.loss))
+print("loss kmeans", losses[-1])
 print("Clustering ended!")
 
 # make an array with the assigned labels of all vectors
-clusters = kmeans.clusters
-labels = kmeans.labels
+clusters = centers[labels]
 
 # ==============================================================================
 # Compute mean squared error "loss" of clustering w.r.t. original vector field
