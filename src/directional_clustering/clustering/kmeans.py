@@ -1,6 +1,6 @@
-import numpy as np
-
 from math import fabs
+
+import numpy as np
 
 from sklearn.metrics.pairwise import pairwise_distances
 
@@ -31,7 +31,7 @@ class CosineKMeans(ClusteringAlgorithm):
 
         # to be set after initialization
         self.seeds = None
-        
+
         # to be set after running cluster()
         self.clusters = None
         self.cluster_centers = None
@@ -55,7 +55,7 @@ class CosineKMeans(ClusteringAlgorithm):
         replace : `bool`
             Flag to sample with or without replacement.
             Defaults to `False`.
-        
+
         Returns
         -------
         W : `np.array`, shape (k, d)
@@ -76,13 +76,13 @@ class CosineKMeans(ClusteringAlgorithm):
 
             distances = pairwise_distances(X, values, metric="cosine")
             distances = np.diagonal(distances).reshape(-1, 1)
-        
+
             index = np.argmax(distances, axis=0)
             farthest = X[index, :]
             W = np.vstack([W, farthest])
 
         self.seeds = W
-    
+
     def cluster(self):
         """
         Main clustering method
@@ -119,7 +119,7 @@ class CosineKMeans(ClusteringAlgorithm):
 
             loss, assoc = associate_centroids_cosine(X, W)
             losses.append(loss)
-            
+
             W = estimate_centroids(X, k, assoc)
 
             if i < 2 or not early_stopping:

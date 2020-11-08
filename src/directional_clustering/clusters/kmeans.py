@@ -28,7 +28,10 @@ from time import time
 
 __all__ = [
     "init_kmeans_farthest",
-    "kmeans"
+    "init_kmeans",
+    "kmeans",
+    "associate_centroids_cosine",
+    "estimate_centroids"
     ]
 
 
