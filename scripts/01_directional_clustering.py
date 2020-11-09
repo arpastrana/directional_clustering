@@ -12,7 +12,6 @@ from compas.geometry import dot_vectors
 from compas.geometry import subtract_vectors
 from compas.geometry import length_vector_sqrd
 
-# this are custom-written functions part of this library
 # which you can find in the src/directional_clustering folder
 from directional_clustering import JSON
 from directional_clustering.geometry import laplacian_smoothed
@@ -123,8 +122,8 @@ for fkey in mesh.faces():
 # concretely, a vector can be pointing to [1, 1] or to [-1, 1] but for archi-
 # tectural and structural reasons this would be the same, because both versions
 # are colinear.
-# 
-# in short, mitigating directional duplicity is something we are kind of 
+#
+# in short, mitigating directional duplicity is something we are kind of
 # sorting out with a heuristic. this will eventually improve the quality of the
 # clustering
 #
@@ -133,7 +132,7 @@ for fkey in mesh.faces():
 # x and global y vectors as references, which have worked ok for my purposes.
 
 if align_vectors:
-    for fkey, vector in vectors.items():    
+    for fkey, vector in vectors.items():
         # if vectors don't point in the same direction
         if dot_vectors(alignment_ref, vector) < 0.0:
             vectors[fkey] = scale_vector(vector, -1)  # reverse it
@@ -146,7 +145,7 @@ if align_vectors:
 # vector field will be very noisy, especially around "singularities".
 # this means there can be drastic orientation jumps/flips between two vectors
 # which will affect the quality of the clustering.
-# to mitigate this, we apply laplacian smoothing which helps to soften and 
+# to mitigate this, we apply laplacian smoothing which helps to soften and
 # preserve continuity between adjacent vectors
 # what this basically does is going through every face in the mesh,
 # querying what are their neighbor faces, and then averaging the vectors stored
@@ -161,7 +160,8 @@ if smooth_iters:
     vectors = laplacian_smoothed(mesh, vectors, smooth_iters, damping)
 
 # ==============================================================================
-# Do K-means Clustering ================================================================================
+# Do K-means Clustering
+# ==============================================================================
 
 # functions related to kmeans are in src/directional_clustering/clusters/
 
@@ -202,12 +202,18 @@ seeds = init_kmeans_farthest(vectors_array, n_clusters, mode, epochs_seeds, eps)
 # what this method returns are three numpy arrays
 # labels contains the cluster index assigned to every vector in the vector field
 # centers contains the centroid of every cluster (the average of all vectors in
-# a cluster), and losses stores the losses generated per epoch. 
+# a cluster), and losses stores the losses generated per epoch.
 # the loss is simply the mean squared error of the cosine distance between
 # every vector and the centroid of the cluster it is assigned to
 # the goal of kmeans is to minimize this loss function
 
-labels, centers, losses = kmeans(vectors_array, seeds, mode, epochs_kmeans, eps, early_stopping=True, verbose=True)
+labels, centers, losses = kmeans(vectors_array,
+                                 seeds,
+                                 mode,
+                                 epochs_kmeans,
+                                 eps,
+                                 early_stopping=True,
+                                 verbose=True)
 
 print("loss kmeans", losses[-1])
 print("Clustering ended!")
@@ -262,12 +268,12 @@ if export_json:
 # =============================================================================
 
 # there is a lot of potential work to do for visualization!
-# below there is the simplest snippet, but you can see more stuff 
+# below there is the simplest snippet, but you can see more stuff
 # in the scripts/visualization folder
 
 # ClusterPlotter is a custom wrapper around a COMPAS MeshPlotter
 # the COMPAS MeshPlotter is built atop of pure Matplotlib (which is crazy)
-# what is different here is that I extended the plotter so that it can plot 
+# what is different here is that I extended the plotter so that it can plot
 # vector fields directly as little lines via
 # ClusterPlotter.draw_vector_field_array()
 plotter = ClusterPlotter(mesh, figsize=(12, 9))
