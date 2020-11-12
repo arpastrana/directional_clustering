@@ -31,5 +31,6 @@ from __future__ import print_function
 from .abstract_clustering import *
 from .kmeans import *
 from .variational_kmeans import *
+from .clustering_factory import *
 
 __all__ = [name for name in dir() if not name.startswith('_')]
