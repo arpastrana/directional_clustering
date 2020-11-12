@@ -20,7 +20,8 @@ class CosineKMeans(ClusteringAlgorithm):
     """
     K-means clustering using cosine distance as association metric.
     """
-    def __init__(self, vector_field, n_clusters, n_init, max_iter=100, tol=0.001):
+    def __init__(self, mesh, vector_field, n_clusters, n_init, max_iter=100, tol=0.001):
+        self.mesh = mesh  # unused, needs refactoring
         self.vector_field = vector_field
 
         self.n_clusters = n_clusters
@@ -36,7 +37,7 @@ class CosineKMeans(ClusteringAlgorithm):
         self.clusters = None
         self.cluster_centers = None
         self.labels = None
-        self.loss = None 
+        self.loss = None
         self.n_iter = None
 
         # create seeds

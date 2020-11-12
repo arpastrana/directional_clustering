@@ -7,22 +7,24 @@ import numpy as np
 # this are ready-made functions from COMPAS (https://compas.dev)
 from compas.datastructures import Mesh
 
+# geometry helpers
 from compas.geometry import scale_vector
 from compas.geometry import dot_vectors
 from compas.geometry import subtract_vectors
 from compas.geometry import length_vector_sqrd
 
+# clustering algorithms factory
+from directional_clustering.clustering import ClusteringFactory
+
 # this are custom-written functions part of this library
 # which you can find in the src/directional_clustering folder
 from directional_clustering import JSON
+from directional_clustering.plotters import ClusterPlotter
 from directional_clustering.geometry import laplacian_smoothed
 from directional_clustering.clusters import init_kmeans_farthest
 from directional_clustering.clusters import kmeans
-from directional_clustering.plotters import ClusterPlotter
 from directional_clustering.plotters import rgb_colors
 
-from directional_clustering.clustering import CosineKMeans
-from directional_clustering.clustering import VariationalKMeans
 
 # =============================================================================
 # Available Vector Fields
@@ -76,15 +78,16 @@ alignment_ref = [1.0, 0.0, 0.0]  # global x
 # alignment_ref = [0.0, 1.0, 0.0]  # global y
 
 # smoothing
-smooth_iters = 0  # how many iterations to run the smoothing for
+smooth_iters = 10  # how many iterations to run the smoothing for
 damping = 0.5  # damping coefficient, a value from 0 to 1
 
 # kmeans clustering
+clustering_name = "variational kmeans" # algorithm name
 n_clusters = 5  # number of clusters to produce
 mode = "cosine"  # "cosine" or "euclidean"
 eps = 1e-6  # loss function threshold for early stopping
 epochs_seeds = 100  # number of epochs to run the farthest seeding for
-epochs_kmeans = 30  # number of epochs to run kmeans clustering for
+epochs_kmeans = 30 # number of epochs to run kmeans clustering for
 
 # exporting
 export_json = False
@@ -102,11 +105,6 @@ mesh = Mesh.from_json(JSON_IN)
 # ==============================================================================
 # Extract vector field from COMPAS mesh for clustering
 # ==============================================================================
-
-# first, create a dict mapping from face keys to indices to remember what
-# vector belonged to what face. This will be handy when we plot the clustering
-# results
-fkey_idx = {fkey: index for index, fkey in enumerate(mesh.faces())}
 
 # store vector field in a dictionary where keys are the mesh face keys
 # and the values are the vectors located at every face
@@ -200,8 +198,8 @@ print("Clustering started...")
 # These seeds will be used later on as input to start the final kmeans run.
  
 # Create an instance of Cosine K-Means
-# kmeans = CosineKMeans(vectors_array, n_clusters, epochs_seeds, epochs_kmeans, eps)
-kmeans = VariationalKMeans(mesh, vectors_array, n_clusters, epochs_seeds, epochs_kmeans, eps, True)
+clustering_algorithm = ClusteringFactory.create(clustering_name)
+clusterer = clustering_algorithm(mesh, vectors_array, n_clusters, epochs_seeds, epochs_kmeans, eps)
 
 # do kmeans clustering
 # labels contains the cluster index assigned to every vector in the vector field
@@ -211,14 +209,14 @@ kmeans = VariationalKMeans(mesh, vectors_array, n_clusters, epochs_seeds, epochs
 # every vector and the centroid of the cluster it is assigned to
 # the goal of kmeans is to minimize this loss function
 
-kmeans.cluster()
+clusterer.cluster()
 
 print("Loss Clustering: {}".format(kmeans.loss))
 print("Clustering ended!")
 
 # make an array with the assigned labels of all vectors
-clusters = kmeans.clusters
-labels = kmeans.labels
+clusters = clusterer.clusters
+labels = clusterer.labels
 
 # ==============================================================================
 # Compute mean squared error "loss" of clustering w.r.t. original vector field
