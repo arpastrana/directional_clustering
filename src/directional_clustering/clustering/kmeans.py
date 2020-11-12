@@ -31,7 +31,7 @@ class CosineKMeans(ClusteringAlgorithm):
 
         # to be set after initialization
         self.seeds = None
-        
+
         # to be set after running cluster()
         self.clusters = None
         self.cluster_centers = None
@@ -55,7 +55,7 @@ class CosineKMeans(ClusteringAlgorithm):
         replace : `bool`
             Flag to sample with or without replacement.
             Defaults to `False`.
-        
+
         Returns
         -------
         W : `np.array`, shape (k, d)
@@ -96,9 +96,9 @@ class CosineKMeans(ClusteringAlgorithm):
         r = self._cluster(self.vector_field, self.seeds, self.max_iter, self.tol)
 
         labels, centers, losses = r
-        self.clusters = centers[labels]
-        self.labels = labels
-        self.cluster_centers = centers
+        self.clusters = centers[labels]  # clustered vector field
+        self.labels = labels  # face labels
+        self.cluster_centers = centers  # clusters centroids
         self.loss = losses[-1]
 
     def _cluster(self, X, W, epochs, eps, early_stopping=True, verbose=True):

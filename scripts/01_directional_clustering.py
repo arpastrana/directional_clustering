@@ -22,6 +22,7 @@ from directional_clustering.plotters import ClusterPlotter
 from directional_clustering.plotters import rgb_colors
 
 from directional_clustering.clustering import CosineKMeans
+from directional_clustering.clustering import VariationalKMeans
 
 # =============================================================================
 # Available Vector Fields
@@ -79,11 +80,11 @@ smooth_iters = 0  # how many iterations to run the smoothing for
 damping = 0.5  # damping coefficient, a value from 0 to 1
 
 # kmeans clustering
-n_clusters = 3  # number of clusters to produce
+n_clusters = 5  # number of clusters to produce
 mode = "cosine"  # "cosine" or "euclidean"
 eps = 1e-6  # loss function threshold for early stopping
 epochs_seeds = 100  # number of epochs to run the farthest seeding for
-epochs_kmeans = 100  # number of epochs to run kmeans clustering for
+epochs_kmeans = 30  # number of epochs to run kmeans clustering for
 
 # exporting
 export_json = False
@@ -163,7 +164,8 @@ if smooth_iters:
     vectors = laplacian_smoothed(mesh, vectors, smooth_iters, damping)
 
 # ==============================================================================
-# Do K-means Clustering ================================================================================
+# Do K-means Clustering
+# ==============================================================================
 
 # functions related to kmeans are in src/directional_clustering/clusters/
 
@@ -198,7 +200,8 @@ print("Clustering started...")
 # These seeds will be used later on as input to start the final kmeans run.
  
 # Create an instance of Cosine K-Means
-kmeans = CosineKMeans(vectors_array, n_clusters, epochs_seeds, epochs_kmeans, eps)
+# kmeans = CosineKMeans(vectors_array, n_clusters, epochs_seeds, epochs_kmeans, eps)
+kmeans = VariationalKMeans(mesh, vectors_array, n_clusters, epochs_seeds, epochs_kmeans, eps, True)
 
 # do kmeans clustering
 # labels contains the cluster index assigned to every vector in the vector field
