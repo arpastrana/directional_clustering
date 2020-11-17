@@ -65,10 +65,7 @@ class VectorField(Field):
         """
         Converts a vector field into a numpy array.
         """
-        vectors = []
-        for key in self.keys():
-            vectors.append(self.vector(key))
-        return vectors
+        return [vector for vector in self.vectors()]
 
     def index_key(self):
         """
@@ -104,6 +101,9 @@ if __name__ == "__main__":
     print("Vector at 0", vf.vector(0))
     print("Vector field keys", list(vf.keys()))
     print("Vector field vectors", list(vf.vectors()))
+
+    vector_list = vf.to_sequence()
+    assert vector_list[0] == vf.vector(0)
 
     vf.remove_vector(0)
     vf.remove_vector(1)
