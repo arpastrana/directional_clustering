@@ -83,11 +83,11 @@ smooth_iters = 10  # how many iterations to run the smoothing for
 damping = 0.5  # damping coefficient, a value from 0 to 1
 
 # kmeans clustering
-clustering_name = "cosine kmeans" # algorithm name
-n_clusters = 3  # number of clusters to produce
+clustering_name = "variational kmeans" # algorithm name
+n_clusters = 5  # number of clusters to produce
 eps = 1e-6  # loss function threshold for early stopping
 epochs_seeds = 100  # number of epochs to run the farthest seeding for
-epochs_kmeans = 30 # number of epochs to run kmeans clustering for
+epochs_kmeans = 50 # number of epochs to run kmeans clustering for
 
 # exporting
 export_json = False
@@ -229,6 +229,8 @@ labels = clusterer.labels
 # ==============================================================================
 
 # probably would be better to encapsulate this in a function or in a Loss object
+# clustering_error = MeanSquaredError(vector_field, clustered_field)
+# clustering_error = MeanAbsoluteError(vector_field, clustered_field)
 
 errors = np.zeros(mesh.number_of_faces())
 for fkey in mesh.faces():

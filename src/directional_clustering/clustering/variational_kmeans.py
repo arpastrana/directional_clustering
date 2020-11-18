@@ -1,13 +1,13 @@
 """
 A wrapper around the variational clustering algorithm.
 """
-import numpy as np
-
 from directional_clustering.clustering import ClusteringAlgorithm
 
 from variational_clustering.clustering import furthest_init
 from variational_clustering.clustering import make_faces
 from variational_clustering.clustering import k_means
+
+from directional_clustering.fields import VectorField
 
 
 __all__ = ["VariationalKMeans"]
@@ -56,26 +56,26 @@ class VariationalKMeans(ClusteringAlgorithm):
         # last chunk in the cluster log
         final_clusters = cluster_log.pop()
 
-        # create arrays - maybe create these at instantiation?
-        centers = np.zeros((self.n_clusters, 3))
-        labels = np.zeros((len(self._faces), 1))
-        clusters = np.zeros((len(self._faces), 3))
+        # create a new vector field
+        clustered_field = VectorField()
+        clustered_labels = {}
+        centers = {}
 
         # fill arrays with results
         loss = 0
         for i, cluster in final_clusters.items():
             centroid = cluster.proxy
-            centers[i, :] = centroid
+            centers[i] = centroid
 
             loss += cluster.distortion
 
             for fkey in cluster.faces_keys:
-                clusters[fkey, :] = centroid
-                labels[fkey, :] = cluster.id
+                clustered_field.add_vector(fkey, centroid)
+                clustered_labels[fkey] = cluster.id
 
         # assign arrays as attributes
-        self.clusters = clusters
-        self.labels = labels
+        self.clusters = clustered_field
+        self.labels = clustered_labels
         self.cluster_centers = centers
         self.loss = loss  # implement better
 

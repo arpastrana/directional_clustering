@@ -112,10 +112,8 @@ class CosineKMeans(ClusteringAlgorithm):
             clustered_labels[fkey] = labels[index]
 
         self.clusters = clustered_field  # clustered vector field
-
         self.labels = clustered_labels  # face labels
-
-        self.cluster_centers = centers.tolist()  # clusters centroids
+        self.cluster_centers = {idx: center for idx, center in enumerate(centers)}
         self.loss = losses[-1]
 
     def _cluster(self, X, W, epochs, eps, early_stopping=True, verbose=True):
