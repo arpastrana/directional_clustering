@@ -19,13 +19,15 @@ from directional_clustering.clustering import ClusteringFactory
 # vector field
 from directional_clustering.fields import VectorField
 
+# transformations
+from directional_clustering.transformations import align_vector_field
+from directional_clustering.transformations import smoothen_vector_field
+
 # this are custom-written functions part of this library
 # which you can find in the src/directional_clustering folder
 from directional_clustering import JSON
 from directional_clustering.plotters import ClusterPlotter
-from directional_clustering.geometry import laplacian_smoothed
 from directional_clustering.plotters import rgb_colors
-
 
 # =============================================================================
 # Available Vector Fields
@@ -135,13 +137,7 @@ vectors = VectorField.from_mesh(mesh, vectorfield_tag)
 # x and global y vectors as references, which have worked ok for my purposes.
 
 if align_vectors:
-    # this should rather become
-    # vector_field = align_vector_field(vector_field, reference)
-
-    for fkey, vector in vectors.items():
-        # if vectors don't point in the same direction
-        if dot_vectors(alignment_ref, vector) < 0.0:
-            vectors[fkey] = scale_vector(vector, -1)  # reverse it
+    align_vector_field(vectors)
 
 # ==============================================================================
 # Apply smoothing to the vector field
@@ -164,8 +160,7 @@ if align_vectors:
 
 # temporarily disabled because it should return a VectorField, not a Dict
 if smooth_iters:
-    a = None
-    # vectors = laplacian_smoothed(mesh, vectors, smooth_iters, damping)
+    smoothen_vector_field(vectors, mesh.face_adjacency(), smooth_iters, damping)
 
 # ==============================================================================
 # Do K-means Clustering
@@ -202,7 +197,7 @@ if smooth_iters:
 # These seeds will be used later on as input to start the final kmeans run.
 print("Clustering started...")
 
-# Create an instance of Cosine K-Means
+# Create an instance of a clustering algorithm
 
 clustering_algo = ClusteringFactory.create(clustering_name)
 clusterer = clustering_algo(mesh, vectors, n_clusters, epochs_seeds, epochs_kmeans, eps)
