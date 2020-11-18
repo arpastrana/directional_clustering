@@ -13,7 +13,6 @@ from numpy import argmin
 from numpy import argmax
 from numpy import dot
 from numpy import min
-from numpy import exp
 from numpy import sum
 from numpy import hstack
 from numpy import vstack

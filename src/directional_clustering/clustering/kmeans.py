@@ -10,6 +10,8 @@ from directional_clustering.clusters import init_kmeans
 
 from directional_clustering.clustering import ClusteringAlgorithm
 
+from directional_clustering.fields import VectorField
+
 
 __all__ = [
     "CosineKMeans"
@@ -62,7 +64,7 @@ class CosineKMeans(ClusteringAlgorithm):
         W : `np.array`, shape (k, d)
             Matrix with cluster centroids, sampled from `X w/o replacement.
         """
-        X = self.vector_field
+        X = np.array(self.vector_field.to_sequence())
         k = self.n_clusters
         epochs = self.seeds_iter
         eps = self.tol
@@ -77,13 +79,13 @@ class CosineKMeans(ClusteringAlgorithm):
 
             distances = pairwise_distances(X, values, metric="cosine")
             distances = np.diagonal(distances).reshape(-1, 1)
-        
+
             index = np.argmax(distances, axis=0)
             farthest = X[index, :]
             W = np.vstack([W, farthest])
 
         self.seeds = W
-    
+
     def cluster(self):
         """
         Main clustering method
@@ -94,12 +96,26 @@ class CosineKMeans(ClusteringAlgorithm):
         Returns
         -------
         """
-        r = self._cluster(self.vector_field, self.seeds, self.max_iter, self.tol)
+        X = np.array(self.vector_field.to_sequence())  # FIXME
+        r = self._cluster(X, self.seeds, self.max_iter, self.tol)
 
         labels, centers, losses = r
-        self.clusters = centers[labels]  # clustered vector field
-        self.labels = labels  # face labels
-        self.cluster_centers = centers  # clusters centroids
+        clusters = centers[labels]
+
+        # create a new vector field
+        clustered_field = VectorField()
+        clustered_labels = {}
+
+        for fkey, index in self.vector_field.key_index().items():
+            vector = clusters[index, :].tolist()
+            clustered_field.add_vector(fkey, vector)
+            clustered_labels[fkey] = labels[index]
+
+        self.clusters = clustered_field  # clustered vector field
+
+        self.labels = clustered_labels  # face labels
+
+        self.cluster_centers = centers.tolist()  # clusters centroids
         self.loss = losses[-1]
 
     def _cluster(self, X, W, epochs, eps, early_stopping=True, verbose=True):

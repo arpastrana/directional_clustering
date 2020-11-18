@@ -50,6 +50,13 @@ class VectorField(Field):
         for _, vector in self:
             yield vector
 
+    def items(self):
+        """
+        ITerate over the keys and the vectors of the field simultaneously.
+        """
+        for key, vector in self:
+            yield key, vector
+
     @classmethod
     def from_sequence(cls, sequence):
         """
@@ -60,6 +67,18 @@ class VectorField(Field):
         for index, vector in enumerate(sequence):
             vf.add_vector(index, vector)
         return cls()
+
+    @classmethod
+    def from_mesh(cls, mesh, name):
+        """
+        Extracts a vector field from a mesh.
+        """
+        vector_field = cls()
+
+        for fkey in mesh.faces():
+            vector_field.add_vector(fkey, mesh.face_attribute(fkey, name))
+
+        return vector_field
 
     def to_sequence(self):
         """
@@ -77,7 +96,7 @@ class VectorField(Field):
         """
         Makes a keys to index mapping.
         """
-        return {key: index for index, key in self.index_key()}
+        return {key: index for index, key in self.index_key().items()}
 
 
 if __name__ == "__main__":
