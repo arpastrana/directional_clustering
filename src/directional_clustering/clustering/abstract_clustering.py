@@ -2,9 +2,7 @@ from abc import ABC
 from abc import abstractmethod
 
 
-__all__ = [
-    "ClusteringAlgorithm"
-    ]
+__all__ = ["ClusteringAlgorithm"]
 
 
 class ClusteringAlgorithm(ABC):

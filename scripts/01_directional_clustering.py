@@ -76,7 +76,7 @@ JSON_OUT = os.path.abspath(os.path.join(JSON, name_out))
 vectorfield_tag = "m_1"  # the vector field to base the clustering on
 
 # reference vector for alignment
-align_vectors = False
+align_vectors = True
 alignment_ref = [1.0, 0.0, 0.0]  # global x
 # alignment_ref = [0.0, 1.0, 0.0]  # global y
 
@@ -85,7 +85,7 @@ smooth_iters = 10  # how many iterations to run the smoothing for
 damping = 0.5  # damping coefficient, a value from 0 to 1
 
 # kmeans clustering
-clustering_name = "variational kmeans" # algorithm name
+clustering_name = "cosine kmeans" # algorithm name
 n_clusters = 5  # number of clusters to produce
 eps = 1e-6  # loss function threshold for early stopping
 epochs_seeds = 100  # number of epochs to run the farthest seeding for
@@ -108,13 +108,8 @@ mesh = Mesh.from_json(JSON_IN)
 # Extract vector field from COMPAS mesh for clustering
 # ==============================================================================
 
-# store vector field in a dictionary where keys are the mesh face keys
-# and the values are the vectors located at every face
+# Extract a vector field from a mesh
 vectors = VectorField.from_mesh(mesh, vectorfield_tag)
-# vectors = {}
-# for fkey in mesh.faces():
-#     # this is a mesh method that will query info stored the faces of the mesh
-#     vectors[fkey] = mesh.face_attribute(fkey, vectorfield_tag)
 
 # ==============================================================================
 # Align vector field to a reference vector
@@ -137,7 +132,7 @@ vectors = VectorField.from_mesh(mesh, vectorfield_tag)
 # x and global y vectors as references, which have worked ok for my purposes.
 
 if align_vectors:
-    align_vector_field(vectors)
+    align_vector_field(vectors, alignment_ref)
 
 # ==============================================================================
 # Apply smoothing to the vector field
@@ -158,15 +153,12 @@ if align_vectors:
 # point that is not longer "representing" the original vector field
 # so smoothing is something to use with care
 
-# temporarily disabled because it should return a VectorField, not a Dict
 if smooth_iters:
     smoothen_vector_field(vectors, mesh.face_adjacency(), smooth_iters, damping)
 
 # ==============================================================================
 # Do K-means Clustering
 # ==============================================================================
-
-# functions related to kmeans are in src/directional_clustering/clusters/
 
 # now we need to put the vector field into numpy arrays to carry out clustering
 # current limitation: at the moment this only works in planar 2d meshes!
@@ -175,11 +167,6 @@ if smooth_iters:
 # other ideas relate to actually "reparametrizing" (squishing) a 3d mesh into a
 # 2d mesh, carrying out clustering directly in 2d, and then reconstructing
 # the results back into the 3d mesh ("reparametrizing it back")
-
-# convert vectors dictionary into a numpy array
-# vectors_array = np.zeros((mesh.number_of_faces(), 3))
-# for fkey, vec in vectors.items():
-#     vectors_array[fkey, :] = vec
 
 # One of the key differences of this work is that use cosine distance as
 # basis metric for clustering. this is in constrast to numpy/scipy

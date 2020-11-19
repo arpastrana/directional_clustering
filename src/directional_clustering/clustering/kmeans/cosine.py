@@ -1,21 +1,19 @@
-import numpy as np
-
 from math import fabs
+
+import numpy as np
 
 from sklearn.metrics.pairwise import pairwise_distances
 
-from directional_clustering.clusters import associate_centroids_cosine
-from directional_clustering.clusters import estimate_centroids
-from directional_clustering.clusters import init_kmeans
+from directional_clustering.clustering.kmeans import associate_centroids_cosine
+from directional_clustering.clustering.kmeans import estimate_centroids
+from directional_clustering.clustering.kmeans import initialize_kmeans
 
 from directional_clustering.clustering import ClusteringAlgorithm
 
 from directional_clustering.fields import VectorField
 
 
-__all__ = [
-    "CosineKMeans"
-    ]
+__all__ = ["CosineKMeans"]
 
 
 class CosineKMeans(ClusteringAlgorithm):
@@ -70,7 +68,7 @@ class CosineKMeans(ClusteringAlgorithm):
         eps = self.tol
         replace = False
 
-        W = init_kmeans(X, 1, replace)
+        W = initialize_kmeans(X, 1, replace)
 
         for i in range(k-1):
             labels, W, _ = self._cluster(X, W, epochs, eps, False, False)
