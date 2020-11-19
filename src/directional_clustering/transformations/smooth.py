@@ -25,6 +25,10 @@ def smoothen_vector_field(vector_field, adjacency, iters, damping=0.5):
         A coefficient between 0.0 and 1.0 that controls the smoothing strenth.
         1.0 is maximum smoothing.
         Defaults to 0.5
+
+    Notes
+    -----
+    Modifies vector field in place.
     """
     assert vector_field.size() == len(adjacency)
 

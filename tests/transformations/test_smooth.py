@@ -129,7 +129,7 @@ def test_adjacent_vectors_not_found(vector_field, flawed_adjacency):
 
 
 @pytest.mark.parametrize("damping", [-1.0, 10.0])
-def test_smoothed_vector_wrong_damping(vector_single, damping):
+def test_smoothed_vector_wrong_damping(vector_single, vector_smoothed, damping):
     """
     Damping values must be between 0 and 1.0.
     """
