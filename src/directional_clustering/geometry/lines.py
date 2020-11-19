@@ -13,12 +13,14 @@ __all__ = [
 
 
 def line_sdl(start, direction, length, both_sides=True):
-
+    """
+    Creates a line from a start point with a given direction and length. It will extend the line in the oposite direction as well unless both_sides is set to False.
+    """
     direction = normalize_vector(direction[:])
     a = start
     b = add_vectors(start, scale_vector(direction, +length))
     if both_sides:
-        a = add_vectors(start, scale_vector(direction, -length))	
+        a = add_vectors(start, scale_vector(direction, -length))
     return a, b
 
 
