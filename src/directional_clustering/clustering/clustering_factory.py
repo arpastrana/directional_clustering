@@ -11,14 +11,14 @@ class ClusteringFactory(object):
     """
     A factory to unify the creation of supporting clustering algorithms.
     """
-    SUPPORTED_ALGORITHMS = {}
+    supported_algorithms = {}
 
     @classmethod
     def create(cls, clustering_name):
         """
         Create a clustering algorithm.
         """
-        algorithm = cls.SUPPORTED_ALGORITHMS.get(clustering_name)
+        algorithm = cls.supported_algorithms.get(clustering_name)
 
         if algorithm is None:
             raise KeyError(f"Algorithm {clustering_name} is not supported!")
@@ -30,7 +30,7 @@ class ClusteringFactory(object):
         """
         Register a clustering algorithm.
         """
-        cls.SUPPORTED_ALGORITHMS[name] = algorithm
+        cls.supported_algorithms[name] = algorithm
 
 
 # Register supported algorithms
@@ -40,7 +40,7 @@ ClusteringFactory.register("variational kmeans", VariationalKMeans)
 
 if __name__ == "__main__":
     # Small tests
-    print(ClusteringFactory.SUPPORTED_ALGORITHMS)
+    print(ClusteringFactory.supported_algorithms)
     print(ClusteringFactory.create("cosine kmeans"))
     print(ClusteringFactory.create("variational kmeans"))
     print(ClusteringFactory.create("unsupported clustering"))
