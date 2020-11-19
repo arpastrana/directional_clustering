@@ -3,7 +3,10 @@ from compas.geometry import subtract_vectors
 from compas.geometry import scale_vector
 
 
-__all__ = ["smoothen_vector_field"]
+__all__ = ["smoothen_vector_field",
+           "adjacent_vectors",
+           "mean_vector",
+           "smoothed_vector"]
 
 
 def smoothen_vector_field(vector_field, adjacency, iters, damping=0.5):
@@ -23,6 +26,8 @@ def smoothen_vector_field(vector_field, adjacency, iters, damping=0.5):
         1.0 is maximum smoothing.
         Defaults to 0.5
     """
+    assert vector_field.size() == len(adjacency)
+
     for _ in range(iters):
 
         smoothed_vectors = {}
@@ -32,6 +37,11 @@ def smoothen_vector_field(vector_field, adjacency, iters, damping=0.5):
 
             vector = vector_field.vector(key)
             neighbors = adjacency[key]
+
+            if not neighbors:
+                smoothed_vectors[key] = vector
+                continue
+
             adj_vector = mean_vector(adjacent_vectors(vector_field, neighbors))
 
             smoothed_vectors[key] = smoothed_vector(vector, adj_vector, damping)
@@ -52,6 +62,9 @@ def mean_vector(vectors):
     """
     Compute the mean of a sequence of vectors.
     """
+    if not vectors:
+        raise ValueError("Sequence of vectors is empty")
+
     m_vector = [0.0, 0.0, 0.0]
 
     for vector in vectors:
@@ -71,8 +84,6 @@ def smoothed_vector(vector, s_vector, damping):
     s_vector = scale_vector(difference, 1.0 - damping)
 
     return add_vectors(vector, s_vector)
-
-
 
 
 if __name__ == "__main__":

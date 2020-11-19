@@ -27,3 +27,7 @@ def align_vector_field(vector_field, reference_vector):
         # if vectors don't point in the same direction, reverse it
         if dot_vectors(reference_vector, vector) < 0.0:
             vector_field.add_vector(fkey, scale_vector(vector, -1.0))
+
+
+if __name__ == "__main__":
+    pass
