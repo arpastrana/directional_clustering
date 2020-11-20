@@ -4,9 +4,9 @@ import numpy as np
 
 from sklearn.metrics.pairwise import pairwise_distances
 
-from directional_clustering.clustering.kmeans import associate_centroids_cosine
-from directional_clustering.clustering.kmeans import estimate_centroids
-from directional_clustering.clustering.kmeans import initialize_kmeans
+from directional_clustering.clustering.kmeans import centroids_associate
+from directional_clustering.clustering.kmeans import centroids_estimate
+from directional_clustering.clustering.kmeans import kmeans_initialize
 
 from directional_clustering.clustering import ClusteringAlgorithm
 
@@ -68,7 +68,7 @@ class CosineKMeans(ClusteringAlgorithm):
         eps = self.tol
         replace = False
 
-        W = initialize_kmeans(X, 1, replace)
+        W = kmeans_initialize(X, 1, replace)
 
         for i in range(k-1):
             labels, W, _ = self._cluster(X, W, epochs, eps, False, False)
@@ -130,10 +130,10 @@ class CosineKMeans(ClusteringAlgorithm):
 
         for i in range(epochs):
 
-            loss, assoc = associate_centroids_cosine(X, W)
+            loss, assoc = centroids_associate(X, W)
             losses.append(loss)
             
-            W = estimate_centroids(X, k, assoc)
+            W = centroids_estimate(X, k, assoc)
 
             if i < 2 or not early_stopping:
                 continue
