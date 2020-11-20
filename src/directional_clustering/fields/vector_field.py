@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Create a vector field.
-"""
-
 from directional_clustering.fields import Field
 
 
@@ -52,7 +46,7 @@ class VectorField(Field):
 
     def items(self):
         """
-        ITerate over the keys and the vectors of the field simultaneously.
+        Iterate over the keys and the vectors of the field simultaneously.
         """
         for key, vector in self:
             yield key, vector
