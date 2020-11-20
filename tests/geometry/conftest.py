@@ -2,6 +2,8 @@
 
 import pytest
 
+from compas.datastructures import Mesh
+
 
 # ==============================================================================
 # Fixtures
@@ -27,3 +29,4 @@ def length():
     Length.
     """
     return 1.0
+

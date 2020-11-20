@@ -15,6 +15,25 @@ __all__ = [
 def line_sdl(start, direction, length, both_sides=True):
     """
     Creates a line from a start point with a given direction and length. It will extend the line in the oposite direction as well unless both_sides is set to False.
+
+    Input
+    -----
+    start : `array`, shape(n,), n<=3
+        A point defined by XYZ coordinates.
+        If Z coordinate is not given, then the results are in 2D.
+        If Y and Z coordinates are not given, then the results are in 1D.
+    direction : `array`
+        XYZ components of the vector to create a line.
+    length : `float`
+        The length of the line.
+    both_sides : `bool`
+        Flag to produce a line in one or both directions.
+        Deafault is set to True.
+
+    Return
+    ------
+    a, b : tuple
+        Returns the start and end points of the line.
     """
     direction = normalize_vector(direction[:])
     a = start
@@ -25,7 +44,26 @@ def line_sdl(start, direction, length, both_sides=True):
 
 
 def vector_lines_on_faces(mesh, vector_tag, uniform=True, factor=0.02):
+    """
 
+    Input
+    -----
+    mesh : a COMPAS mesh
+
+    vector_tag : `string`
+        Identification of vector on mesh polygon.
+    uniform : `bool`
+        Constructs lines with the same length if True, otherwise length is just scaled by factor.
+        Default is set to True.
+    factor : `float`
+        This factor will determine either half the size of the line (created from line_sdl with both_sides=True) or the factor that scales the mesh face vector.
+        Default is set to 0.02.
+
+    Return
+    ------
+    lines : `list of tuples`
+        Returns lines in the direction of the given face vector centered in the centroid of each mesh face.
+    """
     lines = []
 
     for fkey in mesh.faces():
