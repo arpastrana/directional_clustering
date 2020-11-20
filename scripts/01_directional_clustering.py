@@ -78,18 +78,16 @@ vectorfield_tag = "m_1"  # the vector field to base the clustering on
 # reference vector for alignment
 align_vectors = True
 alignment_ref = [1.0, 0.0, 0.0]  # global x
-# alignment_ref = [0.0, 1.0, 0.0]  # global y
 
 # smoothing
 smooth_iters = 10  # how many iterations to run the smoothing for
 damping = 0.5  # damping coefficient, a value from 0 to 1
 
 # kmeans clustering
-clustering_name = "cosine kmeans" # algorithm name
+clustering_name = "variational kmeans" # algorithm name
 n_clusters = 5  # number of clusters to produce
-eps = 1e-6  # loss function threshold for early stopping
-epochs_seeds = 100  # number of epochs to run the farthest seeding for
-epochs_kmeans = 50 # number of epochs to run kmeans clustering for
+tol = 1e-6  # loss function threshold for early stopping
+iters = 30 # number of epochs to run kmeans clustering for
 
 # exporting
 export_json = False
@@ -187,7 +185,7 @@ print("Clustering started...")
 # Create an instance of a clustering algorithm
 
 clustering_algo = ClusteringFactory.create(clustering_name)
-clusterer = clustering_algo(mesh, vectors, n_clusters, epochs_seeds, epochs_kmeans, eps)
+clusterer = clustering_algo(mesh, vectors, n_clusters, iters, tol)
 
 # do kmeans clustering
 # labels contains the cluster index assigned to every vector in the vector field
@@ -199,11 +197,11 @@ clusterer = clustering_algo(mesh, vectors, n_clusters, epochs_seeds, epochs_kmea
 
 clusterer.cluster()
 
-print("Loss Clustering: {}".format(clusterer.loss))
+print("Loss Clustering: {}".format(clusterer.error))
 print("Clustering ended!")
 
 # make an array with the assigned labels of all vectors
-clustered_field = clusterer.clusters
+clustered_field = clusterer.clustered_field
 labels = clusterer.labels
 
 # ==============================================================================

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from compas.geometry import dot_vectors
 from compas.geometry import scale_vector
 

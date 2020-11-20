@@ -29,6 +29,8 @@ from __future__ import print_function
 
 # from .<module> import *
 from .operations import *
+from .distances import *
+from ._kmeans import *
 from .cosine import *
 from .variational import *
 

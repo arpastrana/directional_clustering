@@ -1,5 +1,6 @@
 from abc import ABC
 from abc import abstractmethod
+from abc import abstractproperty
 
 
 __all__ = ["ClusteringAlgorithm"]
@@ -9,14 +10,30 @@ class ClusteringAlgorithm(ABC):
     """
     Abstract base class for all clustering algorithms.
     """
-    def __init__(self):
-        # these may be better off as properties
-        self.loss = None
-        self.centroids = None
-        self.labels = None
-
     @abstractmethod
-    def cluster(self):
+    def cluster(self, *args, **kwargs):
         """
+        Main clustering method.
         """
-        return
+        pass
+
+    @abstractproperty
+    def error(self):
+        """
+        The final error of the produced by the clustering method.
+        """
+        pass
+
+    @abstractproperty
+    def clustered_field(self):
+        """
+        The clustered vector field.
+        """
+        pass
+
+    @abstractproperty
+    def labels(self):
+        """
+        The labels that reference entries in the vector field to clusters.
+        """
+        pass

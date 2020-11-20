@@ -1,7 +1,4 @@
-"""
-A wrapper around the variational clustering algorithm.
-"""
-from directional_clustering.clustering import ClusteringAlgorithm
+from directional_clustering.clustering.kmeans import KMeans
 
 from variational_clustering.clustering import furthest_init
 from variational_clustering.clustering import make_faces
@@ -13,35 +10,24 @@ from directional_clustering.fields import VectorField
 __all__ = ["VariationalKMeans"]
 
 
-class VariationalKMeans(ClusteringAlgorithm):
+class VariationalKMeans(KMeans):
     """
-    A wrapper around the variational shape approximation algorithm.
+    A wrapper of the variational approximation algorithm for vector clustering.
     """
-    def __init__(self, mesh, vector_field, n_clusters, n_init, max_iter=100, tol=0.001, merge_split=True):
-        self.mesh = mesh
-        self.vector_field = vector_field
+    def __init__(self, mesh, vector_field, n_clusters, iters, tol):
+        # parent class constructor
+        args = mesh, vector_field, n_clusters, iters, tol
+        super(VariationalKMeans, self).__init__(*args)
 
-        self.n_clusters = n_clusters
-
-        self.seeds_iter = n_init
-        self.max_iter = max_iter
-        self.tol = tol
-        self.merge_split = merge_split
+        # internal flag
+        self.merge_split = True
 
         # to be set after initialization
-        self.seeds = None
         self._initial_clusters = None
         self._faces = None
 
-        # to be set after running cluster()
-        self.clusters = None
-        self.cluster_centers = None
-        self.labels = None
-        self.loss = None
-        self.n_iter = None
-
         # create seeds
-        self.init_seeds()
+        self._create_seeds()
 
     def cluster(self):
         """
@@ -50,7 +36,7 @@ class VariationalKMeans(ClusteringAlgorithm):
         # do clustering
         cluster_log = k_means(self._initial_clusters,
                               self._faces,
-                              self.max_iter,
+                              self.iters,
                               self.merge_split)
 
         # last chunk in the cluster log
@@ -74,12 +60,12 @@ class VariationalKMeans(ClusteringAlgorithm):
                 clustered_labels[fkey] = cluster.id
 
         # assign arrays as attributes
-        self.clusters = clustered_field
-        self.labels = clustered_labels
-        self.cluster_centers = centers
-        self.loss = loss  # implement better
+        self._clustered_field = clustered_field
+        self._labels = clustered_labels
+        self._centers = centers
+        self._error = loss  # implement better
 
-    def init_seeds(self):
+    def _create_seeds(self):
         """
         Kickstart the algorithm.
         """

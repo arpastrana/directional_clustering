@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from directional_clustering.clustering import CosineKMeans
 from directional_clustering.clustering import VariationalKMeans
 
