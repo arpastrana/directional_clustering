@@ -3,9 +3,9 @@
 import os
 import pytest
 
-from directional_clustering.geometry import line_sdl
-from directional_clustering.geometry import vector_lines_on_faces
-from directional_clustering.geometry import line_tuple_to_dict
+from directional_clustering.plotters import line_sdl
+from directional_clustering.plotters import vector_lines_on_faces
+from directional_clustering.plotters import line_tuple_to_dict
 
 def test_line_sdl_OneSide(start, direction, length):
     """
