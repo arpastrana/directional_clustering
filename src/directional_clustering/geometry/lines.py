@@ -84,13 +84,35 @@ def vector_lines_on_faces(mesh, vector_tag, uniform=True, factor=0.02):
 
 
 def line_tuple_to_dict(line):
+    """
+    Returns a dictionary with start and end points of a line.
 
+    Input
+    -----
+    line : `tuple`
+        A tuple with two points
+
+    Return
+    ------
+    dictionary with two entries : `dict`
+    """
     a, b = line
     return {'start': a, 'end': b}
 
 
 def polygon_list_to_dict(polygon):
+    """
+    Returns a dictionary with the list of points of a polygon.
 
+    Input
+    -----
+    polygon : `list`
+        A list with the vertices of the polygon.
+
+    Return
+    ------
+    dictionary with one entry : `dict`
+    """
     return {'points': polygon}
 
 

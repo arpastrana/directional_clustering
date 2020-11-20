@@ -31,24 +31,28 @@ def length():
     return 1.0
 
 @pytest.fixture
-def meshNoAttribute():
+def vector_tag():
+    return "a_vector"
+
+@pytest.fixture
+def meshNoAttr():
     """
     Mesh with 4 vertices and 1 face.
     """
     mesh = Mesh()
-
-    a = mesh.add_vertex()  # x,y,z coordinates are optional and default to 0,0,0
-    b = mesh.add_vertex(x=1)
-    c = mesh.add_vertex(x=1, y=1)
-    d = mesh.add_vertex(y=1)
-
+    a = mesh.add_vertex(x=0, y=0, z=0)
+    b = mesh.add_vertex(x=1, y=0, z=0)
+    c = mesh.add_vertex(x=1, y=1, z=0)
+    d = mesh.add_vertex(x=0, y=1, z=0)
     mesh.add_face([a, b, c, d])
 
     return mesh
 
 @pytest.fixture
-def meshAttribute(mesh):
+def meshAttr(meshNoAttr, vector_tag):
     """
-    Mesh with a vector as attribute. (WIP)
+    Mesh with a vector as attribute.
     """
-    return mesh
+    faces = list(meshNoAttr.faces())
+    meshNoAttr.faces_attribute(vector_tag, [0,1,0], faces)
+    return meshNoAttr
