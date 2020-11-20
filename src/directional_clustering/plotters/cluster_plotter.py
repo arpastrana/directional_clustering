@@ -1,3 +1,6 @@
+from directional_clustering.plotters import line_tuple_to_dict
+from directional_clustering.plotters import vector_lines_on_faces
+from directional_clustering.plotters import line_sdl
 
 from compas_plotters import MeshPlotter
 
@@ -55,3 +58,4 @@ class ClusterPlotter(MeshPlotter):
         lines.extend(_lines)
 
         self.draw_lines(lines)
+
