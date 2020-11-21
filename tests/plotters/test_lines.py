@@ -1,13 +1,12 @@
-#!/usr/bin/env python3
-
 import os
 import pytest
 
 from directional_clustering.plotters import line_sdl
 from directional_clustering.plotters import vector_lines_on_faces
 from directional_clustering.plotters import line_tuple_to_dict
+from directional_clustering.plotters import polygon_list_to_dict
 
-def test_line_sdl_OneSide(start, direction, length):
+def test_line_sdl_one_side(start, direction, length):
     """
     Tests if a line is create correctly with both sides = False.
     """
@@ -15,14 +14,14 @@ def test_line_sdl_OneSide(start, direction, length):
     assert ln == (start, [1.0, 1.0, 0.0])
 
 
-def test_line_sdl_BothSides(start, direction, length):
+def test_line_sdl_both_sides(start, direction, length):
     """
     Tests if a line is created correctly with both sides = True.
     """
     ln = line_sdl(start, direction, length, True)
     assert ln == ([-1.0, 1.0, 0.0], [1.0, 1.0, 0.0])
 
-def test_lines_sdl_NoLength(start, direction):
+def test_lines_sdl_no_length(start, direction):
     """
     Tests if a type error is raised when a line_sdl has no length as input.
     """
@@ -37,7 +36,7 @@ def test_line_sdl_2D(direction, length):
     ln = line_sdl(start2D, direction, length)
     assert ln == ([-1.0, 1.0], [1.0, 1.0])
 
-def test_line_sd_l1D(direction, length):
+def test_line_sdl_1D(direction, length):
     """
     Tests if the result will produce a 1D line if a 1D point is passed in.
     """
@@ -45,30 +44,43 @@ def test_line_sd_l1D(direction, length):
     ln = line_sdl(start1D, direction, length)
     assert ln == ([-1.0], [1.0])
 
-def test_vector_lines_on_faces_meshNoAttr(meshNoAttr, vector_tag):
+def test_vector_lines_on_faces_mesh_no_attr(mesh_no_attr, vector_tag):
     """
     Tests if the input of a mesh with no attributes raises an error.
     """
     with pytest.raises(ValueError):
-        vector_lines_on_faces(meshNoAttr, vector_tag)
+        vector_lines_on_faces(mesh_no_attr, vector_tag)
 
-def test_vector_lines_on_faces_meshAttr(meshAttr, vector_tag):
+def test_vector_lines_on_faces_mesh_attr(mesh_attr, vector_tag):
     """
     Tests if the input of a mesh with attributes returns the correct line.
     """
-    assert [([0.5,-0.5,0],[0.5,1.5,0])] == vector_lines_on_faces(meshAttr, vector_tag, factor=1)
+    assert [([0.5, -0.5, 0.0],[0.5, 1.5, 0.0])] == vector_lines_on_faces(mesh_attr, vector_tag, factor=1)
 
-def test_line_tuple_to_dict_1LinePassedIn(start):
+def test_line_tuple_to_dict_1_line_passed_in(start):
     """
     Tests if the dictionary is created correctly if a line is passed in.
     """
-    line = (start, [1,1,1])
-    assert {'start': start, 'end': [1,1,1] } == line_tuple_to_dict(line)
+    line = (start, [1.0, 1.0, 1.0])
+    assert {'start': start, 'end': [1.0, 1.0, 1.0]} == line_tuple_to_dict(line)
 
-def test_line_tuple_to_dict_1PointPassedIn(start):
+def test_line_tuple_to_dict_1_point_passed_in(start):
     """
     Tests if a ValueError is raised if only one point is passed in.
     """
     with pytest.raises(ValueError):
         line_tuple_to_dict(start)
+
+def test_polygon_list_to_dict_one_point():
+    """
+    Tests if a dictionary is returned when one point is passed in.
+    """
+    assert {'points': [1.0, 0.0, 0.0]} == polygon_list_to_dict([1.0, 0.0, 0.0])
+
+def test_polygon_list_to_dict_empty():
+    """
+    Tests if TypeError is raised when nothing is passed in.
+    """
+    with pytest.raises(TypeError):
+        polygon_list_to_dict()
 

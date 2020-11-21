@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import pytest
 
 from compas.datastructures import Mesh
@@ -32,10 +30,13 @@ def length():
 
 @pytest.fixture
 def vector_tag():
+    """
+    A string to tag a vector.
+    """
     return "a_vector"
 
 @pytest.fixture
-def meshNoAttr():
+def mesh_no_attr():
     """
     Mesh with 4 vertices and 1 face.
     """
@@ -49,10 +50,10 @@ def meshNoAttr():
     return mesh
 
 @pytest.fixture
-def meshAttr(meshNoAttr, vector_tag):
+def mesh_attr(mesh_no_attr, vector_tag):
     """
     Mesh with a vector as attribute.
     """
-    faces = list(meshNoAttr.faces())
-    meshNoAttr.faces_attribute(vector_tag, [0,1,0], faces)
-    return meshNoAttr
+    faces = list(mesh_no_attr.faces())
+    mesh_no_attr.faces_attribute(vector_tag, [0, 1, 0], faces)
+    return mesh_no_attr

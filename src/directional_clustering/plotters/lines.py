@@ -14,25 +14,25 @@ __all__ = [
 
 def line_sdl(start, direction, length, both_sides=True):
     """
-    Creates a line from a start point with a given direction and length. It will extend the line in the oposite direction as well unless both_sides is set to False.
+    Creates a line from a start point with a given direction and length. It will also extend the line in the oposite direction unless both_sides is set to `False`.
 
-    Input
-    -----
-    start : `array`, shape(n,), n<=3
+    Parameters
+    ----------
+    start : `list` of `float`, shape(n,), n<=3
         A point defined by XYZ coordinates.
         If Z coordinate is not given, then the results are in 2D.
         If Y and Z coordinates are not given, then the results are in 1D.
-    direction : `array`
+    direction : `list` of `float`
         XYZ components of the vector to create a line.
     length : `float`
         The length of the line.
-    both_sides : `bool`
+    both_sides : `bool`, optional
         Flag to produce a line in one or both directions.
-        Deafault is set to True.
+        Deafault is set to `True`.
 
-    Return
-    ------
-    a, b : tuple
+    Returns
+    -------
+    a, b : `tuple`
         Returns the start and end points of the line.
     """
     direction = normalize_vector(direction[:])
@@ -45,23 +45,24 @@ def line_sdl(start, direction, length, both_sides=True):
 
 def vector_lines_on_faces(mesh, vector_tag, uniform=True, factor=0.02):
     """
+    Creates lines in the direction of the vector in each face of the mesh.
 
-    Input
-    -----
-    mesh : a COMPAS mesh
-
+    Parameters
+    ----------
+    mesh : `compas.datastructures.Mesh`
+        A COMPAS mesh with vectors as face attributes.
     vector_tag : `string`
-        Identification of vector on mesh polygon.
-    uniform : `bool`
-        Constructs lines with the same length if True, otherwise length is just scaled by factor.
-        Default is set to True.
-    factor : `float`
-        This factor will determine either half the size of the line (created from line_sdl with both_sides=True) or the factor that scales the mesh face vector.
-        Default is set to 0.02.
+        Name of a vector field stored on the faces of a mesh.
+    uniform : `bool`, optional
+        Constructs lines with the same length if `True`, otherwise length is just scaled by factor.
+        Default is set to `True`.
+    factor : `float`, optional
+        This factor will determine either half the size of the line (created from line_sdl with both_sides set to `True`) or the factor that scales the mesh face vector.
+        Default is set to `0.02`.
 
-    Return
-    ------
-    lines : `list of tuples`
+    Returns
+    -------
+    lines : `list` of `tuple`
         Returns lines in the direction of the given face vector centered in the centroid of each mesh face.
     """
     lines = []
@@ -87,14 +88,15 @@ def line_tuple_to_dict(line):
     """
     Returns a dictionary with start and end points of a line.
 
-    Input
-    -----
+    Parameters
+    ----------
     line : `tuple`
-        A tuple with two points
+        A tuple with two points.
 
-    Return
-    ------
-    dictionary with two entries : `dict`
+    Returns
+    -------
+    line_dict : `dict`
+        A dictionary of with the start and end points of a line.
     """
     a, b = line
     return {'start': a, 'end': b}
@@ -104,14 +106,15 @@ def polygon_list_to_dict(polygon):
     """
     Returns a dictionary with the list of points of a polygon.
 
-    Input
-    -----
+    Parameters
+    ----------
     polygon : `list`
-        A list with the vertices of the polygon.
+        A list with the XYZ coordinates of the vertices of a polygon.
 
-    Return
-    ------
-    dictionary with one entry : `dict`
+    Returns
+    -------
+    polygon_dict : `dict`
+        A dictionary of with the points of a polygon.
     """
     return {'points': polygon}
 
