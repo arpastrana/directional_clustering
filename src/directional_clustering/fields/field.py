@@ -6,22 +6,17 @@ __all__ = ["Field"]
 
 class Field(AbstractField):
     """
-    An abstract field.
-    Basically, a container for scalars and vectors.
+    A concrete field.
 
+    Basically, a container for scalars and vectors.
     One key can store exclusively one value at a time.
 
-    It is crucial to have it as a datastructure where fields' entries
+    It is crucial to have it as a datastructure where a field's entries
     are accessed with the keys of the Mesh they are coupled to.
-
-    If this was a dictionary, and the vector field lives on the faces
-    of a mesh, the way to access entry i in the vector field would be
-
-    entry = Field[face_key]
-    entry = Field[field entry]
     """
     def __init__(self, dimensionality):
         """
+        The constructor.
         """
         self._dimensionality = dimensionality
         self._size = None
@@ -30,62 +25,81 @@ class Field(AbstractField):
     def __getitem__(self, key):
         """
         Retrieves a field value by key.
+
+        Parameters
+        ----------
+        key : `int`
+            An access key representing a pointer to a mesh entity.
+
+        Returns
+        -------
+        item : `list`
+            The queried item in the field.
         """
         return self._field[key]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, item):
         """
-        Sets the value referenced by a key.
-        """
-        if len(value) != self.dimensionality():
-            msg = "Length of {} is incompatible with the field's dimensionality"
-            raise ValueError(msg.format(value))
+        Sets an entry in the field.
 
-        self._field[key] = value
+        Parameters
+        ----------
+        key : `int`
+            An access key representing a pointer to a mesh entity.
+        item : `list`
+            The item to store.
+        """
+        if len(item) != self.dimensionality():
+            msg = "Length of {} is incompatible with the field's dimensionality"
+            raise ValueError(msg.format(item))
+
+        self._field[int(key)] = item
 
     def __delitem__(self, key):
         """
-        Removes a key and the value it references.
+        Deletes a key and dereferences the item it points to.
+
+        Parameter
+        ---------
+        key : `int`
+            The access key of the item to remove.
         """
         del self._field[key]
 
     def __iter__(self):
         """
-        Iterates over the keys and values of the field.
+        Iterates over the keys and items of the field.
+
+        Yields
+        ------
+        key, item: `tuple`
+            The access key and the item it points to.
         """
-        for key, value in self._field.items():
-            yield key, value
+        for key, item in self._field.items():
+            yield key, item
 
     def dimensionality(self):
         """
         The fixed dimensionality of a field.
+
+        Returns
+        -------
+        dimensionality : `int`
+            The dimensionality of the field.
         """
         return self._dimensionality
 
     def size(self):
         """
-        The number of entries in the field.
+        The number of items stored in the field.
+
+        Returns
+        -------
+        size : `int`
+            The number of items.
         """
         return len(self._field)
 
 
 if __name__ == "__main__":
-    # small tests
-
-    field = Field(2)
-    try:
-        field[25] = [0, 1, 2]
-    except ValueError:
-        field[25] = [0, 1]
-
-    assert len(list(field)) == field.size()
-    assert field.dimensionality() == 2
-
-    assert field[25] == [0, 1]
-
-    del field[25]
-
-    try:
-        a = field[25]
-    except KeyError:
-        pass
+    pass

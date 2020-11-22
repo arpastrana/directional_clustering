@@ -29,6 +29,7 @@ from __future__ import print_function
 
 # from .<module> import *
 from .abstract_field import *
+from .field import *
 from .vector_field import *
 
 __all__ = [name for name in dir() if not name.startswith('_')]
