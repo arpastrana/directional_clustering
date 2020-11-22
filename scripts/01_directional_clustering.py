@@ -106,8 +106,8 @@ mesh = Mesh.from_json(JSON_IN)
 # Extract vector field from COMPAS mesh for clustering
 # ==============================================================================
 
-# Extract a vector field from a mesh
-vectors = VectorField.from_mesh(mesh, vectorfield_tag)
+# Extract a vector field from the faces of a mesh
+vectors = VectorField.from_mesh_faces(mesh, vectorfield_tag)
 
 # ==============================================================================
 # Align vector field to a reference vector
