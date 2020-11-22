@@ -1,46 +1,5 @@
 import pytest
 
-from directional_clustering.fields import Field
-
-
-# ==============================================================================
-# Fixtures
-# ==============================================================================
-
-@pytest.fixture
-def field_3d():
-    """
-    A field with a dimensionality of three with 2 entries.
-    """
-    field = Field(3)
-    field[0] = [0.0, 1.0, 2.0]  # vector_3d
-    field[1] = [1.0, 1.0, 1.0]
-    return field
-
-
-@pytest.fixture
-def field_2d():
-    """
-    A field with a dimensionality of two.
-    """
-    return Field(2)
-
-
-@pytest.fixture
-def vector_3d():
-    """
-    A vector with 3 entries.
-    """
-    return [0.0, 1.0, 2.0]
-
-
-@pytest.fixture
-def vector_2d():
-    """
-    A vector with 2 entries.
-    """
-    return [0.0, 1.0]
-
 
 # ==============================================================================
 # Tests

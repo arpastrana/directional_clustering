@@ -133,7 +133,7 @@ class VectorField(Field):
         for index, vector in enumerate(sequence):
             vf.add_vector(index, vector)
 
-        return cls()
+        return vf
 
     @classmethod
     def from_mesh_faces(cls, mesh, name):
@@ -159,12 +159,18 @@ class VectorField(Field):
         vector_field = cls()
 
         for fkey in mesh.faces():
-            vector_field.add_vector(fkey, mesh.face_attribute(fkey, name))
+            vector = mesh.face_attribute(fkey, name)
+
+            msg = "Attribute {} is not defined on face {}!".format(name, fkey)
+            assert vector != None, msg
+
+            vector_field.add_vector(fkey, vector)
 
         return vector_field
 
 
 if __name__ == "__main__":
+    pass
 
     vf = VectorField()
 
