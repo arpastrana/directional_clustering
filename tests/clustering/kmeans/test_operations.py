@@ -14,33 +14,6 @@ from directional_clustering.clustering.kmeans.operations import rows_squared_nor
 
 
 # ==============================================================================
-# Fixtures
-# ==============================================================================
-
-@pytest.fixture
-def random_array():
-    """
-    A 2x2 array with random float values.
-    """
-    return np.random.rand(2, 2)
-
-
-@pytest.fixture
-def cosine_array():
-    """
-    A 3x2 array with float values.
-    """
-    return np.array([[1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
-
-
-@pytest.fixture
-def cosine_centroids():
-    """
-    """
-    return np.array([[1.0, 0.0], [1.0, 1.0]])
-
-
-# ==============================================================================
 # Tests
 # ==============================================================================
 

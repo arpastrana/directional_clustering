@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import pytest
 
 from directional_clustering.transformations import adjacent_vectors
@@ -64,7 +62,7 @@ def test_smoothed_vector_wrong_damping(vector_single, vector_smoothed, damping):
 @pytest.mark.parametrize("damping", [0.1 * _ for _ in range(10)])
 def test_smoothed_vector_returns_same(vector_single, damping):
     """
-    Smoothing unaffects input vector
+    Smoothing unaffects input vector.
     """
     assert smoothed_vector(vector_single, vector_single, damping) == vector_single
 

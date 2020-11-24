@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import pytest
 
 from compas.geometry import scale_vector
