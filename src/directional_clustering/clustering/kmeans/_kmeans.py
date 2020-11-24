@@ -43,13 +43,13 @@ class KMeans(ClusteringAlgorithm):
         self._centers = None
         self._labels = None
 
-        self._error = None
+        self._loss = None
 
     @property
-    def error(self):
+    def loss(self):
         """
         """
-        return self._error
+        return self._loss
 
     @property
     def clustered_field(self):
@@ -115,7 +115,7 @@ class KMeans(ClusteringAlgorithm):
         self._clustered_field = clustered_field  # clustered vector field
         self._labels = clustered_labels  # face labels
         self._centers = {idx: center for idx, center in enumerate(centers)}
-        self._error = losses[-1]
+        self._loss = losses[-1]
 
     def _cluster(self, X, W, iters, tol, early_stopping=True):
         """

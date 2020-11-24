@@ -23,7 +23,7 @@ from directional_clustering.fields import VectorField
 from directional_clustering.transformations import align_vector_field
 from directional_clustering.transformations import smoothen_vector_field
 
-# this are custom-written functions part of this library
+# these are custom-written functions part of this library
 # which you can find in the src/directional_clustering folder
 from directional_clustering import JSON
 from directional_clustering.plotters import ClusterPlotter
@@ -84,7 +84,7 @@ smooth_iters = 10  # how many iterations to run the smoothing for
 damping = 0.5  # damping coefficient, a value from 0 to 1
 
 # kmeans clustering
-clustering_name = "variational kmeans" # algorithm name
+clustering_name = "cosine kmeans" # algorithm name
 n_clusters = 5  # number of clusters to produce
 tol = 1e-6  # loss function threshold for early stopping
 iters = 30 # number of epochs to run kmeans clustering for
@@ -197,7 +197,7 @@ clusterer = clustering_algo(mesh, vectors, n_clusters, iters, tol)
 
 clusterer.cluster()
 
-print("Loss Clustering: {}".format(clusterer.error))
+print("Loss Clustering: {}".format(clusterer.loss))
 print("Clustering ended!")
 
 # make an array with the assigned labels of all vectors
