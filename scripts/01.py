@@ -65,12 +65,13 @@ vectorfield_tags= [
 # Main function: directional_clustering
 # ==============================================================================
 
-def directional_clustering(vectorfield_tag="m_1",
+def directional_clustering(filename="perimeter_supported_slab",
+                           vectorfield_tag="m_1",
                            align_vectors=True,
                            alignment_ref=[1.0, 0.0, 0.0],
                            smooth_iters=10,
                            damping=0.5,
-                           clustering_name="variational kmeans",
+                           clustering_name="cosine kmeans",
                            n_clusters=5,
                            tol=1e-6,
                            iters=30,
@@ -82,7 +83,12 @@ def directional_clustering(vectorfield_tag="m_1",
 
     Parameters
     ----------
-    vectorfield_tag : `str``
+    filename : `str`
+        The name of the JSON file that encodes a MeshPlus object.
+        \nAll JSON files must reside in this repo's data/json folder.
+        Defaults to "perimeter_supported_slab".
+
+    vectorfield_tag : `str`
         The name of the vector field to cluster.
         \nDefaults to "m_1".
 
@@ -139,18 +145,18 @@ def directional_clustering(vectorfield_tag="m_1",
     # ==============================================================================
 
     # Relative path to the JSON file stores the vector fields and the mesh info
-    # The JSON files are stored in the data/json_files folder
+    # The JSON files must be stored in the data/json_files folder
 
-    name_in = "perimeter_supported_slab.json"
-    name_out = "perimeter_supported_slab_k_5.json"
-
-    JSON_IN = os.path.abspath(os.path.join(JSON, name_in))
-    JSON_OUT = os.path.abspath(os.path.join(JSON, name_out))
+    name_in = filename + ".json"
+    name_out = filename + "_k_{}.json".format(n_clusters)
+    json_in = os.path.abspath(os.path.join(JSON, name_in))
+    json_out = os.path.abspath(os.path.join(JSON, name_out))
 
     # ==============================================================================
     # Import a COMPAS mesh
     # ==============================================================================
-    mesh = Mesh.from_json(JSON_IN)
+
+    mesh = Mesh.from_json(json_in)
 
     # ==============================================================================
     # Extract vector field from COMPAS mesh for clustering
@@ -296,8 +302,8 @@ def directional_clustering(vectorfield_tag="m_1",
     # ==============================================================================
 
     if export_json:
-        mesh.to_json(JSON_OUT)
-        print("Exported mesh to: {}".format(JSON_OUT))
+        mesh.to_json(json_out)
+        print("Exported mesh to: {}".format(json_out))
 
     # =============================================================================
     # Plot stuff
