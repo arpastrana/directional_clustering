@@ -29,6 +29,5 @@ from __future__ import print_function
 
 # from .<module> import *
 from .vectors import *
-from .lines import *
 
 __all__ = [name for name in dir() if not name.startswith('_')]

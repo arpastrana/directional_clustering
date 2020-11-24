@@ -18,7 +18,7 @@ class ClusteringAlgorithm(ABC):
         pass
 
     @abstractproperty
-    def error(self):
+    def loss(self):
         """
         The final error of the produced by the clustering method.
         """

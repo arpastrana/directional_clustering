@@ -48,6 +48,7 @@ class VariationalKMeans(KMeans):
         centers = {}
 
         # fill arrays with results
+        # TODO: Refactor this block!
         loss = 0
         for i, cluster in final_clusters.items():
             centroid = cluster.proxy
@@ -63,7 +64,7 @@ class VariationalKMeans(KMeans):
         self._clustered_field = clustered_field
         self._labels = clustered_labels
         self._centers = centers
-        self._error = loss  # implement better
+        self._loss = loss  # implement better
 
     def _create_seeds(self):
         """

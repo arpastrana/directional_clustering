@@ -1,6 +1,9 @@
 # Directional Clustering
 
 Directional clustering of vector fields on meshes.
+This is the repository for APC 524: Software Engineering for Scientific Computing
+Princeton University
+
 
 ## Introduction
 

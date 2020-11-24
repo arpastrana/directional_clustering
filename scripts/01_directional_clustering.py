@@ -23,7 +23,7 @@ from directional_clustering.fields import VectorField
 from directional_clustering.transformations import align_vector_field
 from directional_clustering.transformations import smoothen_vector_field
 
-# this are custom-written functions part of this library
+# these are custom-written functions part of this library
 # which you can find in the src/directional_clustering folder
 from directional_clustering import JSON
 from directional_clustering.plotters import ClusterPlotter
@@ -44,7 +44,7 @@ from directional_clustering.plotters import rgb_colors
 #
 # First and second principal vectors are always orthogonal to each other.
 
-vectorfield_tags= [
+vectorfield_tags = [
     "n_1",  # axial forces in first principal direction
     "n_2",  # axial forces in second principal direction
     "m_1",  # bending moments in first principal direction
@@ -84,7 +84,7 @@ smooth_iters = 10  # how many iterations to run the smoothing for
 damping = 0.5  # damping coefficient, a value from 0 to 1
 
 # kmeans clustering
-clustering_name = "variational kmeans" # algorithm name
+clustering_name = "cosine kmeans" # algorithm name
 n_clusters = 5  # number of clusters to produce
 tol = 1e-6  # loss function threshold for early stopping
 iters = 30 # number of epochs to run kmeans clustering for
@@ -140,7 +140,7 @@ if align_vectors:
 # vector field will be very noisy, especially around "singularities".
 # this means there can be drastic orientation jumps/flips between two vectors
 # which will affect the quality of the clustering.
-# to mitigate this, we apply laplacian smoothing which helps to soften and 
+# to mitigate this, we apply laplacian smoothing which helps to soften and
 # preserve continuity between adjacent vectors
 # what this basically does is going through every face in the mesh,
 # querying what are their neighbor faces, and then averaging the vectors stored
@@ -179,15 +179,17 @@ if smooth_iters:
 # i use here another heuristic which iteratively to find the initial seeds
 # using a furthest point strategy, which basically picks as a new seed the
 # vector which is the "most distant" at a given iteration using kmeans itself
+#
 # These seeds will be used later on as input to start the final kmeans run.
+
 print("Clustering started...")
 
 # Create an instance of a clustering algorithm
-
 clustering_algo = ClusteringFactory.create(clustering_name)
 clusterer = clustering_algo(mesh, vectors, n_clusters, iters, tol)
 
 # do kmeans clustering
+# what this method returns are three numpy arrays
 # labels contains the cluster index assigned to every vector in the vector field
 # centers contains the centroid of every cluster (the average of all vectors in
 # a cluster), and losses stores the losses generated per epoch.
@@ -197,7 +199,7 @@ clusterer = clustering_algo(mesh, vectors, n_clusters, iters, tol)
 
 clusterer.cluster()
 
-print("Loss Clustering: {}".format(clusterer.error))
+print("Loss Clustering: {}".format(clusterer.loss))
 print("Clustering ended!")
 
 # make an array with the assigned labels of all vectors
@@ -254,12 +256,12 @@ if export_json:
 # =============================================================================
 
 # there is a lot of potential work to do for visualization!
-# below there is the simplest snippet, but you can see more stuff 
+# below there is the simplest snippet, but you can see more stuff
 # in the scripts/visualization folder
 
 # ClusterPlotter is a custom wrapper around a COMPAS MeshPlotter
 # the COMPAS MeshPlotter is built atop of pure Matplotlib (which is crazy)
-# what is different here is that I extended the plotter so that it can plot 
+# what is different here is that I extended the plotter so that it can plot
 # vector fields directly as little lines via
 # ClusterPlotter.draw_vector_field_array()
 plotter = ClusterPlotter(mesh, figsize=(12, 9))

@@ -19,5 +19,4 @@ script:
 branches:
   only:
   - master
-  - apc524
-  - travis
+  - develop

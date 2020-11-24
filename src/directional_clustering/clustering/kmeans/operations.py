@@ -50,7 +50,7 @@ def kmeans_initialize(X, k, replace=False):
         2D array where rows are examples.
     k : `int`
         Number of clusters to generate.
-    replace : `bool`, (optional)
+    replace : `bool`, optional
         Flag to sample with or without replacement.
         Defaults to `False`.
 
