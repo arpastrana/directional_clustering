@@ -90,8 +90,8 @@ class KMeans(ClusteringAlgorithm):
         """
         Main clustering method
 
-        Input
-        -----
+        Parameters
+        ----------
 
         Returns
         -------
