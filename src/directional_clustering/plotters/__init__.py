@@ -28,6 +28,7 @@ from __future__ import print_function
 
 
 # from .<module> import *
+from .lines import *
 from .colors import *
 from .cluster_plotter import *
 from .vectors import *
