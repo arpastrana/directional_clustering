@@ -106,7 +106,7 @@ class KMeans(ClusteringAlgorithm):
         clustered_field = VectorField()
         clustered_labels = {}
 
-        for fkey, index in self.vector_field.key_index().items():
+        for index, fkey in enumerate(self.vector_field.keys()):
             vector = clusters[index, :].tolist()
             clustered_field.add_vector(fkey, vector)
             clustered_labels[fkey] = labels[index]
