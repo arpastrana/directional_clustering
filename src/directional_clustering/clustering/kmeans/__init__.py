@@ -1,8 +1,8 @@
 """
-directional_clustering.geometry
+directional_clustering.clustering.kmeans
 ****************************
 
-.. currentmodule:: directional_clustering.geometry
+.. currentmodule:: directional_clustering.clustering.kmeans
 
 
 Classes
@@ -28,7 +28,10 @@ from __future__ import print_function
 
 
 # from .<module> import *
-from .vectors import *
-from .lines import *
+from .operations import *
+from .distances import *
+from ._kmeans import *
+from .cosine import *
+from .variational import *
 
 __all__ = [name for name in dir() if not name.startswith('_')]

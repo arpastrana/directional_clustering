@@ -1,8 +1,8 @@
 """
-directional_clustering.geometry
+directional_clustering.transformations
 ****************************
 
-.. currentmodule:: directional_clustering.geometry
+.. currentmodule:: directional_clustering.transformations
 
 
 Classes
@@ -28,7 +28,8 @@ from __future__ import print_function
 
 
 # from .<module> import *
-from .vectors import *
-from .lines import *
+from .align import *
+from .smooth import *
+
 
 __all__ = [name for name in dir() if not name.startswith('_')]

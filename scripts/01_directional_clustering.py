@@ -7,16 +7,25 @@ import numpy as np
 # this are ready-made functions from COMPAS (https://compas.dev)
 from compas.datastructures import Mesh
 
+# geometry helpers
 from compas.geometry import scale_vector
 from compas.geometry import dot_vectors
 from compas.geometry import subtract_vectors
 from compas.geometry import length_vector_sqrd
 
+# clustering algorithms factory
+from directional_clustering.clustering import ClusteringFactory
+
+# vector field
+from directional_clustering.fields import VectorField
+
+# transformations
+from directional_clustering.transformations import align_vector_field
+from directional_clustering.transformations import smoothen_vector_field
+
+# these are custom-written functions part of this library
 # which you can find in the src/directional_clustering folder
 from directional_clustering import JSON
-from directional_clustering.geometry import laplacian_smoothed
-from directional_clustering.clusters import init_kmeans_farthest
-from directional_clustering.clusters import kmeans
 from directional_clustering.plotters import ClusterPlotter
 from directional_clustering.plotters import rgb_colors
 
@@ -35,7 +44,7 @@ from directional_clustering.plotters import rgb_colors
 #
 # First and second principal vectors are always orthogonal to each other.
 
-vectorfield_tags= [
+vectorfield_tags = [
     "n_1",  # axial forces in first principal direction
     "n_2",  # axial forces in second principal direction
     "m_1",  # bending moments in first principal direction
@@ -67,20 +76,18 @@ JSON_OUT = os.path.abspath(os.path.join(JSON, name_out))
 vectorfield_tag = "m_1"  # the vector field to base the clustering on
 
 # reference vector for alignment
-align_vectors = False
+align_vectors = True
 alignment_ref = [1.0, 0.0, 0.0]  # global x
-# alignment_ref = [0.0, 1.0, 0.0]  # global y
 
 # smoothing
-smooth_iters = 0  # how many iterations to run the smoothing for
+smooth_iters = 10  # how many iterations to run the smoothing for
 damping = 0.5  # damping coefficient, a value from 0 to 1
 
 # kmeans clustering
-n_clusters = 3  # number of clusters to produce
-mode = "cosine"  # "cosine" or "euclidean"
-eps = 1e-6  # loss function threshold for early stopping
-epochs_seeds = 100  # number of epochs to run the farthest seeding for
-epochs_kmeans = 100  # number of epochs to run kmeans clustering for
+clustering_name = "cosine kmeans" # algorithm name
+n_clusters = 5  # number of clusters to produce
+tol = 1e-6  # loss function threshold for early stopping
+iters = 30 # number of epochs to run kmeans clustering for
 
 # exporting
 export_json = False
@@ -99,17 +106,8 @@ mesh = Mesh.from_json(JSON_IN)
 # Extract vector field from COMPAS mesh for clustering
 # ==============================================================================
 
-# first, create a dict mapping from face keys to indices to remember what
-# vector belonged to what face. This will be handy when we plot the clustering
-# results
-fkey_idx = {fkey: index for index, fkey in enumerate(mesh.faces())}
-
-# store vector field in a dictionary where keys are the mesh face keys
-# and the values are the vectors located at every face
-vectors = {}
-for fkey in mesh.faces():
-    # this is a mesh method that will query info stored the faces of the mesh
-    vectors[fkey] = mesh.face_attribute(fkey, vectorfield_tag) 
+# Extract a vector field from the faces of a mesh
+vectors = VectorField.from_mesh_faces(mesh, vectorfield_tag)
 
 # ==============================================================================
 # Align vector field to a reference vector
@@ -132,10 +130,7 @@ for fkey in mesh.faces():
 # x and global y vectors as references, which have worked ok for my purposes.
 
 if align_vectors:
-    for fkey, vector in vectors.items():
-        # if vectors don't point in the same direction
-        if dot_vectors(alignment_ref, vector) < 0.0:
-            vectors[fkey] = scale_vector(vector, -1)  # reverse it
+    align_vector_field(vectors, alignment_ref)
 
 # ==============================================================================
 # Apply smoothing to the vector field
@@ -157,13 +152,11 @@ if align_vectors:
 # so smoothing is something to use with care
 
 if smooth_iters:
-    vectors = laplacian_smoothed(mesh, vectors, smooth_iters, damping)
+    smoothen_vector_field(vectors, mesh.face_adjacency(), smooth_iters, damping)
 
 # ==============================================================================
 # Do K-means Clustering
 # ==============================================================================
-
-# functions related to kmeans are in src/directional_clustering/clusters/
 
 # now we need to put the vector field into numpy arrays to carry out clustering
 # current limitation: at the moment this only works in planar 2d meshes!
@@ -173,14 +166,7 @@ if smooth_iters:
 # 2d mesh, carrying out clustering directly in 2d, and then reconstructing
 # the results back into the 3d mesh ("reparametrizing it back")
 
-# convert vectors dictionary into a numpy array 
-vectors_array = np.zeros((mesh.number_of_faces(), 3))
-for fkey, vec in vectors.items():
-    vectors_array[fkey, :] = vec
-
-print("Clustering started...")
-
-# One of the key differences of this work is that use cosine distance as 
+# One of the key differences of this work is that use cosine distance as
 # basis metric for clustering. this is in constrast to numpy/scipy
 # whose implementations, as far as I remember support other types of distances
 # like euclidean or manhattan in their Kmeans implementations. this would not
@@ -196,7 +182,11 @@ print("Clustering started...")
 #
 # These seeds will be used later on as input to start the final kmeans run.
 
-seeds = init_kmeans_farthest(vectors_array, n_clusters, mode, epochs_seeds, eps)
+print("Clustering started...")
+
+# Create an instance of a clustering algorithm
+clustering_algo = ClusteringFactory.create(clustering_name)
+clusterer = clustering_algo(mesh, vectors, n_clusters, iters, tol)
 
 # do kmeans clustering
 # what this method returns are three numpy arrays
@@ -207,32 +197,30 @@ seeds = init_kmeans_farthest(vectors_array, n_clusters, mode, epochs_seeds, eps)
 # every vector and the centroid of the cluster it is assigned to
 # the goal of kmeans is to minimize this loss function
 
-labels, centers, losses = kmeans(vectors_array,
-                                 seeds,
-                                 mode,
-                                 epochs_kmeans,
-                                 eps,
-                                 early_stopping=True,
-                                 verbose=True)
+clusterer.cluster()
 
-print("loss kmeans", losses[-1])
+print("Loss Clustering: {}".format(clusterer.loss))
 print("Clustering ended!")
 
 # make an array with the assigned labels of all vectors
-clusters = centers[labels]
+clustered_field = clusterer.clustered_field
+labels = clusterer.labels
 
 # ==============================================================================
 # Compute mean squared error "loss" of clustering w.r.t. original vector field
 # ==============================================================================
 
 # probably would be better to encapsulate this in a function or in a Loss object
+# clustering_error = MeanSquaredError(vector_field, clustered_field)
+# clustering_error = MeanAbsoluteError(vector_field, clustered_field)
 
 errors = np.zeros(mesh.number_of_faces())
 for fkey in mesh.faces():
     # for every face compute difference between clustering output and
     # aligned+smoothed vector, might be better to compare against the
     # raw vector
-    difference_vector = subtract_vectors(clusters[fkey], vectors_array[fkey])
+    difference_vector = subtract_vectors(clustered_field.vector(fkey),
+                                         vectors.vector(fkey))
     errors[fkey] = length_vector_sqrd(difference_vector)
 
 mse = np.mean(errors)
@@ -248,7 +236,7 @@ attr_name = vectorfield_tag + "_k_{}".format(n_clusters)  # name for storage
 
 # iterate over the faces of the COMPAS mesh
 for fkey in mesh.faces():
-    c_vector = clusters[fkey, :].tolist()  # convert numpy array to list
+    c_vector = clustered_field.vector(fkey)  # convert numpy array to list
     c_label = labels[fkey]
 
     # store clustered vector in COMPAS mesh as a face attribute
@@ -295,7 +283,7 @@ if draw_faces:
 # draw vector fields on mesh as lines
 if draw_vector_fields:
     # original vector field
-    va = vectors_array  # shorthand
+    va = vectors  # shorthand
     plotter.draw_vector_field_array(va, (50, 50, 50), True, 0.07, 0.5)
     # clustered vector field
     # plotter.draw_vector_field_array(clusters, (0, 0, 255), True, 0.07, 1.0)
