@@ -17,8 +17,5 @@ sphinx >=1.6
 twine
 scikit-learn == 0.23.2
 
-# git repositories
-git+https://github.com/arpastrana/variational_clustering.git@360d56573002f17ad5966f38a4cd2ad8723e07f1#egg=variational_clustering
-
 # install this package
 -e .
