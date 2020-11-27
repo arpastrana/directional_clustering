@@ -18,10 +18,11 @@ from compas.geometry import length_vector
 # this are custom-written functions part of this library
 # which you can find in the src/directional_clustering folder
 from directional_clustering import JSON
-from directional_clustering.geometry import laplacian_smoothed
-from directional_clustering.geometry import cosine_similarity
-from directional_clustering.clusters import init_kmeans_farthest
-from directional_clustering.clusters import kmeans
+from directional_clustering.transformations import *
+#from directional_clustering.geometry import laplacian_smoothed
+#from directional_clustering.geometry import cosine_similarity
+#from directional_clustering.clusters import init_kmeans_farthest
+#from directional_clustering.clusters import kmeans
 from directional_clustering.plotters import ClusterPlotter
 from directional_clustering.plotters import rgb_colors
 from directional_clustering.plotters import plot_kmeans_vectors
@@ -169,7 +170,8 @@ if align_vectors:
 # so smoothing is something to use with care
 
 if smooth_iters:
-    vectors = laplacian_smoothed(mesh, vectors, smooth_iters, damping)
+    #vectors = laplacian_smoothed(mesh, vectors, smooth_iters, damping)
+    smoothen_vector_field(vectors, adjacency, smooth_iters, damping)
 
 # ==============================================================================
 # Do K-means Clustering ================================================================================
