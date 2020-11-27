@@ -5,15 +5,24 @@ __all__ = ["MeshPlus"]
 
 class MeshPlus(Mesh):
     """
-    Extand the original Mesh class with an extra method "get_vectorfield"
+    Extand the original Mesh class with extra methods.
     """
-    def get_vectorfield(self, tag):
+    def get_vectorfield(self, name, vector_field = None):
         """
-        Extracts a vector field from a mesh according to a tag.
+        Get or set the vector field under some certain attribute from or in a mesh.
         """
-        vector_field = VectorField()
+        if vector_field is None:
+            vector_field = VectorField()
+            for fkey in self.faces():
+                vector_field.add_vector(fkey, self.face_attribute(fkey, name))
+            return vector_field
+        else:
+            for vkey in vector_field.keys():
+               self.face_attribute(vkey, name, vector_field.vector(vkey))
 
-        for fkey in self.faces():
-            vector_field.add_vector(fkey, self.face_attribute(fkey, tag))
 
-        return vector_field
+    def vectorfields(self):
+        """
+        Search for attributes of all supported vector fields in a mesh.
+        """
+        
