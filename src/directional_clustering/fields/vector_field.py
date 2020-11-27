@@ -162,7 +162,7 @@ class VectorField(Field):
             vector = mesh.face_attribute(fkey, name)
 
             msg = "Attribute {} is not defined on face {}!".format(name, fkey)
-            assert vector != None, msg
+            assert vector is not None, msg
 
             vector_field.add_vector(fkey, vector)
 
@@ -171,31 +171,3 @@ class VectorField(Field):
 
 if __name__ == "__main__":
     pass
-
-    vf = VectorField()
-
-    print(vf.dimensionality())
-    print(vf.size())
-
-    vf.add_vector(0, [0, 0, 1])
-
-    try:
-        vf.add_vector(1, [0, 0])
-    except ValueError:
-        pass
-    else:
-        raise "Something went wrong!"
-
-    vf.add_vector(1, [1, 0, 0])
-
-    print("Vector at 0", vf.vector(0))
-    print("Vector field keys", list(vf.keys()))
-    print("Vector field vectors", list(vf.vectors()))
-
-    vector_list = vf.to_sequence()
-    assert vector_list[0] == vf.vector(0)
-
-    vf.remove_vector(0)
-    vf.remove_vector(1)
-
-    assert vf.size() == 0
