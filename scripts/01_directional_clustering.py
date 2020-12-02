@@ -253,6 +253,11 @@ if export_json:
 # Plot stuff
 # =============================================================================
 
+# convert vectors dictionary into a numpy array
+vectors_array = np.zeros((mesh.number_of_faces(), 3))
+for fkey, vec in vectors.items():
+    vectors_array[fkey, :] = vec
+
 # there is a lot of potential work to do for visualization!
 # below there is the simplest snippet, but you can see more stuff
 # in the scripts/visualization folder
@@ -281,7 +286,7 @@ if draw_faces:
 # draw vector fields on mesh as lines
 if draw_vector_fields:
     # original vector field
-    va = vectors  # shorthand
+    va = vectors_array  # shorthand
     plotter.draw_vector_field_array(va, (50, 50, 50), True, 0.07, 0.5)
     # clustered vector field
     # plotter.draw_vector_field_array(clusters, (0, 0, 255), True, 0.07, 1.0)
