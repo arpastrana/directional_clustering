@@ -3,7 +3,7 @@ from directional_clustering.plotters import vector_lines_on_faces
 from directional_clustering.plotters import line_sdl
 
 from compas_plotters import MeshPlotter
-
+from compas.geometry import length_vector
 
 __all__ = [
     "ClusterPlotter"
@@ -36,7 +36,7 @@ class ClusterPlotter(MeshPlotter):
 
         _lines = []
 
-        rows, cols = field.shape
+        rows, _ = field.shape
         for fkey in range(rows):
             vector = field[fkey]
             vector = vector.tolist()
