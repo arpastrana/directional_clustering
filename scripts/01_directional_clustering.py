@@ -4,6 +4,9 @@ import os
 # good ol' numpy
 import numpy as np
 
+# plotter is based on Plotly (https://plotly.com/python/)
+import plotly.graph_objects as go
+
 # this are ready-made functions from COMPAS (https://compas.dev)
 from compas.datastructures import Mesh
 
@@ -268,6 +271,7 @@ for fkey, vec in vectors.items():
 # vector fields directly as little lines via
 # ClusterPlotter.draw_vector_field_array()
 plotter = ClusterPlotter(mesh, figsize=(12, 9))
+ply_plotter = go.Figure()
 
 # draw only the boundary edges of the COMPAS Mesh
 plotter.draw_edges(keys=list(mesh.edges_on_boundary()))

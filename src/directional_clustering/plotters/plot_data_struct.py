@@ -4,11 +4,12 @@ from numpy import empty
 
 __all__ = [
     "mesh_to_vertices_xyz",
-    "trimesh_to_face_connected",
+    "trimesh_face_connect",
     "lines_to_start_end_xyz",
     "lines_xyz_to_tables",
-    "lines_start_end_connected"
+    "lines_start_end_connect"
 ]
+
 
 def mesh_to_vertices_xyz(mesh):
     """
@@ -36,7 +37,8 @@ def mesh_to_vertices_xyz(mesh):
 
     return vertices_x, vertices_y, vertices_z
 
-def trimesh_to_face_connected(mesh):
+
+def trimesh_face_connect(mesh):
     """
     Organizes data structure. Splits triangulated COMPAS mesh faces into lists of vertex indices connectivity.
 
@@ -61,6 +63,7 @@ def trimesh_to_face_connected(mesh):
     face_vertex_k = faces_arr[:,2]
 
     return face_vertex_i, face_vertex_j, face_vertex_k
+
 
 def lines_to_start_end_xyz(lines):
     """
@@ -91,6 +94,7 @@ def lines_to_start_end_xyz(lines):
 
     return start_x, start_y, start_z, end_x, end_y, end_z
 
+
 def lines_xyz_to_tables(start_x, start_y, start_z, end_x, end_y, end_z):
     """
 
@@ -115,7 +119,8 @@ def lines_xyz_to_tables(start_x, start_y, start_z, end_x, end_y, end_z):
 
     return table_x, table_y, table_z
 
-def lines_start_end_connected(start_x, start_y, start_z, end_x, end_y, end_z):
+
+def lines_start_end_connect(start_x, start_y, start_z, end_x, end_y, end_z):
     """
 
     Parameters
