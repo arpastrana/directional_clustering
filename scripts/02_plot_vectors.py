@@ -119,10 +119,12 @@ fkey_idx = {fkey: index for index, fkey in enumerate(mesh.faces())}
 
 # store vector field in a dictionary where keys are the mesh face keys
 # and the values are the vectors located at every face
-vectors = {}
-for fkey in mesh.faces():
+
+#vectors = {}
+#for fkey in mesh.faces():
     # this is a mesh method that will query info stored the faces of the mesh
-    vectors[fkey] = mesh.face_attribute(fkey, vectorfield_tag) 
+#    vectors[fkey] = mesh.face_attribute(fkey, vectorfield_tag) 
+vectors = VectorField.from_mesh_faces(mesh, vectorfield_tag)
 
 # ==============================================================================
 # Align vector field to a reference vector
@@ -209,6 +211,7 @@ print("Clustering started...")
 #
 # These seeds will be used later on as input to start the final kmeans run.
 
+ClusteringFactory.create("cosine kmeans")
 seeds = init_kmeans_farthest(vectors_array, n_clusters, mode, epochs_seeds, eps)
 
 # do kmeans clustering
