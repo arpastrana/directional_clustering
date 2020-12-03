@@ -30,6 +30,8 @@ from directional_clustering import JSON
 from directional_clustering.plotters import ClusterPlotter
 from directional_clustering.plotters import rgb_colors
 
+from directional_clustering.plotters import ply_plotter	as pp
+
 # =============================================================================
 # Available Vector Fields
 # =============================================================================
@@ -95,7 +97,8 @@ export_json = False
 
 # plotter flags
 draw_faces = True
-draw_vector_fields = False
+draw_vector_fields = True
+draw_mesh_edges = False
 
 # ==============================================================================
 # Import a COMPAS mesh
@@ -270,11 +273,12 @@ for fkey, vec in vectors.items():
 # what is different here is that I extended the plotter so that it can plot
 # vector fields directly as little lines via
 # ClusterPlotter.draw_vector_field_array()
-plotter = ClusterPlotter(mesh, figsize=(12, 9))
+plotter = ClusterPlotter(mesh, figsize=(12, 9)) # matplotlib
 ply_plotter = go.Figure()
 
 # draw only the boundary edges of the COMPAS Mesh
-plotter.draw_edges(keys=list(mesh.edges_on_boundary()))
+plotter.draw_edges(keys=list(mesh.edges_on_boundary())) # matplotlib
+# TODO: add the equivalent of this function to ply_plotters
 
 if draw_faces:
     # color up the faces of the COMPAS mesh according to their cluster
@@ -285,15 +289,21 @@ if draw_faces:
     # convert labels to rgb colors
     face_colors = rgb_colors(labels_to_color, invert=False)
     # draw faces
-    plotter.draw_faces(facecolor=face_colors)
+    plotter.draw_faces(facecolor=face_colors) # matplotlib
+    ply_plotter = pp.ply_draw_trimesh(ply_plotter, mesh, face_colors, draw_mesh_edges)
 
 # draw vector fields on mesh as lines
 if draw_vector_fields:
     # original vector field
     va = vectors_array  # shorthand
-    plotter.draw_vector_field_array(va, (50, 50, 50), True, 0.07, 0.5)
+    plotter.draw_vector_field_array(va, (50, 50, 50), True, 0.07, 0.5) # matplotlib
+    ply_plotter = pp.ply_draw_vector_field_array(ply_plotter, mesh, va, (50, 50, 50), True, 0.07, 0.5)
     # clustered vector field
     # plotter.draw_vector_field_array(clusters, (0, 0, 255), True, 0.07, 1.0)
 
+# set layout, such as aspect ratio and title
+ply_plotter = pp.ply_layout(ply_plotter, "Example 01 Directional Clustering")
+
 #  show to screen
-plotter.show()
+# plotter.show() # matplotlib
+ply_plotter.show()

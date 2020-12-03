@@ -16,8 +16,8 @@ import plotly.figure_factory as ff
 from numpy import asarray
 
 __all__ = [
-    "ply_layout"
-    "draw_vector_field_lines"
+    "ply_layout",
+    "ply_draw_vector_field_array",
     "ply_draw_trimesh"
 ]
 
@@ -66,7 +66,7 @@ def ply_draw_vector_field_array(figure, mesh, field, color, uniform, scale, widt
     return figure
 
 
-def ply_draw_trimesh(figure, mesh, face_colors, draw_lines=False, opacity=0.8):
+def ply_draw_trimesh(figure, mesh, face_colors, draw_edges=False, opacity=0.8):
 
     # "v" is shorthand for vertices
     v_x, v_y, v_z = mesh_to_vertices_xyz(mesh)
@@ -81,7 +81,7 @@ def ply_draw_trimesh(figure, mesh, face_colors, draw_lines=False, opacity=0.8):
 
     figure.add_trace(figure_mesh.data[0]) # adds mesh faces
 
-    if draw_lines:
+    if draw_edges:
         figure.add_trace(figure_mesh.data[1]) # adds mesh lines
 
     figure.update_traces(opacity=opacity)
@@ -104,24 +104,4 @@ def ply_draw_vector_field_cones(figure, mesh, field):
     return figure
 
 
-""" This might be trash but not sure yet.
 
-# "s" is shorthand for start, "e" is shorthand for end
-s_x, s_y, s_z, e_x, e_y, e_z = lines_to_start_end_xyz(lines)
-
-# "fv" is shorthand for face_vertex
-fv_i, fv_j, fv_k = trimesh_face_connect(mesh)
-
-start_x, start_y, start_z, end_x, end_y, end_z = lines_to_start_end_xyz(lines)
-
-table_x, table_y, table_z = lines_xyz_to_tables(start_x, start_y, start_z, end_x, end_y, end_z)
-
-figure.add_trace(
-        go.Scatter3d(
-            x = table_x, y = table_y, z = table_z,
-            mode = 'markers',
-            marker = dict(
-                size = 2, color = 'rgb(255, 0, 0)',
-                line = dict(width = width, color = color)
-            )))
-"""
