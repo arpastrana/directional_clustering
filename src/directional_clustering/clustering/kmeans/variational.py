@@ -27,6 +27,10 @@ class VariationalKMeans(KMeans):
     tol : `float`
         The tolerance to declare convergence.
 
+    Notes
+    -----
+    This method normalizes all vectors before doing clustering.
+
     Reference
     ---------
     [1] Cohen-Steiner, D., Alliez, P., Desbrun, M. (2004). Variational Shape Approximation.
@@ -99,5 +103,6 @@ class VariationalKMeans(KMeans):
         It internally sets `self._faces` and `self._initial_clusters`.
         Returns `None`.
         """
-        self._faces = make_faces(self.mesh, self.vector_field)
+        vectors = {key: vector for key, vector in self.vector_field.items()}
+        self._faces = make_faces(self.mesh, vectors)
         self._initial_clusters = furthest_init(self.n_clusters, self._faces).pop()
