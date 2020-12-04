@@ -34,6 +34,10 @@ class KMeans(ClusteringAlgorithm):
         The tolerance to declare convergence.
     """
     def __init__(self, mesh, vector_field, n_clusters, iters, tol):
+        # check sanity
+        assert mesh.number_of_faces() >= n_clusters
+        assert len(list(vector_field)) >= n_clusters
+
         # data structures
         self.mesh = mesh
         self.vector_field = vector_field
@@ -126,7 +130,7 @@ class KMeans(ClusteringAlgorithm):
         W = kmeans_initialize(X, 1, replace)
 
         for _ in range(k-1):
-            labels, W, _ = self._cluster(X, W, self.iters, self.tol, False)
+            labels, W, _ = self._cluster(X, W, self.distance_func, self.iters, self.tol, False)
 
             values = W[labels]
 
@@ -139,16 +143,9 @@ class KMeans(ClusteringAlgorithm):
 
         self.seeds = W
 
-    def cluster(self, *args, **kwargs):
+    def cluster(self):
         """
         Cluster a vector field.
-
-        Parameters
-        ----------
-        args : `list`, optional.
-            Additional arguments.
-        kwargs : `dict`, optional.
-            Additional keyword arguments.
 
         Notes
         -----
@@ -156,7 +153,7 @@ class KMeans(ClusteringAlgorithm):
         Returns `None`.
         """
         X = np.array(self.vector_field.to_sequence())
-        r = self._cluster(X, self.seeds, self.iters, self.tol, False)
+        r = self._cluster(X, self.seeds, self.distance_func, self.iters, self.tol, False)
 
         labels, centers, losses = r
         clusters = centers[labels]
@@ -176,7 +173,8 @@ class KMeans(ClusteringAlgorithm):
         self._centers = {idx: center for idx, center in enumerate(centers)}
         self._loss = losses[-1]
 
-    def _cluster(self, X, W, iters, tol, early_stopping=True):
+    @staticmethod
+    def _cluster(X, W, dist_func, iters, tol, early_stopping=False):
         """
         Perform k-means clustering on a vector field.
 
@@ -186,6 +184,8 @@ class KMeans(ClusteringAlgorithm):
             An array with the vectors of a vector field.
         W : `np.array`, (k, 3)
             An array with the clusters' centers.
+        dist_func : `function`
+            A distance function to calculate the association metric.
         iters : `float`
             The number of iterations to run the k-means for.
         tol : `tol`
@@ -193,7 +193,7 @@ class KMeans(ClusteringAlgorithm):
         early_stopping : `bool`, optional.
             Flag to stop when tolerance threshold is met.
             Otherwise, the algorithm will exhaust all iterations.
-            Defaults to `True`.
+            Defaults to `False`.
 
         Returns
         -------
@@ -216,7 +216,7 @@ class KMeans(ClusteringAlgorithm):
         for i in range(iters):
 
             # assign labels
-            loss, labels = centroids_associate(X, W, self.distance_func)
+            loss, labels = centroids_associate(X, W, dist_func)
             losses.append(loss)
 
             # recalculate centroids
