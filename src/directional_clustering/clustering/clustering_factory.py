@@ -1,3 +1,4 @@
+from directional_clustering.clustering import ClusteringAlgorithm
 from directional_clustering.clustering import CosineKMeans
 from directional_clustering.clustering import VariationalKMeans
 
@@ -28,6 +29,7 @@ class ClusteringFactory(object):
         """
         Register a clustering algorithm.
         """
+        assert isinstance(algorithm, type(ClusteringAlgorithm))
         cls.supported_algorithms[name] = algorithm
 
 
