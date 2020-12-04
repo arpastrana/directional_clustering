@@ -8,7 +8,20 @@ __all__ = ["CosineKMeans"]
 
 class CosineKMeans(KMeans):
     """
-    K-means clustering using cosine distance as association metric.
+    K-means clustering using cosine distance as the association metric.
+
+    Parameters
+    ----------
+    mesh : `directional_clustering.mesh.MeshPlus`
+        A reference mesh. Reserved.
+    vector_field : `directional_clustering.fields.VectorField`
+        The vector field to cluster.
+    n_clusters : `int`
+        The number of clusters to generate.
+    iters : `int`
+        The iterations to run the algorithm for.
+    tol : `float`
+        The tolerance to declare convergence.
     """
     def __init__(self, mesh, vector_field, n_clusters, iters, tol):
         # initialize parent class constructor

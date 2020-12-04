@@ -19,6 +19,19 @@ __all__ = ["KMeans"]
 class KMeans(ClusteringAlgorithm):
     """
     Generic K-means clustering algorithm.
+
+    Parameters
+    ----------
+    mesh : `directional_clustering.mesh.MeshPlus`
+        A reference mesh.
+    vector_field : `directional_clustering.fields.VectorField`
+        The vector field to cluster.
+    n_clusters : `int`
+        The number of clusters to generate.
+    iters : `int`
+        The iterations to run the algorithm for.
+    tol : `float`
+        The tolerance to declare convergence.
     """
     def __init__(self, mesh, vector_field, n_clusters, iters, tol):
         # data structures
@@ -48,23 +61,63 @@ class KMeans(ClusteringAlgorithm):
     @property
     def loss(self):
         """
+        The total loss that k-means produced after clustering a vector field.
+
+        Returns
+        -------
+        loss : `float`
+            The loss.
+
+        Notes
+        -----
+        This is computed as the mean squared distance of to the k-centers.
         """
         return self._loss
 
     @property
     def clustered_field(self):
         """
+        The clustered vector field.
+
+        Returns
+        -------
+        vector_field : `directional_clustering.fields.VectorField`
+            The clustered vector field.
+
+        Notes
+        -----
+        The vector field will contain k-unique vectors.
+        This is a new object that leaves the original vector field unchanged.
         """
         return self._clustered_field
 
     @property
     def labels(self):
         """
+        A mapping from a vector field's keys to the indices of the clusters centers.
+
+        Returns
+        -------
+        labels : `dict`
+            A dictionary of the form `{key: cluster_index}`.
         """
         return self._labels
 
     def _create_seeds(self, metric):
         """
+        Find the initial seeds using random picking without replacement.
+
+        Parameters
+        ----------
+        metric : `str`
+            The name of the distance metric to use.
+            Available options are `"cosine"` and `"euclidean"`.
+            Check `sklearn.metrics.pairwise.pairwise_distances` for more info.
+
+        Notes
+        -----
+        This is a private method.
+        It sets `self.seeds` and returns `None`.
         """
         X = np.array(self.vector_field.to_sequence())
         k = self.n_clusters
@@ -88,15 +141,21 @@ class KMeans(ClusteringAlgorithm):
 
     def cluster(self, *args, **kwargs):
         """
-        Main clustering method
+        Cluster a vector field.
 
         Parameters
         ----------
+        args : `list`, optional.
+            Additional arguments.
+        kwargs : `dict`, optional.
+            Additional keyword arguments.
 
-        Returns
-        -------
+        Notes
+        -----
+        It sets `self._clustered_field`, `self_labels`, `self.centers`, and `self.loss`.
+        Returns `None`.
         """
-        X = np.array(self.vector_field.to_sequence())  # TODO
+        X = np.array(self.vector_field.to_sequence())
         r = self._cluster(X, self.seeds, self.iters, self.tol, False)
 
         labels, centers, losses = r
@@ -119,13 +178,36 @@ class KMeans(ClusteringAlgorithm):
 
     def _cluster(self, X, W, iters, tol, early_stopping=True):
         """
-        Internal clustering method
+        Perform k-means clustering on a vector field.
 
         Parameters
         ----------
+        X : `np.array`, (n, 3)
+            An array with the vectors of a vector field.
+        W : `np.array`, (k, 3)
+            An array with the clusters' centers.
+        iters : `float`
+            The number of iterations to run the k-means for.
+        tol : `tol`
+            The loss relative difference between iterations to declare early convergence.
+        early_stopping : `bool`, optional.
+            Flag to stop when tolerance threshold is met.
+            Otherwise, the algorithm will exhaust all iterations.
+            Defaults to `True`.
 
         Returns
         -------
+        labels : `np.array` (n, )
+            The index of the center closest to every vector in the vector field.
+        W : `np.array` (k, 3)
+            The cluster centers of a vector field.
+        losses : `list` of `float`
+            The losses generated at every iteration.
+
+        Notes
+        -----
+        The nuts and bolts of kmeans clustering.
+        This is a private method.
         """
         k, d = W.shape
 
@@ -134,23 +216,23 @@ class KMeans(ClusteringAlgorithm):
         for i in range(iters):
 
             # assign labels
-            loss, assoc = centroids_associate(X, W, self.distance_func)
+            loss, labels = centroids_associate(X, W, self.distance_func)
             losses.append(loss)
 
             # recalculate centroids
-            W = centroids_estimate(X, k, assoc)
+            W = centroids_estimate(X, k, labels)
 
             # check for exit
             if i < 2 or not early_stopping:
                 continue
 
-            # check if relative loss difference between two iterations is too small
+            # check if relative loss difference between two iterations is small
             if fabs((losses[-2] - losses[-1]) / losses[-1]) < tol:
                 print("Early stopping at {}/{} iteration".format(i, iters))
                 break
 
-        return assoc, W, losses
+        return labels, W, losses
 
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     pass
