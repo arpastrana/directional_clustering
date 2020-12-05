@@ -190,6 +190,8 @@ def vectors_dict_to_array(vectors, num_faces):
     vectors_array : `ndarray`
         Array of vectors
     """
+    if type(vectors) is not dict:
+        raise TypeError
 
     # convert vectors dictionary into a numpy array
     vectors_array = zeros((num_faces, 3))

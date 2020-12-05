@@ -65,20 +65,29 @@ def test_coord_start_end_none():
     assert all([0.0==c[0], 2.0==c[1], isnan(c[2]),
                 1.0==c[3], 3.0==c[4], isnan(c[5])])
 
-def test_lines_start_end_connect():
+def test_lines_start_end_connect(start, end):
     """
-    Test
+    Tests outputs when a list of one line is passed in.
     """
-    pass
+    cx, cy, cz = lines_start_end_connect([start[0]], [start[1]], [start[2]],
+                            [end[0]], [end[1]], [end[2]])
+
+    test_x = all([start[0]==cx[0], end[0]==cx[1], isnan(cx[2])])
+    test_y = all([start[1]==cy[0], end[1]==cy[1], isnan(cy[2])])
+    test_z = all([start[2]==cz[0], end[2]==cz[1], isnan(cz[2])])
+    assert all([test_x, test_y, test_z])
 
 def test_vectors_dict_to_array():
     """
-    Test
+    Test if vectors is type dictionary.
     """
-    pass
+    with pytest.raises(TypeError):
+        vectors_dict_to_array([0, 1, 2], 1)
 
-def test_face_centroids():
+
+def test_face_centroids(quadmesh_no_attr):
     """
-    Test
+    Tests function is returning the centroid of a face of a mesh.
     """
-    pass
+    cx, cy, cz = face_centroids(quadmesh_no_attr)
+    assert all([[cx==0.5], [cy==0.5], [cz==0.0]])
