@@ -1,24 +1,40 @@
+import os
 from compas.datastructures import Mesh
 from directional_clustering.fields import VectorField
-import os
 
 __all__ = ["MeshPlus"]
 
 class MeshPlus(Mesh):
     """
-    Extand the original Mesh class with extra methods.
+    Extend a COMPAS Mesh with methods to parse vector fields.
+    
+    Parameters
+    -----------
+    See `help(compas.datastructures.Mesh)` for details on the constructor signature.
     """
-    def vectorfield(self, name, vector_field = None):
+    def vector_field(self, name, vector_field=None):
         """
-        Get or set the vector field under some certain attribute from or in a mesh.
+        Get or store a vector field based on the face attributes of a Mesh.
+
+        Parameters
+        -----------
+        name  : `str`
+            The name of the vector field to get or to set.
+        vector_field  : `directional_clustering.fields.VectorField`, optional.
+            The vector field to store.
+        
+        Returns
+        --------
+        vector_field : `directional_clustering.fields.VectorField`
+            The fetched vector field if only `name` was passed in as a parameter. 
         """
         if vector_field is None:
             vector_field = VectorField()
             for fkey in self.faces():
                 try:
-                    value = self.face_attribute(fkey, name)
+                    vector = self.face_attribute(fkey, name)
                     if type(value) is list:
-                        vector_field.add_vector(fkey, value)
+                        vector_field.add_vector(fkey, vector)
                     else:
                         raise ValueError
                 except ValueError:
@@ -30,9 +46,13 @@ class MeshPlus(Mesh):
                 self.face_attribute(vkey, name, vector_field.vector(vkey))
 
 
-    def all_vectorfields(self):
+    def vector_fields(self):
         """
         Search for attributes of all supported vector fields in a mesh.
+
+        Returns
+        --------
+        attr_vectorfield : all supported attributes storing a vector field of a mesh
         """
         fkey = self.get_any_face()
 
