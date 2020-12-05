@@ -33,17 +33,15 @@ class PlyPlotter(go.Figure):
         """
         Sets title of the plot and sets the aspect ratio to the data. The default aspect ratio is of a cube, which distorts the image.
         """
-
         self.update_layout(
-            title_text = title,
-            showlegend = False,
-            scene = dict(aspectmode = 'data'))
+            title_text=title,
+            showlegend=False,
+            scene=dict(aspectmode='data'))
 
     def draw_vector_field_array(self, mesh, vectors, color, uniform, scale, width=0.5):
         """
         Plots the vector field.
         """
-
         field = vectors_dict_to_array(vectors, mesh.number_of_faces())
         lines = []
 
@@ -65,24 +63,24 @@ class PlyPlotter(go.Figure):
         s_x, s_y, s_z, e_x, e_y, e_z = lines_to_start_end_xyz(lines)
 
         # "cse" is shorthand for connected start and end
-        cse_x, cse_y, cse_z = lines_start_end_connect(s_x, s_y, s_z, e_x, e_y, e_z)
+        cse_x, cse_y, cse_z = lines_start_end_connect(s_x, s_y, s_z,
+            e_x, e_y, e_z)
 
         # add lines to plot
         self.add_trace(
             go.Scatter3d(
-                x = cse_x,
-                y = cse_y,
-                z = cse_z,
-                mode = 'lines',
-                line = dict(width=2, color=color),
-                opacity = 1
+                x=cse_x,
+                y=cse_y,
+                z=cse_z,
+                mode='lines',
+                line=dict(width=2, color=color),
+                opacity=1
             ))
 
     def draw_trimesh(self, mesh, paint_clusters, draw_edges=False, opacity=0.8):
         """
         Plots the mesh with or without its edges, depending on what is chosen in `draw_edges`. Draws face colors according to values in each face.
         """
-
         # color up the faces of the COMPAS mesh according to their cluster
         # make a dictionary with all labels
         if paint_clusters:
@@ -102,11 +100,11 @@ class PlyPlotter(go.Figure):
 
         # we must go for another type of plot if we want to have the option of drawing mesh edges down the line
         figure_mesh = ff.create_trisurf(
-            x = v_x,
-            y = v_y,
-            z = v_z,
-            simplices = asarray(mesh_faces),
-            color_func = face_colors
+            x=v_x,
+            y=v_y,
+            z=v_z,
+            simplices=asarray(mesh_faces),
+            color_func=face_colors
             )
 
         self.add_trace(figure_mesh.data[0]) # adds mesh faces
@@ -127,12 +125,12 @@ class PlyPlotter(go.Figure):
 
         self.add_trace(
             go.Cone(
-                x = c_x,
-                y = c_y,
-                z = c_z,
-                u = field[:,0],
-                v = field[:,1],
-                w = field[:,2]
+                x=c_x,
+                y=c_y,
+                z=c_z,
+                u=field[:,0],
+                v=field[:,1],
+                w=field[:,2]
                 ))
 
 
