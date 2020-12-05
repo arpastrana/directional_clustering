@@ -16,6 +16,7 @@ sphinx_compas_theme >=0.4
 sphinx >=1.6
 twine
 scikit-learn == 0.23.2
+plotly == 4.13.0
 
 # install this package
 -e .

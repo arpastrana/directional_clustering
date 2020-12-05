@@ -44,12 +44,12 @@ def test_line_sdl_1D(direction, length):
     ln = line_sdl(start1D, direction, length)
     assert ln == ([-1.0], [1.0])
 
-def test_vector_lines_on_faces_mesh_no_attr(mesh_no_attr, vector_tag):
+def test_vector_lines_on_faces_mesh_no_attr(quadmesh_no_attr, vector_tag):
     """
     Tests if the input of a mesh with no attributes raises an error.
     """
     with pytest.raises(ValueError):
-        vector_lines_on_faces(mesh_no_attr, vector_tag)
+        vector_lines_on_faces(quadmesh_no_attr, vector_tag)
 
 def test_vector_lines_on_faces_mesh_attr(mesh_attr, vector_tag):
     """

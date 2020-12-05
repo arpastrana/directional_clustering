@@ -1,107 +1,140 @@
-from directional_clustering.plotters import mesh_to_vertices_xyz
-from directional_clustering.plotters import trimesh_face_connect
-from directional_clustering.plotters import lines_to_start_end_xyz
-from directional_clustering.plotters import lines_xyz_to_tables
-from directional_clustering.plotters import lines_start_end_connect
+from numpy import zeros
+from numpy import asarray
 
-from directional_clustering.plotters import line_tuple_to_dict
-from directional_clustering.plotters import vector_lines_on_faces
-from directional_clustering.plotters import line_sdl
-
-from compas.geometry import length_vector
-
+# plotter is based on Plotly (https://plotly.com/python/)
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
 
-from numpy import asarray
+from compas.geometry import length_vector
+
+from directional_clustering.plotters import mesh_to_vertices_xyz
+from directional_clustering.plotters import lines_to_start_end_xyz
+from directional_clustering.plotters import lines_start_end_connect
+from directional_clustering.plotters import vectors_dict_to_array
+from directional_clustering.plotters import face_centroids
+from directional_clustering.plotters import line_sdl
+from directional_clustering.plotters import rgb_colors
 
 __all__ = [
-    "ply_layout",
-    "ply_draw_vector_field_array",
-    "ply_draw_trimesh"
+    "PlyPlotter"
 ]
 
-# TODO: turn the functions in this file into a class (decorator)
+# TODO: see decorator style
 
-def ply_layout(figure, title):
+class PlyPlotter(go.Figure):
+    """
+    PlyPlotter is a custom wrapper around a Plotly.py graph object plotter.
+    """
 
-    figure.update_layout(
-        title_text = title,
-        showlegend = False,
-        scene = dict(aspectmode = 'data'))
+    def __init__(self, *args):
+        super(PlyPlotter, self).__init__(*args)
 
-    return figure
+    def set_title(self, title):
+        """
+        Sets title of the plot and sets the aspect ratio to the data. The default aspect ratio is of a cube, which distorts the image.
+        """
 
+        self.update_layout(
+            title_text = title,
+            showlegend = False,
+            scene = dict(aspectmode = 'data'))
 
-def ply_draw_vector_field_array(figure, mesh, field, color, uniform, scale, width=0.5):
-    lines = []
+    def draw_vector_field_array(self, mesh, vectors, color, uniform, scale, width=0.5):
+        """
+        Plots the vector field.
+        """
 
-    rows, _ = field.shape
-    for fkey in range(rows):
-        vector = field[fkey]
-        vector = vector.tolist()
+        field = vectors_dict_to_array(vectors, mesh.number_of_faces())
+        lines = []
 
-        if uniform:
-            vec_length = scale
-        else:
-            vec_length = length_vector(vector) * scale
+        # get lines
+        rows, _ = field.shape
+        for fkey in range(rows):
+            vector = field[fkey]
+            vector = vector.tolist()
 
-        pt = mesh.face_centroid(fkey)
-        lines.append(line_sdl(pt, vector, vec_length))
+            if uniform:
+                vec_length = scale
+            else:
+                vec_length = length_vector(vector) * scale
 
-    # "s" is shorthand for start, "e" is shorthand for end
-    s_x, s_y, s_z, e_x, e_y, e_z = lines_to_start_end_xyz(lines)
+            pt = mesh.face_centroid(fkey)
+            lines.append(line_sdl(pt, vector, vec_length))
 
-    # "cse" is shorthand for connected start and end
-    cse_x, cse_y, cse_z = lines_start_end_connect(s_x, s_y, s_z, e_x, e_y, e_z)
+        # "s" is shorthand for start, "e" is shorthand for end
+        s_x, s_y, s_z, e_x, e_y, e_z = lines_to_start_end_xyz(lines)
 
-    figure.add_trace(
-        go.Scatter3d(
-            x = cse_x, y = cse_y, z = cse_z,
-            mode = 'lines',
-            line = dict(width = 2,color = 'black'),
-            opacity = 1
-        ))
+        # "cse" is shorthand for connected start and end
+        cse_x, cse_y, cse_z = lines_start_end_connect(s_x, s_y, s_z, e_x, e_y, e_z)
 
-    return figure
-
-
-def ply_draw_trimesh(figure, mesh, face_colors, draw_edges=False, opacity=0.8):
-
-    # "v" is shorthand for vertices
-    v_x, v_y, v_z = mesh_to_vertices_xyz(mesh)
-
-    _, mesh_faces = mesh.to_vertices_and_faces()
-
-    figure_mesh = ff.create_trisurf(
-        x = v_x, y = v_y, z = v_z,
-        simplices = asarray(mesh_faces),
-        color_func = list(face_colors.values())
-        )
-
-    figure.add_trace(figure_mesh.data[0]) # adds mesh faces
-
-    if draw_edges:
-        figure.add_trace(figure_mesh.data[1]) # adds mesh lines
-
-    figure.update_traces(opacity=opacity)
-
-    return figure
-
-
-def ply_draw_vector_field_cones(figure, mesh, field):
-
-    for fkey in mesh.faces():
-        # "c" is shorthand for centroid
-        c_x, c_y, c_z = mesh.face_centroid(fkey)
-
-    figure.add_trace(
-        data = go.Cone(
-            x=c_x, y=c_y, z=c_z,
-            u=field[:,0], v=field[:,1], w=field[:,2]
+        # add lines to plot
+        self.add_trace(
+            go.Scatter3d(
+                x = cse_x,
+                y = cse_y,
+                z = cse_z,
+                mode = 'lines',
+                line = dict(width=2, color=color),
+                opacity = 1
             ))
 
-    return figure
+    def draw_trimesh(self, mesh, paint_clusters, draw_edges=False, opacity=0.8):
+        """
+        Plots the mesh with or without its edges, depending on what is chosen in `draw_edges`. Draws face colors according to values in each face.
+        """
+
+        # color up the faces of the COMPAS mesh according to their cluster
+        # make a dictionary with all labels
+        if paint_clusters:
+            labels_to_color = {}
+            for fkey in mesh.faces():
+                labels_to_color[fkey] = mesh.face_attribute(key=fkey, name="cluster")
+            # convert labels to rgb colors
+            face_colors = rgb_colors(labels_to_color, invert=False)
+            face_colors = list(face_colors.values())
+        else:
+            face_colors = [(255,255,255) for i in range(mesh.number_of_faces())]
+
+        # "v" is shorthand for vertices
+        v_x, v_y, v_z = mesh_to_vertices_xyz(mesh)
+
+        _, mesh_faces = mesh.to_vertices_and_faces()
+
+        # we must go for another type of plot if we want to have the option of drawing mesh edges down the line
+        figure_mesh = ff.create_trisurf(
+            x = v_x,
+            y = v_y,
+            z = v_z,
+            simplices = asarray(mesh_faces),
+            color_func = face_colors
+            )
+
+        self.add_trace(figure_mesh.data[0]) # adds mesh faces
+
+        if draw_edges:
+            self.add_trace(figure_mesh.data[1]) # adds mesh lines
+
+        self.update_traces(opacity=opacity)
+
+    def draw_vector_field_cones(self, mesh, vectors):
+        """
+        Plots the vector field as cones. Automatic color scale is set to vary with magnitude of the vector.
+        """
+        num_faces = mesh.number_of_faces()
+        field = vectors_dict_to_array(vectors, num_faces)
+
+        c_x, c_y, c_z = face_centroids(mesh)
+
+        self.add_trace(
+            go.Cone(
+                x = c_x,
+                y = c_y,
+                z = c_z,
+                u = field[:,0],
+                v = field[:,1],
+                w = field[:,2]
+                ))
 
 
-
+if __name__ == "__main__":
+    pass

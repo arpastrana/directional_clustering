@@ -7,7 +7,9 @@ __all__ = [
     "trimesh_face_connect",
     "lines_to_start_end_xyz",
     "lines_xyz_to_tables",
-    "lines_start_end_connect"
+    "lines_start_end_connect",
+    "vectors_dict_to_array",
+    "face_centroids"
 ]
 
 
@@ -49,13 +51,13 @@ def trimesh_face_connect(mesh):
 
     Returns
     -------
-    face_vertex_i, face_vertex_j, face_vertex_k : `tuple`
+    face_vertex_i, face_vertex_j, face_vertex_k : `tuple` of `list`
         Returns lists of i, j, k indices of mesh faces.
     """
     _, mesh_faces = mesh.to_vertices_and_faces()
     faces_arr = asarray(mesh_faces)
 
-    # TODO: test if mesh is not triangulated
+    # TODO: test if mesh is triangulated
 
     # get separate arrays for vertex connectivity i, j, k
     face_vertex_i = faces_arr[:,0]
@@ -67,13 +69,17 @@ def trimesh_face_connect(mesh):
 
 def lines_to_start_end_xyz(lines):
     """
+    Arranges start and end points of lines into lists of xyz coordinates.
 
     Parameters
     ----------
+    lines : `tuple`
+        Start and end point of a line.
 
     Returns
     -------
-
+    start_x, start_y, start_z, end_x, end_y, end_z : `tuple`
+        Returns lists of coordinates of start and end points of lines.
     """
 
     num_lines = len(lines)
@@ -97,13 +103,17 @@ def lines_to_start_end_xyz(lines):
 
 def lines_xyz_to_tables(start_x, start_y, start_z, end_x, end_y, end_z):
     """
+    Arranges lists of xyz coordinates of lines into tables of start and end coordinate.
 
     Parameters
     ----------
+    start_x, start_y, start_z, end_x, end_y, end_z : `tuple`
+        Lists of coordinates of start and end points of lines.
 
     Returns
     -------
-
+    table_x, table_y, table_z : `tuple`
+        2D lists of start and end coordinates of lines.
     """
 
     num_lines = len(start_x)
@@ -119,40 +129,99 @@ def lines_xyz_to_tables(start_x, start_y, start_z, end_x, end_y, end_z):
 
     return table_x, table_y, table_z
 
-
-def lines_start_end_connect(start_x, start_y, start_z, end_x, end_y, end_z):
+def coord_start_end_none(start, end, num_lines):
     """
-
+    Helper function to lines_start_end_connect.
     Parameters
     ----------
+    start, end : `list`
+        List of numbers representing one coordinate of start and end points of lines.
 
     Returns
     -------
+    connect : `list`
+        List of of a start and end coordinate with `nan` as separator.
+    """
 
+    connect = empty(3 * num_lines)
+    connect[::3] = start
+    connect[1::3] = end
+    connect[2::3] = None
+
+    return connect
+
+def lines_start_end_connect(start_x, start_y, start_z, end_x, end_y, end_z):
+    """
+    Arranges connectivity of lines into a table with respective coordinates to connect and None to separate each line coordinate.
+
+    Parameters
+    ----------
+    start_x, start_y, start_z, end_x, end_y, end_z : `list`
+        Lists of coordinates of start and end points of lines.
+
+    Returns
+    -------
+    connected_x, connected_y, connected_z : `tuple`
+        Lists of start and end coordinates of lines with `nan` as separators.
     """
     num_lines = len(start_x)
 
-    connected_x = []
-    connected_y = []
-    connected_z = []
-
-    connected_x = empty(3 * num_lines)
-    connected_x[::3] = start_x
-    connected_x[1::3] = end_x
-    connected_x[2::3] = None
-
-    connected_y = empty(3 * num_lines)
-    connected_y[::3] = start_y
-    connected_y[1::3] = end_y
-    connected_y[2::3] = None
-
-    connected_z = empty(3 * num_lines)
-    connected_z[::3] = start_z
-    connected_z[1::3] = end_z
-    connected_z[2::3] = None
+    connected_x = coord_start_end_none(start_x, end_x, num_lines)
+    connected_y = coord_start_end_none(start_y, end_y, num_lines)
+    connected_z = coord_start_end_none(start_z, end_z, num_lines)
 
     return connected_x, connected_y, connected_z
 
+def vectors_dict_to_array(vectors, num_faces):
+    """
+    Returns an array of vectors when a dictionary of vectors is passed in.
+
+    Parameters
+    ----------
+    vectors : `dict`
+        A dictionary of vectors.
+    num_faces : `int`
+        Number of faces in the mesh.
+
+    Returns
+    -------
+    vectors_array : `ndarray`
+        Array of vectors
+    """
+
+    # convert vectors dictionary into a numpy array
+    vectors_array = zeros((num_faces, 3))
+    for fkey, vec in vectors.items():
+        vectors_array[fkey, :] = vec
+    return vectors_array
+
+def face_centroids(mesh):
+    """
+    Arranges the centroids of a mesh into lists of each xyz coordinate.
+
+    Parameters
+    ----------
+    mesh : `compas.datastructures.Mesh`
+        A COMPAS mesh.
+
+    Returns
+    -------
+    c_x, c_y, c_z : `tuple`
+        Returns lists of x, y, z coordinates of the centroids of a mesh.
+    """
+
+    num_faces = mesh.number_of_faces()
+
+    # "c" is shorthand for centroid
+    c_x = zeros(num_faces)
+    c_y = zeros(num_faces)
+    c_z = zeros(num_faces)
+
+    for fkey in mesh.faces():
+        # "c" is shorthand for centroid
+        c_x[fkey], c_y[fkey], c_z[fkey] = mesh.face_centroid(fkey)
+
+    return c_x, c_y, c_z
 
 if __name__ == "__main__":
     pass
