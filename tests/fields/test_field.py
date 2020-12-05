@@ -5,7 +5,6 @@ import pytest
 # Tests
 # ==============================================================================
 
-
 def test_field_size(field_2d, field_3d):
     """
     Checks the number of entries in a field is correct.

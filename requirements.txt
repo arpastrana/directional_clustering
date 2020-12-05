@@ -1,3 +1,2 @@
-
 COMPAS>=0.16.1
-
+variational_clustering @ git+https://github.com/arpastrana/variational_clustering.git@9fbd30efeba6ab3d3255ac2ef13f9ed6574002b0

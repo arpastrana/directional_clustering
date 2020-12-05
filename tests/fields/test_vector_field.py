@@ -10,7 +10,7 @@ from directional_clustering.fields import VectorField
 
 def test_vector_field_dimensionality(vector_field):
     """
-    Checks the dimensionality is equal to three.
+    Checks that the dimensionality is equal to three.
     """
     assert vector_field.dimensionality() == 3
 
@@ -51,7 +51,7 @@ def test_vector_field_remove_all(vector_field):
 
 def test_vector_field_remove_wrong_key(vector_field):
     """
-    Attempt to remove an unexistant entry from a vector field.
+    Attempts to remove an unexistant entry from a vector field.
     """
     with pytest.raises(KeyError):
         vector_field.remove_vector(999)
@@ -83,7 +83,7 @@ def test_vector_field_vectors(vector_field, vectors_3d):
 
 def test_vector_field_to_sequence(vector_field):
     """
-    Test that a list of length 2 is output.
+    Tests that a list of length 2 is output.
     """
     seq = vector_field.to_sequence()
     assert len(seq) == vector_field.size()

@@ -13,8 +13,8 @@ from math import degrees
 
 from compas.utilities import i_to_rgb
 
-from directional_clustering.geometry import vector_from_angle
-from directional_clustering.geometry import vectors_from_angles
+from directional_clustering.plotters import vector_from_angle
+from directional_clustering.plotters import vectors_from_angles
 
 
 __all__ = [

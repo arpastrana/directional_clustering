@@ -79,10 +79,11 @@ interface, let's type the following and hit enter:
 
 ```bash
 python -c "import directional_clustering"
+python -c "import variational_clustering"
 ```
 
 If no errors occur, smile 🙂! You have a working installation of
-`directional_clustering`.
+`directional_clustering` and `variational_clustering`.
 
 ## Contributing
 
