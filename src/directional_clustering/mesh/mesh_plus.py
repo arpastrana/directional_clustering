@@ -52,7 +52,8 @@ class MeshPlus(Mesh):
 
         Returns
         --------
-        attr_vectorfield : all supported attributes storing a vector field of a mesh
+        attr_vectorfield : `list`
+            A list of all attributes storing vector field of a mesh.
         """
         fkey = self.get_any_face()
 
