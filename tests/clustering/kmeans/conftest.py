@@ -10,6 +10,7 @@ from directional_clustering.clustering import KMeans
 from directional_clustering.clustering import CosineKMeans
 from directional_clustering.clustering import VariationalKMeans
 
+
 # ==============================================================================
 # Fixtures
 # ==============================================================================

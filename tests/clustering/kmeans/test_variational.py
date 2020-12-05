@@ -13,7 +13,7 @@ from directional_clustering.clustering import distance_cosine
 
 def test_loss(variational_kmeans):
     """
-    Verifies that the clustering loss is zero for the test vector field.
+    Verifies that the clustering loss is zero for a test vector field.
     """
     variational_kmeans.cluster()
     assert variational_kmeans.loss == 0.0
