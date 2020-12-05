@@ -15,6 +15,13 @@ def start():
     return [0.0, 1.0, 0.0]
 
 @pytest.fixture
+def end():
+    """
+    3D point as end point.
+    """
+    return [1.0, 1.0, 0.0]
+
+@pytest.fixture
 def direction():
     """
     3D vector as direction.

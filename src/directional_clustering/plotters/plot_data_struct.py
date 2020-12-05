@@ -7,6 +7,7 @@ __all__ = [
     "trimesh_face_connect",
     "lines_to_start_end_xyz",
     "lines_xyz_to_tables",
+    "coord_start_end_none",
     "lines_start_end_connect",
     "vectors_dict_to_array",
     "face_centroids"
@@ -51,7 +52,7 @@ def trimesh_face_connect(mesh):
 
     Returns
     -------
-    face_vertex_i, face_vertex_j, face_vertex_k : `tuple` of `list`
+    face_vertex_i, face_vertex_j, face_vertex_k : `tuple` of `array`
         Returns lists of i, j, k indices of mesh faces.
     """
     _, mesh_faces = mesh.to_vertices_and_faces()
@@ -73,7 +74,7 @@ def lines_to_start_end_xyz(lines):
 
     Parameters
     ----------
-    lines : `tuple`
+    lines : `list` of tuple`
         Start and end point of a line.
 
     Returns
@@ -112,7 +113,7 @@ def lines_xyz_to_tables(start_x, start_y, start_z, end_x, end_y, end_z):
 
     Returns
     -------
-    table_x, table_y, table_z : `tuple`
+    table_x, table_y, table_z : `tuple` of `list`
         2D lists of start and end coordinates of lines.
     """
 
@@ -129,23 +130,24 @@ def lines_xyz_to_tables(start_x, start_y, start_z, end_x, end_y, end_z):
 
     return table_x, table_y, table_z
 
-def coord_start_end_none(start, end, num_lines):
+def coord_start_end_none(nums_1st, nums_2nd, num_lines):
     """
     Helper function to lines_start_end_connect.
+    Orders a list with 1st number of 1st list, 2nd number of 2nd list, and None; then 2nd number of 1st list, 2nd number of 2nd list, and None; and so on, until the end of the list.
     Parameters
     ----------
-    start, end : `list`
-        List of numbers representing one coordinate of start and end points of lines.
+    nums_1st, nums_2nd : `list`
+        List of numbers to reorder.
 
     Returns
     -------
     connect : `list`
-        List of of a start and end coordinate with `nan` as separator.
+        Combined list of 1st number, 2nd number, and `nan` as separator.
     """
 
     connect = empty(3 * num_lines)
-    connect[::3] = start
-    connect[1::3] = end
+    connect[::3] = nums_1st
+    connect[1::3] = nums_2nd
     connect[2::3] = None
 
     return connect
@@ -222,6 +224,7 @@ def face_centroids(mesh):
         c_x[fkey], c_y[fkey], c_z[fkey] = mesh.face_centroid(fkey)
 
     return c_x, c_y, c_z
+
 
 if __name__ == "__main__":
     pass
