@@ -54,7 +54,7 @@ Next, let's create a new `conda` environment from your command line interface
 The only required dependencies are `python`, `numpy`, `sklearn`, and `compas`.
 
 ```bash
-conda create -n clusters python=3.7 COMPAS=0.16.9 scikit-learn plotly=4.13.0
+conda create -n clusters python=3.7 COMPAS=0.16.9 scikit-learn
 conda activate clusters
 ```
 

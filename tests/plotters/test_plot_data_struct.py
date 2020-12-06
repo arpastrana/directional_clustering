@@ -34,6 +34,7 @@ def test_trimesh_face_connect(trimesh_attr):
 
     assert all([[i==[0]], [j==[1]], [k==[2]]])
 
+
 def test_lines_to_start_end_xyz(start, end):
     """
     Test order and type (list) of output.
@@ -44,15 +45,18 @@ def test_lines_to_start_end_xyz(start, end):
     assert all([[sx==start[0]], [sy==start[1]], [sz==start[2]],
                 [ex==end[0]], [ey==end[1]], [ez==end[2]]])
 
+
 def test_lines_xyz_to_tables(start, end):
     """
     Test order of 2D list output.
     """
-    tx, ty, tz = lines_xyz_to_tables([start[0]], [start[1]], [start[2]], [end[0]], [end[1]], [end[2]])
+    tx, ty, tz = lines_xyz_to_tables([start[0]], [start[1]], [start[2]],
+        [end[0]], [end[1]], [end[2]])
 
     assert all([start[0]==tx[0][0], end[0]==tx[0][1],
                 start[1]==ty[0][0], end[1]==ty[0][1],
                 start[2]==tz[0][0], end[2]==tz[0][1]])
+
 
 def test_coord_start_end_none():
     """
@@ -65,6 +69,7 @@ def test_coord_start_end_none():
     assert all([0.0==c[0], 2.0==c[1], isnan(c[2]),
                 1.0==c[3], 3.0==c[4], isnan(c[5])])
 
+
 def test_lines_start_end_connect(start, end):
     """
     Tests outputs when a list of one line is passed in.
@@ -76,6 +81,7 @@ def test_lines_start_end_connect(start, end):
     test_y = all([start[1]==cy[0], end[1]==cy[1], isnan(cy[2])])
     test_z = all([start[2]==cz[0], end[2]==cz[1], isnan(cz[2])])
     assert all([test_x, test_y, test_z])
+
 
 def test_vectors_dict_to_array():
     """

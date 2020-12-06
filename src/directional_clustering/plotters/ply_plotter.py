@@ -15,34 +15,37 @@ from directional_clustering.plotters import face_centroids
 from directional_clustering.plotters import line_sdl
 from directional_clustering.plotters import rgb_colors
 
+
 __all__ = [
     "PlyPlotter"
 ]
 
 # TODO: see decorator style
 
+
 class PlyPlotter(go.Figure):
     """
     PlyPlotter is a custom wrapper around a Plotly.py graph object plotter.
     """
-
     def __init__(self, *args):
         super(PlyPlotter, self).__init__(*args)
 
     def set_title(self, title):
         """
-        Sets title of the plot and sets the aspect ratio to the data. The default aspect ratio is of a cube, which distorts the image.
+        Sets title of the plot and sets the aspect ratio to the data. The
+        default aspect ratio is of a cube, which distorts the image.
         """
         self.update_layout(
             title_text=title,
             showlegend=False,
             scene=dict(aspectmode='data'))
 
-    def draw_vector_field_array(self, mesh, vectors, color, uniform, scale, width=0.5):
+    def plot_vector_field_lines(self, mesh, vector_field, color,
+        uniform, scale, width=0.5):
         """
         Plots the vector field.
         """
-        field = vectors_dict_to_array(vectors, mesh.number_of_faces())
+        field = vectors_dict_to_array(vector_field, mesh.number_of_faces())
         lines = []
 
         # get lines
@@ -77,16 +80,18 @@ class PlyPlotter(go.Figure):
                 opacity=1
             ))
 
-    def draw_trimesh(self, mesh, paint_clusters, draw_edges=False, opacity=0.8):
+    def plot_trimesh(self, mesh, paint_clusters, plot_edges=False, opacity=0.8):
         """
-        Plots the mesh with or without its edges, depending on what is chosen in `draw_edges`. Draws face colors according to values in each face.
+        Plots the mesh with or without its edges, depending on what is chosen
+        in `plot_edges`. Plots face colors according to values in each face.
         """
         # color up the faces of the COMPAS mesh according to their cluster
         # make a dictionary with all labels
         if paint_clusters:
             labels_to_color = {}
             for fkey in mesh.faces():
-                labels_to_color[fkey] = mesh.face_attribute(key=fkey, name="cluster")
+                labels_to_color[fkey] = mesh.face_attribute(key=fkey,
+                name="cluster")
             # convert labels to rgb colors
             face_colors = rgb_colors(labels_to_color, invert=False)
             face_colors = list(face_colors.values())
@@ -98,7 +103,8 @@ class PlyPlotter(go.Figure):
 
         _, mesh_faces = mesh.to_vertices_and_faces()
 
-        # we must go for another type of plot if we want to have the option of drawing mesh edges down the line
+        # we must go for another type of plot if we want to have the option of
+        # ploting mesh edges down the line
         figure_mesh = ff.create_trisurf(
             x=v_x,
             y=v_y,
@@ -109,17 +115,18 @@ class PlyPlotter(go.Figure):
 
         self.add_trace(figure_mesh.data[0]) # adds mesh faces
 
-        if draw_edges:
+        if plot_edges:
             self.add_trace(figure_mesh.data[1]) # adds mesh lines
 
         self.update_traces(opacity=opacity)
 
-    def draw_vector_field_cones(self, mesh, vectors):
+    def plot_vector_field_cones(self, mesh, vector_field):
         """
-        Plots the vector field as cones. Automatic color scale is set to vary with magnitude of the vector.
+        Plots the vector field as cones. Automatic color scale is set to vary
+        with magnitude of the vector.
         """
         num_faces = mesh.number_of_faces()
-        field = vectors_dict_to_array(vectors, num_faces)
+        field = vectors_dict_to_array(vector_field, num_faces)
 
         c_x, c_y, c_z = face_centroids(mesh)
 
