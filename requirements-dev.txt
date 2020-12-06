@@ -2,31 +2,21 @@ autopep8
 attrs >=17.4
 bumpversion >=0.5
 check-manifest >=0.36
-cython
 doc8
 flake8
 invoke >=0.14
 ipykernel
 ipython >=5.8
 isort
-matplotlib
-mayavi
-meshio[all]
 m2r
-mpi4py
 nbsphinx
 pydocstyle
-pyparsing
 pytest >=3.2
-scikit-learn == 0.23.2
-scikit-umfpack
-scipy
-sfepy
 sphinx_compas_theme >=0.4
 sphinx >=1.6
-sympy
-tables
 twine
+scikit-learn == 0.23.2
+
 
 # install this package
 -e .
