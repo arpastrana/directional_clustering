@@ -4,10 +4,9 @@ from directional_clustering.plotters import line_sdl
 
 from compas_plotters import MeshPlotter
 
+from compas.geometry import length_vector
 
-__all__ = [
-    "ClusterPlotter"
-]
+__all__ = ["ClusterPlotter"]
 
 class ClusterPlotter(MeshPlotter):
     def __init__(self, *args, **kwargs):
@@ -36,7 +35,7 @@ class ClusterPlotter(MeshPlotter):
 
         _lines = []
 
-        rows, cols = field.shape
+        rows, _ = field.shape
         for fkey in range(rows):
             vector = field[fkey]
             vector = vector.tolist()
