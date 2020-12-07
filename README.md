@@ -83,6 +83,18 @@ python -c "import directional_clustering"
 If no errors occur, smile 🙂! You have a working installation of
 `directional_clustering`.
 
+Update: How to add sfepy to your system:
+
+```bash
+conda install -c conda-forge sfepy
+```
+
+and then the installation:
+
+```bash
+python setup.py install
+```
+
 ## Contributing
 
 Pull requests are welcome!
