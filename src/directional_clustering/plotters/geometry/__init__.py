@@ -1,5 +1,5 @@
 """
-directional_clustering.geometry
+directional_clustering.plotters.geometry
 ****************************
 
 .. currentmodule:: directional_clustering.geometry
@@ -28,7 +28,7 @@ from __future__ import print_function
 
 
 # from .<module> import *
-from .vectors import *
 from .lines import *
+from .vectors import *
 
 __all__ = [name for name in dir() if not name.startswith('_')]

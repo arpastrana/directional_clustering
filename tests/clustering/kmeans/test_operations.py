@@ -14,40 +14,12 @@ from directional_clustering.clustering.kmeans.operations import rows_squared_nor
 
 
 # ==============================================================================
-# Fixtures
-# ==============================================================================
-
-@pytest.fixture
-def random_array():
-    """
-    A 2x2 array with random float values.
-    """
-    return np.random.rand(2, 2)
-
-
-@pytest.fixture
-def cosine_array():
-    """
-    A 3x2 array with float values.
-    """
-    return np.array([[1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
-
-
-@pytest.fixture
-def cosine_centroids():
-    """
-    """
-    return np.array([[1.0, 0.0], [1.0, 1.0]])
-
-
-# ==============================================================================
 # Tests
 # ==============================================================================
 
-
 def test_rows_norm(random_array):
     """
-    Check squared norm is calculated along the right axis.
+    Checks that the squared norm is calculated along the right axis.
     """
     random_norm = rows_norm(random_array).reshape(-1,)
 
@@ -60,7 +32,7 @@ def test_rows_norm(random_array):
 
 def test_rows_norm_shape(random_array):
     """
-    Check squared norm is calculated along the right axis.
+    Checks that the squared norm is calculated along the right axis.
     """
     random_norm = rows_norm(random_array)
     assert random_norm.shape == (random_array.shape[0], 1)
@@ -68,7 +40,7 @@ def test_rows_norm_shape(random_array):
 
 def test_rows_squared_norm(random_array):
     """
-    Check squared norm is calculated along the right axis.
+    Checks that the squared norm is calculated along the right axis.
     """
     random_norm = rows_squared_norm(random_array).reshape(-1,)
 
@@ -81,7 +53,7 @@ def test_rows_squared_norm(random_array):
 @pytest.mark.parametrize("size", list(range(1, 2)))
 def test_kmeans_initialize_size(random_array, size):
     """
-    Check that number of examples produced is correct.
+    Checks that the number of examples produced is correct.
     """
     seeds = kmeans_initialize(random_array, size)
     assert seeds.shape[0] == size
@@ -89,7 +61,7 @@ def test_kmeans_initialize_size(random_array, size):
 
 def test_kmeans_initialize_belongs(random_array):
     """
-    Check that seeds exist in the array.
+    Tests whether seeds exist in the array.
     """
     seed = kmeans_initialize(random_array, 1)
     assert seed in random_array
@@ -97,7 +69,7 @@ def test_kmeans_initialize_belongs(random_array):
 
 def test_kmeans_initialize_bad_k(random_array):
     """
-    Tries to produce more clusters than entries in the random array.
+    Produces more clusters than entries in the random array.
     """
     n, d = random_array.shape
     with pytest.raises(AssertionError):
@@ -106,7 +78,7 @@ def test_kmeans_initialize_bad_k(random_array):
 
 def test_centroids_associate_cosine(cosine_array, cosine_centroids):
     """
-    Assign labels to three vectors based on two redundant centroids.
+    Assigns labels to three vectors based on two redundant centroids.
     """
     _, closest = centroids_associate(cosine_array,
                                      cosine_centroids,
@@ -117,7 +89,7 @@ def test_centroids_associate_cosine(cosine_array, cosine_centroids):
 
 def test_centroids_estimate_cosine(cosine_array):
     """
-    Re-estimate two new centroids based on redundant association.
+    Re-estimates two new centroids based on redundant association.
     """
     assoc = np.array([0, 1, 1])
     new_centroids = centroids_estimate(cosine_array, 2, assoc)

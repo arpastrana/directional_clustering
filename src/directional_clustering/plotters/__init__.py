@@ -28,8 +28,9 @@ from __future__ import print_function
 
 
 # from .<module> import *
+from .geometry import *
 from .colors import *
 from .cluster_plotter import *
-from .vectors import *
+from .plot_vectors import *
 
 __all__ = [name for name in dir() if not name.startswith('_')]

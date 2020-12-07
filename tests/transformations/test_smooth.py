@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import pytest
 
 from directional_clustering.transformations import adjacent_vectors
@@ -12,10 +10,9 @@ from directional_clustering.transformations import smoothen_vector_field
 # Tests
 # ==============================================================================
 
-
 def test_mean_vector_empty(empty_list):
     """
-    Check if an empty least is passed to mean_vector.
+    Checks if an empty least is passed to mean_vector.
     """
     with pytest.raises(ValueError):
         mean_vector(empty_list)
@@ -37,7 +34,7 @@ def test_mean_vector(vectors_list):
 
 def test_adjacent_vectors(vector_field, adjacency):
     """
-    Regular behavior
+    Regular behavior.
     """
     vectors = [[1.0, -1.0, 0.0], [1.0, 1.0, 2.0]]
     assert adjacent_vectors(vector_field, adjacency[0]) == vectors
@@ -64,7 +61,7 @@ def test_smoothed_vector_wrong_damping(vector_single, vector_smoothed, damping):
 @pytest.mark.parametrize("damping", [0.1 * _ for _ in range(10)])
 def test_smoothed_vector_returns_same(vector_single, damping):
     """
-    Smoothing unaffects input vector
+    Smoothing unaffects input vector.
     """
     assert smoothed_vector(vector_single, vector_single, damping) == vector_single
 
@@ -94,7 +91,7 @@ def test_smoothen_vector_field_solitary_faces(vector_field, adjacency_full):
 @pytest.mark.parametrize("damping", [0.1 * _ for _ in range(10)])
 def test_smoothen_vector_field(vector_field, adjacency_full, damping):
     """
-    Regular behavior for first entry.
+    Regular behavior for the first entry.
     """
     smoothen_vector_field(vector_field, adjacency_full, iters=1, damping=damping)
     vector = vector_field.vector(0)
