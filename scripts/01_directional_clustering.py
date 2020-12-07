@@ -24,8 +24,7 @@ from directional_clustering.transformations import smoothen_vector_field
 # these are custom-written functions part of this library
 # which you can find in the src/directional_clustering folder
 from directional_clustering import JSON
-from directional_clustering.plotters import ClusterPlotter
-from directional_clustering.plotters import rgb_colors
+from directional_clustering.plotters import PlyPlotter
 
 # =============================================================================
 # Available Vector Fields
@@ -48,10 +47,12 @@ vectorfield_tags = [
     "m_1",  # bending moments in first principal direction
     "m_2",  # bending moments in second principal direction
     "ps_1_top",  # first principal direction stress direction at topmost fiber
-    "ps_1_bot",  # first principal direction stress direction at bottommost fiber
+    "ps_1_bot",  # first principal direction stress direction at bottommost
+    # fiber
     "ps_1_mid",  # first principal direction stress direction at middle fiber
     "ps_2_top",  # second principal direction stress direction at topmost fiber
-    "ps_2_bot",  # second principal direction stress direction at bottommost fiber
+    "ps_2_bot",  # second principal direction stress direction at bottommost
+    # fiber
     "ps_2_mid",  # second principal direction stress direction at middle fiber
     "custom_1",  # an arbitrary vector field pointing in the global X direction
     "custom_2"   # an arbitrary vector field pointing in the global X direction
@@ -91,8 +92,13 @@ iters = 30 # number of epochs to run kmeans clustering for
 export_json = False
 
 # plotter flags
-draw_faces = True
-draw_vector_fields = False
+plot_faces = True
+paint_clusters = True
+plot_vector_fields = True
+plot_mesh_edges = False
+plot_cones = False
+plot_original_field = False
+plot_clustered_field = True
 
 # ==============================================================================
 # Import a COMPAS mesh
@@ -257,34 +263,32 @@ if export_json:
 # below there is the simplest snippet, but you can see more stuff
 # in the scripts/visualization folder
 
-# ClusterPlotter is a custom wrapper around a COMPAS MeshPlotter
-# the COMPAS MeshPlotter is built atop of pure Matplotlib (which is crazy)
-# what is different here is that I extended the plotter so that it can plot
-# vector fields directly as little lines via
-# ClusterPlotter.draw_vector_field_array()
-plotter = ClusterPlotter(mesh, figsize=(12, 9))
+# PlyPlotter is a custom wrapper around a Plotly graph object (Figure)
+# that handles formating and adjustments to data structure.
+plotter = PlyPlotter()
 
-# draw only the boundary edges of the COMPAS Mesh
-plotter.draw_edges(keys=list(mesh.edges_on_boundary()))
+# plot only the boundary edges of the COMPAS Mesh
+# plotter.draw_edges(keys=list(mesh.edges_on_boundary())) # matplotlib
+# TODO: add the equivalent of this function to ply_plotters
 
-if draw_faces:
+if plot_faces:
     # color up the faces of the COMPAS mesh according to their cluster
-    # make a dictionary with all labels
-    labels_to_color = {}
-    for fkey in mesh.faces():
-        labels_to_color[fkey] = mesh.face_attribute(key=fkey, name="cluster")
-    # convert labels to rgb colors
-    face_colors = rgb_colors(labels_to_color, invert=False)
-    # draw faces
-    plotter.draw_faces(facecolor=face_colors)
+    plotter.plot_trimesh(mesh, paint_clusters, plot_mesh_edges)
 
-# draw vector fields on mesh as lines
-if draw_vector_fields:
-    # original vector field
-    va = vectors  # shorthand
-    plotter.draw_vector_field_array(va, (50, 50, 50), True, 0.07, 0.5)
-    # clustered vector field
-    # plotter.draw_vector_field_array(clusters, (0, 0, 255), True, 0.07, 1.0)
+# plot vector fields on mesh as lines
+if plot_vector_fields:
+    if plot_original_field:
+        plotter.plot_vector_field_lines(mesh, vectors, (50, 50, 50),
+            True, 0.07, 0.5)
+    if plot_clustered_field:
+        plotter.plot_vector_field_lines(mesh, clustered_field, (0, 0, 255),
+            True, 0.07, 1.0)
+
+if plot_cones:
+    plotter.plot_vector_field_cones(mesh, vectors)
+
+# set title, this will also set the final aspect ratio according to the data
+plotter.set_title(title="Example 01 Directional Clustering")
 
 #  show to screen
 plotter.show()

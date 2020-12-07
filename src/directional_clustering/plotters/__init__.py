@@ -32,5 +32,7 @@ from .geometry import *
 from .colors import *
 from .cluster_plotter import *
 from .plot_vectors import *
+from .plot_data_struct import *
+from .ply_plotter import *
 
 __all__ = [name for name in dir() if not name.startswith('_')]

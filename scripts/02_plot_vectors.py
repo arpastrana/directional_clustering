@@ -123,8 +123,7 @@ fkey_idx = {fkey: index for index, fkey in enumerate(mesh.faces())}
 #vectors = {}
 #for fkey in mesh.faces():
     # this is a mesh method that will query info stored the faces of the mesh
-#    vectors[fkey] = mesh.face_attribute(fkey, vectorfield_tag) 
-vectors = VectorField.from_mesh_faces(mesh, vectorfield_tag)
+    vectors[fkey] = mesh.face_attribute(fkey, vectorfield_tag)
 
 # ==============================================================================
 # Align vector field to a reference vector
@@ -137,8 +136,8 @@ vectors = VectorField.from_mesh_faces(mesh, vectorfield_tag)
 # concretely, a vector can be pointing to [1, 1] or to [-1, 1] but for archi-
 # tectural and structural reasons this would be the same, because both versions
 # are colinear.
-# 
-# in short, mitigating directional duplicity is something we are kind of 
+#
+# in short, mitigating directional duplicity is something we are kind of
 # sorting out with a heuristic. this will eventually improve the quality of the
 # clustering
 #
@@ -147,7 +146,7 @@ vectors = VectorField.from_mesh_faces(mesh, vectorfield_tag)
 # x and global y vectors as references, which have worked ok for my purposes.
 
 if align_vectors:
-    for fkey, vector in vectors.items():    
+    for fkey, vector in vectors.items():
         # if vectors don't point in the same direction
         if dot_vectors(alignment_ref, vector) < 0.0:
             vectors[fkey] = scale_vector(vector, -1)  # reverse it
@@ -160,7 +159,7 @@ if align_vectors:
 # vector field will be very noisy, especially around "singularities".
 # this means there can be drastic orientation jumps/flips between two vectors
 # which will affect the quality of the clustering.
-# to mitigate this, we apply laplacian smoothing which helps to soften and 
+# to mitigate this, we apply laplacian smoothing which helps to soften and
 # preserve continuity between adjacent vectors
 # what this basically does is going through every face in the mesh,
 # querying what are their neighbor faces, and then averaging the vectors stored
@@ -188,14 +187,14 @@ if smooth_iters:
 # 2d mesh, carrying out clustering directly in 2d, and then reconstructing
 # the results back into the 3d mesh ("reparametrizing it back")
 
-# convert vectors dictionary into a numpy array 
+# convert vectors dictionary into a numpy array
 vectors_array = np.zeros((mesh.number_of_faces(), 3))
 for fkey, vec in vectors.items():
     vectors_array[fkey, :] = vec
 
 print("Clustering started...")
 
-# One of the key differences of this work is that use cosine distance as 
+# One of the key differences of this work is that use cosine distance as
 # basis metric for clustering. this is in constrast to numpy/scipy
 # whose implementations, as far as I remember support other types of distances
 # like euclidean or manhattan in their Kmeans implementations. this would not
@@ -218,7 +217,7 @@ seeds = init_kmeans_farthest(vectors_array, n_clusters, mode, epochs_seeds, eps)
 # what this method returns are three numpy arrays
 # labels contains the cluster index assigned to every vector in the vector field
 # centers contains the centroid of every cluster (the average of all vectors in
-# a cluster), and losses stores the losses generated per epoch. 
+# a cluster), and losses stores the losses generated per epoch.
 # the loss is simply the mean squared error of the cosine distance between
 # every vector and the centroid of the cluster it is assigned to
 # the goal of kmeans is to minimize this loss function
@@ -270,7 +269,7 @@ if plot_vectors_2d:
 
 cosim = np.zeros(mesh.number_of_faces())
 for fkey, vec in vectors.items():
-    cosim[fkey] = cosine_similarity(cosim_ref, vec) 
+    cosim[fkey] = cosine_similarity(cosim_ref, vec)
 
 # =============================================================================
 # Plot cosine similarity as heights
@@ -281,11 +280,11 @@ if plot_cosine_similarity_3d:
     D = np.zeros((mesh.number_of_faces(), 3))
     for fkey in mesh.faces():
         x, y, z = mesh.face_centroid(fkey)
-        
+
         D[fkey, 0] = x
         D[fkey, 1] = y
         D[fkey, 2] = cosim[fkey]
-    
+
     fig = plt.figure(figsize=(16, 9))
     ax = plt.axes(projection="3d")
 
