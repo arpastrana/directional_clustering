@@ -14,6 +14,9 @@ from compas.geometry import length_vector_sqrd
 # these are custom-written functions part of this library
 # which you can find in the src/directional_clustering folder
 
+#JSON file directory
+from directional_clustering import JSON
+
 # extended version of Mesh
 from directional_clustering.mesh import MeshPlus
 
@@ -28,10 +31,8 @@ from directional_clustering.transformations import align_vector_field
 from directional_clustering.transformations import smoothen_vector_field
 
 #plotters
-from directional_clustering.plotters import ClusterPlotter
-from directional_clustering.plotters import rgb_colors
+from directional_clustering.plotters import PlyPlotter
 
-from directional_clustering import JSON
 
 # ==============================================================================
 # Main function: directional_clustering
@@ -264,7 +265,7 @@ def directional_clustering(filename="perimeter_supported_slab",
     
     # name for storage
     field_name = vectorfield_tag + "_{}_{}".format(clustering_name, n_clusters)  
-    label_name = vectorfield_tag + "_{}_{}".format(clustering_name, n_clusters) + "cluster"
+    label_name = "cluster"
 
     mesh.vector_field(field_name, clustered_field)
     mesh.clustering_label(label_name, labels)
@@ -274,7 +275,8 @@ def directional_clustering(filename="perimeter_supported_slab",
     # ==============================================================================
 
     if export_json:
-        name_out = filename + vectorfield_tag+ "_{}_{}.json".format(clustering_name, n_clusters)
+        name_out = filename + "_" + vectorfield_tag+ "_{}_{}.json".format(clustering_name, 
+                    n_clusters)
         json_out = os.path.abspath(os.path.join(JSON, name_out))
         mesh.to_json(json_out)
         print("Exported clustered mesh to: {}".format(json_out))
@@ -293,33 +295,55 @@ def directional_clustering(filename="perimeter_supported_slab",
     # vector fields directly as little lines via
     # ClusterPlotter.draw_vector_field_array()
     
-    new_mesh = MeshPlus.from_json(json_out)
-    plotter = ClusterPlotter(new_mesh, figsize=(12, 9))
-
-    # draw only the boundary edges of the Mesh
-    plotter.draw_edges(keys=list(new_mesh.edges_on_boundary()))
-
-    if draw_faces:
-        # color up the faces of the mesh according to their cluster
-        labels_to_color = new_mesh.clustering_label(label_name)
-        
-        # convert labels to rgb colors
-        face_colors = rgb_colors(labels_to_color, invert=False)
-        
-        # draw faces
-        plotter.draw_faces(facecolor=face_colors)
+    #resume results from JSON file
+    mesh_to_plot = MeshPlus.from_json(json_out)
+    clustered_field_to_plot = mesh_to_plot.vector_field(field_name)
     
-    # Rivision Needed!!!
-    # draw vector fields on mesh as lines
-    #if draw_vector_fields:
-        # original vector field
-    #    va = new_mesh.vector_field(vectorfield_tag)  # shorthand
-    #    plotter.draw_vector_field(va, (50, 50, 50), True, 0.07, 0.5)
-        # clustered vector field
-        # plotter.draw_vector_field_array(clusters, (0, 0, 255), True, 0.07, 1.0)
+    # there is a lot of potential work to do for visualization!
+    # below there is the simplest snippet, but you can see more stuff
+    # in the scripts/visualization folder
+    
+    # PlyPlotter is a custom wrapper around a Plotly graph object (Figure)
+    # that handles formating and adjustments to data structure.
+    plotter = PlyPlotter()
+    
+    # plot only the boundary edges of the COMPAS Mesh
+    # plotter.draw_edges(keys=list(mesh.edges_on_boundary())) # matplotlib
+    # TODO: add the equivalent of this function to ply_plotters
+    
+    # plotter flags
+    # to many arguments to pass if these below are put on the top, suggest to 
+    # spilt clustering and plot into two files
+    plot_faces = True
+    paint_clusters = True
+    plot_mesh_edges = False
+    plot_vector_fields = True
+    plot_original_field = False
+    plot_clustered_field = True
+    plot_cones = False
+    
+    if plot_faces:
+        # color up the faces of the mesh according to their cluster
+        plotter.plot_trimesh(mesh_to_plot, paint_clusters, plot_mesh_edges)
+    
+    # plot vector fields on mesh as lines
+    if plot_vector_fields:
+        if plot_original_field:
+            plotter.plot_vector_field_lines(mesh_to_plot, vectors, (50, 50, 50),
+                True, 0.07, 0.5)
+        if plot_clustered_field:
+            plotter.plot_vector_field_lines(mesh_to_plot, clustered_field_to_plot, (0, 0, 255),
+                True, 0.07, 1.0)
+    
+    if plot_cones:
+        plotter.plot_vector_field_cones(mesh_to_plot, vectors)
+    
+    # set title, this will also set the final aspect ratio according to the data
+    plotter.set_title(title="Example 01 Directional Clustering")
     
     #  show to screen
     plotter.show()
 
+    
 if __name__ == '__main__':
-  fire.Fire(directional_clustering)
+    fire.Fire(directional_clustering)
