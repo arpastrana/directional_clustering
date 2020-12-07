@@ -42,7 +42,7 @@ def directional_clustering(filename="perimeter_supported_slab",
                            alignment_ref=[1.0, 0.0, 0.0],
                            smooth_iters=10,
                            damping=0.5,
-                           clustering_name="cosine kmeans",
+                           clustering_name="variational kmeans",
                            n_clusters=5,
                            tol=1e-6,
                            iters=30,
@@ -266,18 +266,15 @@ def directional_clustering(filename="perimeter_supported_slab",
     field_name = vectorfield_tag + "_{}_{}".format(clustering_name, n_clusters)  
     label_name = vectorfield_tag + "_{}_{}".format(clustering_name, n_clusters) + "cluster"
 
-    mesh.vector_field(name=field_name, vector_field=clustered_field)
-    
-    for fkey in mesh.faces():
-        c_label = labels[fkey]
-        mesh.face_attribute(key=fkey, name=label_name, value=c_label)
+    mesh.vector_field(field_name, clustered_field)
+    mesh.clustering_label(label_name, labels)
     
     # ==============================================================================
     # Export new JSON file for further processing
     # ==============================================================================
 
     if export_json:
-        name_out = filename + "_{}_{}.json".format(clustering_name, n_clusters)
+        name_out = filename + vectorfield_tag+ "_{}_{}.json".format(clustering_name, n_clusters)
         json_out = os.path.abspath(os.path.join(JSON, name_out))
         mesh.to_json(json_out)
         print("Exported clustered mesh to: {}".format(json_out))
@@ -295,31 +292,29 @@ def directional_clustering(filename="perimeter_supported_slab",
     # what is different here is that I extended the plotter so that it can plot 
     # vector fields directly as little lines via
     # ClusterPlotter.draw_vector_field_array()
+    
     new_mesh = MeshPlus.from_json(json_out)
     plotter = ClusterPlotter(new_mesh, figsize=(12, 9))
 
-    # draw only the boundary edges of the COMPAS Mesh
+    # draw only the boundary edges of the Mesh
     plotter.draw_edges(keys=list(new_mesh.edges_on_boundary()))
 
     if draw_faces:
-        # color up the faces of the COMPAS mesh according to their cluster
-        # make a dictionary with all labels
+        # color up the faces of the mesh according to their cluster
+        labels_to_color = new_mesh.clustering_label(label_name)
         
-        #labels_to_color = new_mesh.faces_attribute(name="cluster")
-        labels_to_color = {}
-        for fkey in mesh.faces():
-            labels_to_color[fkey] = new_mesh.face_attribute(key=fkey, name="cluster")
-
         # convert labels to rgb colors
         face_colors = rgb_colors(labels_to_color, invert=False)
+        
         # draw faces
         plotter.draw_faces(facecolor=face_colors)
     
+    # Rivision Needed!!!
     # draw vector fields on mesh as lines
-    if draw_vector_fields:
+    #if draw_vector_fields:
         # original vector field
-        va = new_mesh.vector_field(vectorfield_tag)  # shorthand
-        plotter.draw_vector_field(va, (50, 50, 50), True, 0.07, 0.5)
+    #    va = new_mesh.vector_field(vectorfield_tag)  # shorthand
+    #    plotter.draw_vector_field(va, (50, 50, 50), True, 0.07, 0.5)
         # clustered vector field
         # plotter.draw_vector_field_array(clusters, (0, 0, 255), True, 0.07, 1.0)
     
