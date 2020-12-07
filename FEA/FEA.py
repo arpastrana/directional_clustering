@@ -12,6 +12,7 @@ from sfepy.solvers.ls import ScipyDirect
 from sfepy.solvers.nls import Newton
 from sfepy.postprocess.viewer import Viewer
 
+##Add mesh from file
 mesh = Mesh.from_file('C:/Users/16098/sfepy/meshes/2d/rectangle_tri.mesh')
 domain = FEDomain('domain', mesh)
 min_x, max_x = domain.get_mesh_bounding_box()[:, 0]
@@ -61,6 +62,8 @@ for i in range(0,len(u)):
     temp = u[i]
     temp2 = np.append(temp, 0.0)
     arr.append(temp2)
+    
+##returns vector array that can be plugged into script for clustering
 np.array(arr)
 
 
