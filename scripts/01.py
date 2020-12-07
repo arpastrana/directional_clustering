@@ -7,12 +7,15 @@ import fire
 # good ol' numpy
 import numpy as np
 
-# this are ready-made functions from COMPAS (https://compas.dev)
-from compas.datastructures import Mesh
-
 # geometry helpers
 from compas.geometry import subtract_vectors
 from compas.geometry import length_vector_sqrd
+
+# these are custom-written functions part of this library
+# which you can find in the src/directional_clustering folder
+
+# extended version of Mesh
+from directional_clustering.mesh import MeshPlus
 
 # clustering algorithms factory
 from directional_clustering.clustering import ClusteringFactory
@@ -24,49 +27,17 @@ from directional_clustering.fields import VectorField
 from directional_clustering.transformations import align_vector_field
 from directional_clustering.transformations import smoothen_vector_field
 
-# this are custom-written functions part of this library
-# which you can find in the src/directional_clustering folder
-from directional_clustering import JSON
+#plotters
 from directional_clustering.plotters import ClusterPlotter
 from directional_clustering.plotters import rgb_colors
 
-# =============================================================================
-# Available Vector Fields
-# =============================================================================
-
-# Just for reference, this is a list with all available vector fields
-# which have been stored in a JSON file.
-#
-# The JSON file will be loaded to create a COMPAS mesh.
-#
-# A vector field here is just a cloud of vectors, where there always is a
-# single vector associated with the centroid of every face of the mesh.
-# E.g., if a mesh has N faces, there will be a vector field with N vectors.
-#
-# First and second principal vectors are always orthogonal to each other.
-
-vectorfield_tags= [
-    "n_1",  # axial forces in first principal direction
-    "n_2",  # axial forces in second principal direction
-    "m_1",  # bending moments in first principal direction
-    "m_2",  # bending moments in second principal direction
-    "ps_1_top",  # first principal direction stress direction at topmost fiber
-    "ps_1_bot",  # first principal direction stress direction at bottommost fiber
-    "ps_1_mid",  # first principal direction stress direction at middle fiber
-    "ps_2_top",  # second principal direction stress direction at topmost fiber
-    "ps_2_bot",  # second principal direction stress direction at bottommost fiber
-    "ps_2_mid",  # second principal direction stress direction at middle fiber
-    "custom_1",  # an arbitrary vector field pointing in the global X direction
-    "custom_2"   # an arbitrary vector field pointing in the global X direction
-    ]
-
+from directional_clustering import JSON
 
 # ==============================================================================
 # Main function: directional_clustering
 # ==============================================================================
 
 def directional_clustering(filename="perimeter_supported_slab",
-                           vectorfield_tag="m_1",
                            align_vectors=True,
                            alignment_ref=[1.0, 0.0, 0.0],
                            smooth_iters=10,
@@ -75,7 +46,7 @@ def directional_clustering(filename="perimeter_supported_slab",
                            n_clusters=5,
                            tol=1e-6,
                            iters=30,
-                           export_json=False,
+                           export_json=True,
                            draw_faces=True,
                            draw_vector_fields=False):
     """
@@ -87,10 +58,6 @@ def directional_clustering(filename="perimeter_supported_slab",
         The name of the JSON file that encodes a MeshPlus object.
         \nAll JSON files must reside in this repo's data/json folder.
         Defaults to "perimeter_supported_slab".
-
-    vectorfield_tag : `str`
-        The name of the vector field to cluster.
-        \nDefaults to "m_1".
 
     align_vectors : `bool`
         Flag to align vectors relative to a reference vector.
@@ -141,29 +108,37 @@ def directional_clustering(filename="perimeter_supported_slab",
     """
 
     # ==============================================================================
-    # Set directory of input and output JSON files
+    # Set directory of input JSON files
     # ==============================================================================
 
     # Relative path to the JSON file stores the vector fields and the mesh info
     # The JSON files must be stored in the data/json_files folder
 
     name_in = filename + ".json"
-    name_out = filename + "_k_{}.json".format(n_clusters)
-    json_in = os.path.abspath(os.path.join(JSON, name_in))
-    json_out = os.path.abspath(os.path.join(JSON, name_out))
+    json_in = os.path.abspath(os.path.join(JSON, name_in)) 
 
     # ==============================================================================
-    # Import a COMPAS mesh
+    # Import a mesh as an instance of MeshPlus
     # ==============================================================================
 
-    mesh = Mesh.from_json(json_in)
+    mesh = MeshPlus.from_json(json_in)
 
     # ==============================================================================
-    # Extract vector field from COMPAS mesh for clustering
+    # Search for supported vector field attributes and take one choice from user
+    # ==============================================================================
+    
+    # supported vector field attributes
+    supported_attr = mesh.vector_fields()
+    print("supported vector field attributes are:\n", supported_attr)
+    
+    # vectorfield_tag : The name of the vector field to cluster.
+    vectorfield_tag = input("please choose one attribute:")
+
+    # ==============================================================================
+    # Extract vector field from mesh for clustering
     # ==============================================================================
 
-    # Extract a vector field from the faces of a mesh
-    vectors = VectorField.from_mesh_faces(mesh, vectorfield_tag)
+    vectors = mesh.vector_field(vectorfield_tag)
 
     # ==============================================================================
     # Align vector field to a reference vector
@@ -236,10 +211,10 @@ def directional_clustering(filename="perimeter_supported_slab",
     # using a furthest point strategy, which basically picks as a new seed the
     # vector which is the "most distant" at a given iteration using kmeans itself
     # These seeds will be used later on as input to start the final kmeans run.
+    
     print("Clustering started...")
 
-    # Create an instance of a clustering algorithm
-
+    # Create an instance of a clustering algorithm from ClusteringFactory
     clustering_algo = ClusteringFactory.create(clustering_name)
     clusterer = clustering_algo(mesh, vectors, n_clusters, iters, tol)
 
@@ -256,12 +231,12 @@ def directional_clustering(filename="perimeter_supported_slab",
     print("Loss Clustering: {}".format(clusterer.loss))
     print("Clustering ended!")
 
-    # make an array with the assigned labels of all vectors
+    # store results in clustered_field and labels
     clustered_field = clusterer.clustered_field
     labels = clusterer.labels
-
+    
     # ==============================================================================
-    # Compute mean squared error "loss" of clustering w.r.t. original vector field
+    # Compute mean squared error "loss" of clustering
     # ==============================================================================
 
     # probably would be better to encapsulate this in a function or in a Loss object
@@ -282,28 +257,30 @@ def directional_clustering(filename="perimeter_supported_slab",
     print("Clustered Field MSE: {}".format(mse))
 
     # ==============================================================================
-    # Assign clusters back to COMPAS mesh
+    # Assign clusters back to mesh
     # ==============================================================================
 
-    # this is for visualization and exporting purposes
-    attr_name = vectorfield_tag + "_k_{}".format(n_clusters)  # name for storage
+    # add the clustered vector field and label with correspondding attibutes to mesh
+    
+    # name for storage
+    field_name = vectorfield_tag + "_{}_{}".format(clustering_name, n_clusters)  
+    label_name = vectorfield_tag + "_{}_{}".format(clustering_name, n_clusters) + "cluster"
 
-    # iterate over the faces of the COMPAS mesh
+    mesh.vector_field(name=field_name, vector_field=clustered_field)
+    
     for fkey in mesh.faces():
-        c_vector = clustered_field.vector(fkey)  # convert numpy array to list
         c_label = labels[fkey]
-
-        # store clustered vector in COMPAS mesh as a face attribute
-        mesh.face_attribute(key=fkey, name=attr_name, value=c_vector)
-        mesh.face_attribute(key=fkey, name="cluster", value=c_label)
-
+        mesh.face_attribute(key=fkey, name=label_name, value=c_label)
+    
     # ==============================================================================
     # Export new JSON file for further processing
     # ==============================================================================
 
     if export_json:
+        name_out = filename + "_{}_{}.json".format(clustering_name, n_clusters)
+        json_out = os.path.abspath(os.path.join(JSON, name_out))
         mesh.to_json(json_out)
-        print("Exported mesh to: {}".format(json_out))
+        print("Exported clustered mesh to: {}".format(json_out))
 
     # =============================================================================
     # Plot stuff
@@ -318,17 +295,21 @@ def directional_clustering(filename="perimeter_supported_slab",
     # what is different here is that I extended the plotter so that it can plot 
     # vector fields directly as little lines via
     # ClusterPlotter.draw_vector_field_array()
-    plotter = ClusterPlotter(mesh, figsize=(12, 9))
+    new_mesh = MeshPlus.from_json(json_out)
+    plotter = ClusterPlotter(new_mesh, figsize=(12, 9))
 
     # draw only the boundary edges of the COMPAS Mesh
-    plotter.draw_edges(keys=list(mesh.edges_on_boundary()))
+    plotter.draw_edges(keys=list(new_mesh.edges_on_boundary()))
 
     if draw_faces:
         # color up the faces of the COMPAS mesh according to their cluster
         # make a dictionary with all labels
+        
+        #labels_to_color = new_mesh.faces_attribute(name="cluster")
         labels_to_color = {}
         for fkey in mesh.faces():
-            labels_to_color[fkey] = mesh.face_attribute(key=fkey, name="cluster")
+            labels_to_color[fkey] = new_mesh.face_attribute(key=fkey, name="cluster")
+
         # convert labels to rgb colors
         face_colors = rgb_colors(labels_to_color, invert=False)
         # draw faces
@@ -337,8 +318,8 @@ def directional_clustering(filename="perimeter_supported_slab",
     # draw vector fields on mesh as lines
     if draw_vector_fields:
         # original vector field
-        va = vectors  # shorthand
-        plotter.draw_vector_field_array(va, (50, 50, 50), True, 0.07, 0.5)
+        va = new_mesh.vector_field(vectorfield_tag)  # shorthand
+        plotter.draw_vector_field(va, (50, 50, 50), True, 0.07, 0.5)
         # clustered vector field
         # plotter.draw_vector_field_array(clusters, (0, 0, 255), True, 0.07, 1.0)
     
