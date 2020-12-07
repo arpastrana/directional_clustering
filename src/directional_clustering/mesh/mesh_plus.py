@@ -33,7 +33,7 @@ class MeshPlus(Mesh):
             for fkey in self.faces():
                 try:
                     vector = self.face_attribute(fkey, name)
-                    if type(value) is list:
+                    if type(vector) is list:
                         vector_field.add_vector(fkey, vector)
                     else:
                         raise ValueError
@@ -65,10 +65,38 @@ class MeshPlus(Mesh):
 
         attr_vectorfield = []
         for name in attr:
-            if self.vectorfield(name) is not None: 
+            if self.vector_field(name) is not None: 
                 attr_vectorfield.append(name)
 
         return attr_vectorfield
+
+    def clustering_label(self, name, labels=None):
+        """
+        Get or store clustering labels based on corresponding attribute.
+
+        Parameters
+        -----------
+        name  : `str`
+            The name of clustering labels, composed of original vector field, 
+            \nalgorithm and number of clusters.
+        labels  : `dict`, optional.
+            The clustering labels to store.
+        
+        Returns
+        --------
+        labels  : `dict`
+            The fetched labels if only `name` was passed in as a parameter. 
+        """
+        if labels is None:
+            labels = {}
+            for fkey in self.faces():
+                labels[fkey] = self.face_attribute(fkey, name)
+            return labels
+        else:
+            for fkey in self.faces():
+                label = labels[fkey]
+                self.face_attribute(fkey, name, label)
+            
 
 
 
@@ -79,13 +107,14 @@ if __name__ == "__main__":
     JSON_IN = os.path.abspath(os.path.join(JSON, name_in))
     mesh = MeshPlus.from_json(JSON_IN)
 
-    attr = mesh.all_vectorfields()
+    attr = mesh.vector_fields()
     print(attr)
 
-    fkey = mesh.get_any_face()
-    for name in attr :
-        value = mesh.face_attribute(fkey, name)
-        print(value)
+
+    vf = mesh.faces_attribute(name="m_1")
+    mesh.faces_attribute(name="m_1_copy", value=[1,2,3])
+    vf_copy = mesh.faces_attribute(name="m_1_copy")
+    print(vf_copy)
     
 
     
