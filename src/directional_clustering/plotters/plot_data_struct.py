@@ -5,22 +5,10 @@ from numpy import empty
 from directional_clustering.fields import VectorField
 
 
-__all__ = [
-    "mesh_to_vertices_xyz",
-    "trimesh_face_connect",
-    "lines_to_start_end_xyz",
-    "lines_xyz_to_tables",
-    "coord_start_end_none",
-    "lines_start_end_connect",
-    "vectors_dict_to_array",
-    "face_centroids"
-]
-
-
 def mesh_to_vertices_xyz(mesh):
     """
     Organizes data structure. Splits the vertices of a COMPAS mesh into lists
-    of x, y, and z coordinate.
+    of x, y, and z coordinates.
 
     Parameters
     ----------
@@ -30,7 +18,17 @@ def mesh_to_vertices_xyz(mesh):
     Returns
     -------
     vertices_x, vertices_y, vertices_z : `tuple`
-        Returns lists of x, y, z coordinates of a mesh.
+        vertices_x : `np.array`, (n,)
+            The x coordinates of the vertices of a mesh. `n` is the number of
+            vertices in the mesh.
+        vertices_y : `np.array`, (n,)
+            The y coordinates of the vertices of a mesh.
+        vertices_z : `np.array`, (n,)
+            The z coordinates of the vertices of a mesh.
+
+    Notes
+    ------
+    This is a helper to organize a data structure.
     """
     mesh_vertices, _ = mesh.to_vertices_and_faces()
     vertices_arr = asarray(mesh_vertices)
@@ -38,9 +36,9 @@ def mesh_to_vertices_xyz(mesh):
     # TODO: test if vertices have 3D coordinates
 
     # get separate arrays for x, y, z coords. of vertices
-    vertices_x = vertices_arr[:,0]
-    vertices_y = vertices_arr[:,1]
-    vertices_z = vertices_arr[:,2]
+    vertices_x = vertices_arr[:, 0]
+    vertices_y = vertices_arr[:, 1]
+    vertices_z = vertices_arr[:, 2]
 
     return vertices_x, vertices_y, vertices_z
 
@@ -57,8 +55,18 @@ def trimesh_face_connect(mesh):
 
     Returns
     -------
-    face_vertex_i, face_vertex_j, face_vertex_k : `tuple` of `array`
-        Returns lists of i, j, k indices of mesh faces.
+    face_vertex_i, face_vertex_j, face_vertex_k : `tuple`
+        face_vertex_i : `np.array`, (n,)
+            The key of the first vertex of the mesh faces. `n` is the number of
+            faces in the mesh.
+        face_vertex_j : `np.array`, (n,)
+            The key of the second vertex of the mesh faces.
+        face_vertex_k : `np.array`, (n,)
+            The key of the third vertex of the mesh faces.
+
+    Notes
+    ------
+    This is a helper to organize a data structure.
     """
     _, mesh_faces = mesh.to_vertices_and_faces()
     faces_arr = asarray(mesh_faces)
@@ -66,9 +74,9 @@ def trimesh_face_connect(mesh):
     # TODO: test if mesh is triangulated
 
     # get separate arrays for vertex connectivity i, j, k
-    face_vertex_i = faces_arr[:,0]
-    face_vertex_j = faces_arr[:,1]
-    face_vertex_k = faces_arr[:,2]
+    face_vertex_i = faces_arr[:, 0]
+    face_vertex_j = faces_arr[:, 1]
+    face_vertex_k = faces_arr[:, 2]
 
     return face_vertex_i, face_vertex_j, face_vertex_k
 
@@ -79,29 +87,41 @@ def lines_to_start_end_xyz(lines):
 
     Parameters
     ----------
-    lines : `list` of tuple`
-        Start and end point of a line.
+    lines : `list` of `tuple`
+        A list with the start and end point of lines.
 
     Returns
     -------
     start_x, start_y, start_z, end_x, end_y, end_z : `tuple`
-        Returns lists of coordinates of start and end points of lines.
+        start_x : `np.array`, (n,)
+            The x coordinates of the start point of a line. `n` is the number
+            of lines.
+        start_y : `np.array`, (n,)
+            The y coordinates of the start point of a line.
+        start_z : `np.array`, (n,)
+            The z coordinates of the start point of a line.
+        end_x : `np.array`, (n,)
+            The x coordinates of the end point of a line.
+        end_y : `np.array`, (n,)
+            The y coordinates of the end point of a line.
+        end_z : `np.array`, (n,)
+            The z coordinates of the end point of a line.
     """
     num_lines = len(lines)
 
-    start = zeros((num_lines,3))
-    end = zeros((num_lines,3))
+    start = zeros((num_lines, 3))
+    end = zeros((num_lines, 3))
 
     for l in range(num_lines):
         start[l], end[l] = lines[l]
 
-    start_x = start[:,0]
-    start_y = start[:,1]
-    start_z = start[:,2]
+    start_x = start[:, 0]
+    start_y = start[:, 1]
+    start_z = start[:, 2]
 
-    end_x = end[:,0]
-    end_y = end[:,1]
-    end_z = end[:,2]
+    end_x = end[:, 0]
+    end_y = end[:, 1]
+    end_z = end[:, 2]
 
     return start_x, start_y, start_z, end_x, end_y, end_z
 
@@ -114,18 +134,37 @@ def lines_xyz_to_tables(start_x, start_y, start_z, end_x, end_y, end_z):
     Parameters
     ----------
     start_x, start_y, start_z, end_x, end_y, end_z : `tuple`
-        Lists of coordinates of start and end points of lines.
+        start_x : `np.array`, (n,)
+            The x coordinates of the start point of a line. `n` is the length
+            of the list.
+        start_y : `np.array`, (n,)
+            The y coordinates of the start point of a line.
+        start_z : `np.array`, (n,)
+            The z coordinates of the start point of a line.
+        end_x : `np.array`, (n,)
+            The x coordinates of the end point of a line.
+        end_y : `np.array`, (n,)
+            The y coordinates of the end point of a line.
+        end_z : `np.array`, (n,)
+            The z coordinates of the end point of a line.
 
     Returns
     -------
-    table_x, table_y, table_z : `tuple` of `list`
+    table_x, table_y, table_z : `tuple`
         2D lists of start and end coordinates of lines.
+        table_x : `np.array`, (n, 2)
+            The x coordinates of the start and end point of a line. `n` is the
+            number of lines.
+        table_y : `np.array`, (n, 2)
+            The y coordinates of the start and end point of a line.
+        table_z : `np.array`, (n, 2)
+            The z coordinates of the start and end point of a line.
     """
     num_lines = len(start_x)
 
-    table_x = zeros((num_lines,2)) # start and end point x coord.
-    table_y = zeros((num_lines,2)) # start and end point y coord.
-    table_z = zeros((num_lines,2)) # start and end point z coord.
+    table_x = zeros((num_lines, 2)) # start and end point x coord.
+    table_y = zeros((num_lines, 2)) # start and end point y coord.
+    table_z = zeros((num_lines, 2)) # start and end point z coord.
 
     for i in range(num_lines):
         table_x[i] = [start_x[i], end_x[i]]
@@ -137,19 +176,28 @@ def lines_xyz_to_tables(start_x, start_y, start_z, end_x, end_y, end_z):
 
 def coord_start_end_none(nums_1st, nums_2nd, num_lines):
     """
-    Helper function to lines_start_end_connect.
-    Orders a list with 1st number of 1st list, 2nd number of 2nd list, and
-    None; then 2nd number of 1st list, 2nd number of 2nd list, and None; and so
-    on, until the end of the list.
+    Merges the entries of two lists into a single stream by inserting NaNs as a
+    separator.
+
     Parameters
     ----------
     nums_1st, nums_2nd : `list`
-        List of numbers to reorder.
+        List of numbers to reorder. Both lists should be length `num_lines`.
+    num_lines : `int`
+        Length of list to reorder.
 
     Returns
     -------
-    connect : `list`
-        Combined list of 1st number, 2nd number, and `nan` as separator.
+    connect : `np.array`, (3 * n,)
+        Combined list of 1st number, 2nd number, and `nan` as separator. `n` is the length of the lists.
+
+    Notes
+    ------
+    Helper function for lines_start_end_connect.
+
+    Orders a list with 1st number of 1st list, 2nd number of 2nd list, and None.
+    Then, 2nd number of 1st list, 2nd number of 2nd list, and None; and so on.
+    This is repeated until the end of the list is hit.
     """
     connect = empty(3 * num_lines)
     connect[::3] = nums_1st
@@ -161,8 +209,7 @@ def coord_start_end_none(nums_1st, nums_2nd, num_lines):
 
 def lines_start_end_connect(start_x, start_y, start_z, end_x, end_y, end_z):
     """
-    Arranges connectivity of lines into a table with respective coordinates to
-    connect and None to separate each line coordinate.
+    Creates a connectivity table from lines' endpoints.
 
     Parameters
     ----------
@@ -172,7 +219,12 @@ def lines_start_end_connect(start_x, start_y, start_z, end_x, end_y, end_z):
     Returns
     -------
     connected_x, connected_y, connected_z : `tuple`
-        Lists of start and end coordinates of lines with `nan` as separators.
+        connected_x : `np.array` (3 * n,)
+            Start and end x coordinates of lines with `nan` as separators. `n` is the number of lines.
+        connected_y : `np.array` (3 * n,)
+            Start and end y coordinates of lines with `nan` as separators.
+        connected_z : `np.array` (3 * n,)
+            Start and end z coordinates of lines with `nan` as separators.
     """
     num_lines = len(start_x)
 
@@ -206,12 +258,14 @@ def vectors_dict_to_array(vector_field, num_faces):
     vectors_array = zeros((num_faces, 3))
     for fkey, vec in vector_field.items():
         vectors_array[fkey, :] = vec
+
     return vectors_array
 
 
 def face_centroids(mesh):
     """
-    Arranges the centroids of a mesh into lists of each xyz coordinate.
+    Splits the XYZ coordinates of the face centroids of a mesh into separate
+    coordinate streams.
 
     Parameters
     ----------
@@ -221,7 +275,12 @@ def face_centroids(mesh):
     Returns
     -------
     c_x, c_y, c_z : `tuple`
-        Returns lists of x, y, z coordinates of the centroids of a mesh.
+        c_x : `np.array` (n,)
+            The x coordinates of the face centroids of a mesh. `n` is the number of faces in the mesh.
+        c_y : `np.array` (n,)
+            The y coordinates of the face centroids of a mesh.
+        c_z : `np.array` (n,)
+            The z coordinates of the face centroids of a mesh.
     """
     num_faces = mesh.number_of_faces()
 

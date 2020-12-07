@@ -97,6 +97,8 @@ paint_clusters = True
 plot_vector_fields = True
 plot_mesh_edges = False
 plot_cones = False
+plot_original_field = False
+plot_clustered_field = True
 
 # ==============================================================================
 # Import a COMPAS mesh
@@ -275,11 +277,12 @@ if plot_faces:
 
 # plot vector fields on mesh as lines
 if plot_vector_fields:
-    # # original vector field
-    plotter.plot_vector_field_lines(mesh, vectors, (50, 50, 50),
-        True, 0.07, 0.5)
-    # clustered vector field
-    # pp.plot_vector_field_lines(mesh, clusters, (0, 0, 255), True, 0.07, 1.0)
+    if plot_original_field:
+        plotter.plot_vector_field_lines(mesh, vectors, (50, 50, 50),
+            True, 0.07, 0.5)
+    if plot_clustered_field:
+        plotter.plot_vector_field_lines(mesh, clustered_field, (0, 0, 255),
+            True, 0.07, 1.0)
 
 if plot_cones:
     plotter.plot_vector_field_cones(mesh, vectors)

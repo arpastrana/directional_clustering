@@ -3,11 +3,10 @@ from directional_clustering.plotters import vector_lines_on_faces
 from directional_clustering.plotters import line_sdl
 
 from compas_plotters import MeshPlotter
+
 from compas.geometry import length_vector
 
-__all__ = [
-    "ClusterPlotter"
-]
+__all__ = ["ClusterPlotter"]
 
 class ClusterPlotter(MeshPlotter):
     def __init__(self, *args, **kwargs):
