@@ -3,7 +3,7 @@
 from sfepy import data_dir
 from sfepy.mechanics.matcoefs import stiffness_from_lame
 from sfepy.discrete.fem import Mesh, FEDomain, Field
-import numpy as nm
+import numpy as np
 from sfepy.discrete import (FieldVariable, Material, Integral, Function,Equation, Equations, Problem)
 from sfepy.terms import Term
 from sfepy.discrete.conditions import Conditions, EssentialBC
