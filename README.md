@@ -28,10 +28,6 @@ what we want is to find the lowest possible amount of different vectors that
 encode the maximum amount of directional information about a principal stress
 field. We leverage clustering methods to this end.
 
-## How to I use this thing?
-
-**PLACEHOLDER. Please provide instructions on how to use the two driver codes.**.
-
 ## Installation
 
 The simplest way to install `directional_clustering` is to build it from source
@@ -75,6 +71,63 @@ python -c "import directional_clustering"
 
 If no errors occur, smile 🙂! You have a working installation of
 `directional_clustering`.
+
+## How to use this library?
+
+After installation completed, we are able to play around with this library to realize 
+a bunch of cool tasks related to directional clustering! We provide an example of how 
+to utilize our library. Example scripts `01_clustering.py` and `01_plotting.py` are in 
+folder `directional_clustering/scripts`.
+
+`01_clustering.py` takes care of importing a mesh from JSON file, doing clustering on 
+the choosen vector field and exporting the clustering results into another JSON file.
+
+`01_plotting.py` takes care of resuming the previous clustering results from JSON file 
+and visualizing the results.
+
+Instuctions on how to run these two are as follows.
+
+1. Go to the directory where scripts live (suppose you're currently at 
+`directional_clustering`):
+
+```bash
+cd scripts
+```
+
+2.Run `01_clustering.py` with default command line arguments by typing the following.
+In addition, you can pass customized values of command line arguments by `--flag` syntax
+or taking them as positional arguments.
+As usual, `--help` will lead you to our documentation for arguments.
+
+```
+python 01_clustering.py
+```
+
+3.There will be an inquriy about which vector filed do you want to do clustering on while 
+`01_clustering.py` running (for exmaple you're choosing attribute `m_1`, input `m_1` will 
+be passed to `vectorfield_tag`):
+
+```bash
+supported vector field attributes are:
+ ['ps_2_top', 'ps_2_bot', 'ps_1_top', 'm_1', 'm_2', 'n_1', 'n_2', 'custom_2', 'ps_2_mid', 
+ 'ps_1_bot', 'ps_1_mid', 'custom_1']
+please choose one attribute:m_1
+```
+
+4.Wait till the running process is over! The results will be automatically stored in a JSON
+file named after `filename`_`vectorfield_tag`_`clustering_name`_`n_clusters`in folder 
+`data/json_files`.
+
+5. Run `01_plotting.py` with default command line arguments by typing the following.
+In addition, you can pass customized values of command line arguments by `--flag` syntax
+or taking them as positional arguments. 
+As usual, `--help` will lead you to our documentation for arguments.
+
+```
+python 01_plotting.py
+```
+
+6.Plot will be shown as html.
 
 ## Developer Mode
 
