@@ -7,21 +7,21 @@ __all__ = ["AbstractField"]
 
 class AbstractField(ABC):
     """
-    An abstract field.
+    An abstract class for all fields.
     """
     @abstractmethod
     def dimensionality(self):
         """
         The fixed dimensionality of a field.
         """
-        return
+        pass
 
     @abstractmethod
     def size(self):
         """
         The number of entries in the field.
         """
-        return
+        pass
 
 
 if __name__ == "__main__":

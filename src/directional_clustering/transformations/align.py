@@ -11,7 +11,7 @@ def align_vector_field(vector_field, reference_vector):
 
     Parameters
     ----------
-    vector_field: `VectorField`
+    vector_field : `directional_clustering.fields.VectorField`
         A vector field.
     reference_vector : `list` of `float`
         The vector whose orientation is to be matched.

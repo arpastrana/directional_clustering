@@ -13,11 +13,18 @@ class Field(AbstractField):
 
     It is crucial to have it as a datastructure where a field's entries
     are accessed with the keys of the Mesh they are coupled to.
+
+    Parameters
+    ----------
+    dimensionality : `int`
+        The dimensionality of the field.
     """
     def __init__(self, dimensionality):
         """
         The constructor.
         """
+        assert isinstance(dimensionality, int)
+
         self._dimensionality = dimensionality
         self._size = None
         self._field = dict()
@@ -72,7 +79,7 @@ class Field(AbstractField):
 
         Yields
         ------
-        key, item: `tuple`
+        key, item : `tuple`
             The access key and the item it points to.
         """
         for key, item in self._field.items():

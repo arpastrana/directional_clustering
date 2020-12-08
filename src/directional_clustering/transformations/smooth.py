@@ -15,14 +15,14 @@ def smoothen_vector_field(vector_field, adjacency, iters, damping=0.5):
 
     Parameters
     ----------
-    vector_field: `VectorField`
+    vector_field : `directional_clustering.clustering.VectorField`
         A vector field.
     adjacency : `dict`
         A dictionary that maps a key to all the other keys neighboring it.
     iters : `int`
         The number of iterations to run this algorithm for.
-    damping : `float`. Optional.
-        A coefficient between 0.0 and 1.0 that controls the smoothing strenth.
+    damping : `float`, optional.
+        A coefficient between 0.0 and 1.0 that controls the smoothing strength.
         1.0 is maximum smoothing.
         Defaults to 0.5
 
