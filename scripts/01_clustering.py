@@ -47,16 +47,14 @@ def directional_clustering(filename="perimeter_supported_slab",
                            n_clusters=5,
                            tol=1e-6,
                            iters=30,
-                           export_json=True,
-                           draw_faces=True,
-                           draw_vector_fields=False):
+                           export_json=True):
     """
     Cluster a vector field atop a mesh based on its direction.
 
     Parameters
     ----------
     filename : `str`
-        The name of the JSON file that encodes a MeshPlus object.
+        The name of the JSON file that encodes a mesh.
         \nAll JSON files must reside in this repo's data/json folder.
         Defaults to "perimeter_supported_slab".
 
@@ -97,15 +95,7 @@ def directional_clustering(filename="perimeter_supported_slab",
 
     export_json: `bool`
         True to export the vector field and the mesh to JSON file.
-        \nDefaults to False.
-
-    draw_faces : `bool`
-        Colors the faces of the mesh based on the resulting labales of a clustered field.
         \nDefaults to True.
-
-    draw_vector_fields : `bool`
-        Plots the clustered vector field atop of the input mesh.
-        \nDefaults to False.
     """
 
     # ==============================================================================
@@ -185,6 +175,8 @@ def directional_clustering(filename="perimeter_supported_slab",
 
     if smooth_iters:
         smoothen_vector_field(vectors, mesh.face_adjacency(), smooth_iters, damping)
+        #smoothened_field_name = vectorfield_tag + "_smoothened"
+        #mesh.vector_field(smoothened_field_name, vectors)
 
     # ==============================================================================
     # Do K-means Clustering
@@ -264,11 +256,10 @@ def directional_clustering(filename="perimeter_supported_slab",
     # add the clustered vector field and label with correspondding attibutes to mesh
     
     # name for storage
-    field_name = vectorfield_tag + "_{}_{}".format(clustering_name, n_clusters)  
-    label_name = "cluster"
+    clustered_field_name = vectorfield_tag + "_clustered"
+    mesh.vector_field(clustered_field_name, clustered_field)
 
-    mesh.vector_field(field_name, clustered_field)
-    mesh.clustering_label(label_name, labels)
+    mesh.clustering_label("cluster", labels)
     
     # ==============================================================================
     # Export new JSON file for further processing
@@ -280,70 +271,6 @@ def directional_clustering(filename="perimeter_supported_slab",
         json_out = os.path.abspath(os.path.join(JSON, name_out))
         mesh.to_json(json_out)
         print("Exported clustered mesh to: {}".format(json_out))
-
-    # =============================================================================
-    # Plot stuff
-    # =============================================================================
-
-    # there is a lot of potential work to do for visualization!
-    # below there is the simplest snippet, but you can see more stuff 
-    # in the scripts/visualization folder
-
-    # ClusterPlotter is a custom wrapper around a COMPAS MeshPlotter
-    # the COMPAS MeshPlotter is built atop of pure Matplotlib (which is crazy)
-    # what is different here is that I extended the plotter so that it can plot 
-    # vector fields directly as little lines via
-    # ClusterPlotter.draw_vector_field_array()
-    
-    #resume results from JSON file
-    mesh_to_plot = MeshPlus.from_json(json_out)
-    clustered_field_to_plot = mesh_to_plot.vector_field(field_name)
-    
-    # there is a lot of potential work to do for visualization!
-    # below there is the simplest snippet, but you can see more stuff
-    # in the scripts/visualization folder
-    
-    # PlyPlotter is a custom wrapper around a Plotly graph object (Figure)
-    # that handles formating and adjustments to data structure.
-    plotter = PlyPlotter()
-    
-    # plot only the boundary edges of the COMPAS Mesh
-    # plotter.draw_edges(keys=list(mesh.edges_on_boundary())) # matplotlib
-    # TODO: add the equivalent of this function to ply_plotters
-    
-    # plotter flags
-    # to many arguments to pass if these below are put on the top, suggest to 
-    # spilt clustering and plot into two files
-    plot_faces = True
-    paint_clusters = True
-    plot_mesh_edges = False
-    plot_vector_fields = True
-    plot_original_field = False
-    plot_clustered_field = True
-    plot_cones = False
-    
-    if plot_faces:
-        # color up the faces of the mesh according to their cluster
-        plotter.plot_trimesh(mesh_to_plot, paint_clusters, plot_mesh_edges)
-    
-    # plot vector fields on mesh as lines
-    if plot_vector_fields:
-        if plot_original_field:
-            plotter.plot_vector_field_lines(mesh_to_plot, vectors, (50, 50, 50),
-                True, 0.07, 0.5)
-        if plot_clustered_field:
-            plotter.plot_vector_field_lines(mesh_to_plot, clustered_field_to_plot, (0, 0, 255),
-                True, 0.07, 1.0)
-    
-    if plot_cones:
-        plotter.plot_vector_field_cones(mesh_to_plot, vectors)
-    
-    # set title, this will also set the final aspect ratio according to the data
-    plotter.set_title(title="Example 01 Directional Clustering")
-    
-    #  show to screen
-    plotter.show()
-
     
 if __name__ == '__main__':
     fire.Fire(directional_clustering)
