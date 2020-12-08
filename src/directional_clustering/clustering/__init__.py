@@ -1,25 +1,40 @@
 """
 directional_clustering.clustering
-****************************
+*********************************
 
 .. currentmodule:: directional_clustering.clustering
 
 
-Classes
-=======
+Clustering Classes
+==================
 
 .. autosummary::
     :toctree: generated/
     :nosignatures:
 
+    KMeans
+    CosineKMeans
+    VariationalKMeans
 
-Functions
-=========
+
+Factory Classes
+===============
 
 .. autosummary::
     :toctree: generated/
     :nosignatures:
 
+    ClusteringFactory
+
+
+Abstract Classes
+================
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    ClusteringAlgorithm
 """
 
 from __future__ import absolute_import

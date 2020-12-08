@@ -12,7 +12,7 @@ __all__ = ["VariationalKMeans"]
 
 class VariationalKMeans(KMeans):
     """
-    A wrapper of the variational shape approximation for vector clustering.
+    The variational shape approximation method for vector clustering.
 
     Parameters
     ----------
@@ -31,10 +31,10 @@ class VariationalKMeans(KMeans):
     -----
     This method normalizes all vectors before doing clustering.
 
-    Reference
-    ---------
+    References
+    ----------
     [1] Cohen-Steiner, D., Alliez, P., Desbrun, M. (2004). Variational Shape Approximation.
-        RR-5371, INRIA. 2004, pp.29. inria-00070632
+    RR-5371, INRIA. 2004, pp.29. inria-00070632
     """
     def __init__(self, mesh, vector_field, n_clusters, iters, tol):
         # parent class constructor

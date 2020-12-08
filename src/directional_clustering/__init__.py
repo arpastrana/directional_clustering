@@ -9,7 +9,11 @@ directional_clustering
 .. toctree::
     :maxdepth: 1
 
-
+    directional_clustering.clustering
+    directional_clustering.fields
+    directional_clustering.mesh
+    directional_clustering.plotters
+    directional_clustering.transformations
 """
 
 from __future__ import print_function
@@ -18,10 +22,8 @@ import os
 import sys
 
 
-__author__ = ["Rafael Pastrana"]
-__copyright__ = "Rafael Pastrana"
+__copyright__ = "Princeton University"
 __license__ = "MIT License"
-__email__ = "arpj@princeton.edu"
 __version__ = "0.1.0"
 
 

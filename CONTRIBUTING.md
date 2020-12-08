@@ -32,7 +32,7 @@ In short, this is how that works.
    invoke test
    ```
 
-6. Start making your changes to the **master** branch (or branch off of it).
+6. Start making your changes to the **develop** branch (or branch off of it).
 
 7. Make sure all tests still pass:
 
@@ -54,6 +54,7 @@ command line to ease recurring operations:
 * `invoke clean`: Clean all generated artifacts.
 * `invoke check`: Run various code and documentation style checks.
 * `invoke docs`: Generate documentation.
+* `invoke pdf`: Create the PDF manual.
 * `invoke test`: Run all tests and checks in one swift command.
 * `invoke`: Show available tasks.
 

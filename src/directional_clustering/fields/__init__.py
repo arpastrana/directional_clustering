@@ -1,25 +1,29 @@
 """
 directional_clustering.fields
-****************************
+*****************************
 
 .. currentmodule:: directional_clustering.fields
 
 
-Classes
-=======
+Fields
+======
 
 .. autosummary::
     :toctree: generated/
     :nosignatures:
 
+    Field
+    VectorField
 
-Functions
-=========
+
+Abstract Classes
+================
 
 .. autosummary::
     :toctree: generated/
     :nosignatures:
 
+    AbstractField
 """
 
 from __future__ import absolute_import
