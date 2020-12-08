@@ -82,13 +82,6 @@ python -c "import directional_clustering"
 python -c "import variational_clustering"
 ```
 
-And for the FEA:
-
-```bash
-conda install -c conda-forge sfepy
-python setup.py build
-```
-
 If no errors occur, smile 🙂! You have a working installation of
 `directional_clustering` and `variational_clustering`.
 

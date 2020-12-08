@@ -111,5 +111,11 @@ if __name__ == "__main__":
     print(attr)
 
 
+    vf = mesh.faces_attribute(name="m_1")
+    mesh.faces_attribute(name="m_1_copy", value=[1,2,3])
+    vf_copy = mesh.faces_attribute(name="m_1_copy")
+    print(vf_copy)
+    
+
     
 
