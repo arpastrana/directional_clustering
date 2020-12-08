@@ -74,8 +74,7 @@ python -c "import directional_clustering"
 ```
 
 If no errors occur, smile 🙂! You have a working installation of
-`directional_clustering`. 
-
+`directional_clustering`.
 
 ## Developer Mode
 
@@ -116,7 +115,7 @@ If instead what we need is a manual in `pdf` format, let's run:
 invoke pdf
 ```
 
-The manual will be saved in `docs/latex` as `directional_clustering.pdf`. 
+The manual will be saved in `docs/latex` as `directional_clustering.pdf`.
 
 ## License
 

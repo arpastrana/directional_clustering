@@ -117,11 +117,4 @@ class MeshPlus(Mesh):
 
 
 if __name__ == "__main__":
-    from directional_clustering import JSON
-    name_in = "perimeter_supported_slab.json"
-
-    JSON_IN = os.path.abspath(os.path.join(JSON, name_in))
-    mesh = MeshPlus.from_json(JSON_IN)
-
-    attr = mesh.vector_fields()
-    print(attr)
+    pass
