@@ -14,6 +14,13 @@ class ClusteringAlgorithm(ABC):
     def cluster(self, *args, **kwargs):
         """
         Main clustering method.
+
+        Parameters
+        ----------
+        args : `list`, optional
+            Default arguments.
+        kwargs : `dict`, optional
+            Default keyword arguments.
         """
         pass
 

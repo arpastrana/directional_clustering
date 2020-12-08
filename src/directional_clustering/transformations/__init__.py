@@ -1,16 +1,8 @@
 """
 directional_clustering.transformations
-****************************
+**************************************
 
 .. currentmodule:: directional_clustering.transformations
-
-
-Classes
-=======
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
 
 
 Functions
@@ -20,6 +12,8 @@ Functions
     :toctree: generated/
     :nosignatures:
 
+    align_vector_field
+    smoothen_vector_field
 """
 
 from __future__ import absolute_import

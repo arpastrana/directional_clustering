@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>directional_clustering</title>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <meta name="author" content="" />
+  <meta name="description" content="" />
+
+  <link rel="shortcut icon" href="../../_static/images/compas.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/default.min.css">
+  <link rel="stylesheet" type="text/css" href="../../_static/css/compas.css" />
+  <link rel="stylesheet" type="text/css" href="../../_static/css/compas-reference.css" />
+
+  
+    <link rel="next" title="PlyPlotter.__init__" href="directional_clustering.plotters.PlyPlotter.__init__.html" />
+  
+  
+  
+    <link rel="prev" title="directional_clustering.plotters" href="../directional_clustering.plotters.html" />
+  
+
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+  <style>
+    .footer-text,
+    .footer-link,
+    .footer-title {
+      color: rgba(255, 255, 255, 0.25);
+    }
+    .footer-link:hover {
+      color: rgba(255, 255, 255, 0.5);
+    }
+    </style>
+</head>
+
+<body data-spy="scroll" data-target="#compas-toc">
+  <!-- header -->
+  <header id="header" class="compas-header d-flex align-items-center">
+    <nav class="navbar navbar-expand navbar-dark col flex-column flex-md-row text-center">
+      <!-- brand -->
+      <a class="navbar-brand" href="">
+        <img src="../../_static/images/compas_icon_white.png" alt="directional_clustering" width="48px" height="48px" />
+      </a>
+      <!-- brand -->
+      <!-- primary -->
+      <ul class="navbar-nav">
+        <li class="nav-item active"><a class="nav-link" href="">directional_clustering</a></li>
+      </ul>
+      <!-- primary -->
+      <ul class="navbar-nav d-none d-md-flex ml-md-auto">
+        
+        <!-- version -->
+        <!-- social -->
+        <li class="nav-item">
+          <a class="nav-link" href="" target="_blank">
+            <span class="fab fa-github fa-1x"></span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="http://forum.compas-framework.org" target="_blank">
+            <span class="fab fa-discourse fa-1x"></span>
+          </a>
+        </li>
+        <!-- social -->
+      </ul>
+    </nav>
+  </header>
+  <!-- header -->
+  <!-- main -->
+  <div class="container-fluid">
+    <div class="row">
+      <!-- main -->
+      <main class="col-12 col-md-9 col-xl-7 px-2 px-md-5 py-5 compas-content" role="main">
+        
+        
+        <div class="detail section" id="plyplotter">
+<h1 class="display-4 p-0 mb-5">PlyPlotter</h1>
+<dl class="py class">
+<dt id="directional_clustering.plotters.PlyPlotter">
+<em class="property">class </em><code class="sig-prename descclassname">directional_clustering.plotters.</code><code class="sig-name descname">PlyPlotter</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span></dt>
+<dd><p>A web plotter for 3D geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> (<cite>list</cite>, optional) – Additional arguments.</p></li>
+<li><p><strong>kwargs</strong> (<cite>dict</cite>, optional) – Additional keyword arguments.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This is a custom wrapper around a Plotly.py graph object plotter.</p>
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+</tbody>
+</table>
+<p class="rubric">Inherited Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">data</span></code></p></td>
+<td><p>The <cite>data</cite> property is a tuple of the figure’s trace objects</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">frames</span></code></p></td>
+<td><p>The <cite>frames</cite> property is a tuple of the figure’s frame objects</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">layout</span></code></p></td>
+<td><p>The <cite>layout</cite> property of the figure</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.__init__.html#directional_clustering.plotters.PlyPlotter.__init__" title="directional_clustering.plotters.PlyPlotter.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(*args, **kwargs)</p></td>
+<td><p>The constructor.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.plot_trimesh.html#directional_clustering.plotters.PlyPlotter.plot_trimesh" title="directional_clustering.plotters.PlyPlotter.plot_trimesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_trimesh</span></code></a>(mesh, paint_clusters[, …])</p></td>
+<td><p>Plots a triangulated mesh in color.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.plot_vector_field_cones.html#directional_clustering.plotters.PlyPlotter.plot_vector_field_cones" title="directional_clustering.plotters.PlyPlotter.plot_vector_field_cones"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_vector_field_cones</span></code></a>(mesh, vector_field)</p></td>
+<td><p>Plots a vector field as cones.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.plot_vector_field_lines.html#directional_clustering.plotters.PlyPlotter.plot_vector_field_lines" title="directional_clustering.plotters.PlyPlotter.plot_vector_field_lines"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_vector_field_lines</span></code></a>(mesh, vector_field, …)</p></td>
+<td><p>Plots a vector field.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.set_title.html#directional_clustering.plotters.PlyPlotter.set_title" title="directional_clustering.plotters.PlyPlotter.set_title"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_title</span></code></a>(title)</p></td>
+<td><p>Sets title of the plot and sets the aspect ratio to the data.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Inherited Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_annotation.html#directional_clustering.plotters.PlyPlotter.add_annotation" title="directional_clustering.plotters.PlyPlotter.add_annotation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_annotation</span></code></a>([arg, align, arrowcolor, …])</p></td>
+<td><p>Create and add a new annotation to the figure’s layout</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_area.html#directional_clustering.plotters.PlyPlotter.add_area" title="directional_clustering.plotters.PlyPlotter.add_area"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_area</span></code></a>([customdata, customdatasrc, …])</p></td>
+<td><p>Add a new Area trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_bar.html#directional_clustering.plotters.PlyPlotter.add_bar" title="directional_clustering.plotters.PlyPlotter.add_bar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_bar</span></code></a>([alignmentgroup, base, basesrc, …])</p></td>
+<td><p>Add a new Bar trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_barpolar.html#directional_clustering.plotters.PlyPlotter.add_barpolar" title="directional_clustering.plotters.PlyPlotter.add_barpolar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_barpolar</span></code></a>([base, basesrc, customdata, …])</p></td>
+<td><p>Add a new Barpolar trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_box.html#directional_clustering.plotters.PlyPlotter.add_box" title="directional_clustering.plotters.PlyPlotter.add_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_box</span></code></a>([alignmentgroup, boxmean, …])</p></td>
+<td><p>Add a new Box trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_candlestick.html#directional_clustering.plotters.PlyPlotter.add_candlestick" title="directional_clustering.plotters.PlyPlotter.add_candlestick"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_candlestick</span></code></a>([close, closesrc, …])</p></td>
+<td><p>Add a new Candlestick trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_carpet.html#directional_clustering.plotters.PlyPlotter.add_carpet" title="directional_clustering.plotters.PlyPlotter.add_carpet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_carpet</span></code></a>([a, a0, aaxis, asrc, b, b0, …])</p></td>
+<td><p>Add a new Carpet trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_choropleth.html#directional_clustering.plotters.PlyPlotter.add_choropleth" title="directional_clustering.plotters.PlyPlotter.add_choropleth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_choropleth</span></code></a>([autocolorscale, coloraxis, …])</p></td>
+<td><p>Add a new Choropleth trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_choroplethmapbox.html#directional_clustering.plotters.PlyPlotter.add_choroplethmapbox" title="directional_clustering.plotters.PlyPlotter.add_choroplethmapbox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_choroplethmapbox</span></code></a>([autocolorscale, …])</p></td>
+<td><p>Add a new Choroplethmapbox trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_cone.html#directional_clustering.plotters.PlyPlotter.add_cone" title="directional_clustering.plotters.PlyPlotter.add_cone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_cone</span></code></a>([anchor, autocolorscale, cauto, …])</p></td>
+<td><p>Add a new Cone trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_contour.html#directional_clustering.plotters.PlyPlotter.add_contour" title="directional_clustering.plotters.PlyPlotter.add_contour"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_contour</span></code></a>([autocolorscale, autocontour, …])</p></td>
+<td><p>Add a new Contour trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_contourcarpet.html#directional_clustering.plotters.PlyPlotter.add_contourcarpet" title="directional_clustering.plotters.PlyPlotter.add_contourcarpet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_contourcarpet</span></code></a>([a, a0, asrc, atype, …])</p></td>
+<td><p>Add a new Contourcarpet trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_densitymapbox.html#directional_clustering.plotters.PlyPlotter.add_densitymapbox" title="directional_clustering.plotters.PlyPlotter.add_densitymapbox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_densitymapbox</span></code></a>([autocolorscale, below, …])</p></td>
+<td><p>Add a new Densitymapbox trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_funnel.html#directional_clustering.plotters.PlyPlotter.add_funnel" title="directional_clustering.plotters.PlyPlotter.add_funnel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_funnel</span></code></a>([alignmentgroup, cliponaxis, …])</p></td>
+<td><p>Add a new Funnel trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_funnelarea.html#directional_clustering.plotters.PlyPlotter.add_funnelarea" title="directional_clustering.plotters.PlyPlotter.add_funnelarea"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_funnelarea</span></code></a>([aspectratio, baseratio, …])</p></td>
+<td><p>Add a new Funnelarea trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_heatmap.html#directional_clustering.plotters.PlyPlotter.add_heatmap" title="directional_clustering.plotters.PlyPlotter.add_heatmap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_heatmap</span></code></a>([autocolorscale, coloraxis, …])</p></td>
+<td><p>Add a new Heatmap trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_heatmapgl.html#directional_clustering.plotters.PlyPlotter.add_heatmapgl" title="directional_clustering.plotters.PlyPlotter.add_heatmapgl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_heatmapgl</span></code></a>([autocolorscale, coloraxis, …])</p></td>
+<td><p>Add a new Heatmapgl trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_histogram.html#directional_clustering.plotters.PlyPlotter.add_histogram" title="directional_clustering.plotters.PlyPlotter.add_histogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_histogram</span></code></a>([alignmentgroup, autobinx, …])</p></td>
+<td><p>Add a new Histogram trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_histogram2d.html#directional_clustering.plotters.PlyPlotter.add_histogram2d" title="directional_clustering.plotters.PlyPlotter.add_histogram2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_histogram2d</span></code></a>([autobinx, autobiny, …])</p></td>
+<td><p>Add a new Histogram2d trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_histogram2dcontour.html#directional_clustering.plotters.PlyPlotter.add_histogram2dcontour" title="directional_clustering.plotters.PlyPlotter.add_histogram2dcontour"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_histogram2dcontour</span></code></a>([autobinx, autobiny, …])</p></td>
+<td><p>Add a new Histogram2dContour trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_hline.html#directional_clustering.plotters.PlyPlotter.add_hline" title="directional_clustering.plotters.PlyPlotter.add_hline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_hline</span></code></a>(y[, row, col, exclude_empty_subplots])</p></td>
+<td><p>Add a horizontal line to a plot or subplot that extends infinitely in the x-dimension.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_hrect.html#directional_clustering.plotters.PlyPlotter.add_hrect" title="directional_clustering.plotters.PlyPlotter.add_hrect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_hrect</span></code></a>(y0, y1[, row, col, …])</p></td>
+<td><p>Add a rectangle to a plot or subplot that extends infinitely in the x-dimension.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_image.html#directional_clustering.plotters.PlyPlotter.add_image" title="directional_clustering.plotters.PlyPlotter.add_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_image</span></code></a>([colormodel, customdata, …])</p></td>
+<td><p>Add a new Image trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_indicator.html#directional_clustering.plotters.PlyPlotter.add_indicator" title="directional_clustering.plotters.PlyPlotter.add_indicator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_indicator</span></code></a>([align, customdata, …])</p></td>
+<td><p>Add a new Indicator trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_isosurface.html#directional_clustering.plotters.PlyPlotter.add_isosurface" title="directional_clustering.plotters.PlyPlotter.add_isosurface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_isosurface</span></code></a>([autocolorscale, caps, …])</p></td>
+<td><p>Add a new Isosurface trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_layout_image.html#directional_clustering.plotters.PlyPlotter.add_layout_image" title="directional_clustering.plotters.PlyPlotter.add_layout_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_layout_image</span></code></a>([arg, layer, name, …])</p></td>
+<td><p>Create and add a new image to the figure’s layout</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_mesh3d.html#directional_clustering.plotters.PlyPlotter.add_mesh3d" title="directional_clustering.plotters.PlyPlotter.add_mesh3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_mesh3d</span></code></a>([alphahull, autocolorscale, …])</p></td>
+<td><p>Add a new Mesh3d trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_ohlc.html#directional_clustering.plotters.PlyPlotter.add_ohlc" title="directional_clustering.plotters.PlyPlotter.add_ohlc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_ohlc</span></code></a>([close, closesrc, customdata, …])</p></td>
+<td><p>Add a new Ohlc trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_parcats.html#directional_clustering.plotters.PlyPlotter.add_parcats" title="directional_clustering.plotters.PlyPlotter.add_parcats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_parcats</span></code></a>([arrangement, bundlecolors, …])</p></td>
+<td><p>Add a new Parcats trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_parcoords.html#directional_clustering.plotters.PlyPlotter.add_parcoords" title="directional_clustering.plotters.PlyPlotter.add_parcoords"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_parcoords</span></code></a>([customdata, customdatasrc, …])</p></td>
+<td><p>Add a new Parcoords trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_pie.html#directional_clustering.plotters.PlyPlotter.add_pie" title="directional_clustering.plotters.PlyPlotter.add_pie"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_pie</span></code></a>([automargin, customdata, …])</p></td>
+<td><p>Add a new Pie trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_pointcloud.html#directional_clustering.plotters.PlyPlotter.add_pointcloud" title="directional_clustering.plotters.PlyPlotter.add_pointcloud"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_pointcloud</span></code></a>([customdata, customdatasrc, …])</p></td>
+<td><p>Add a new Pointcloud trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_sankey.html#directional_clustering.plotters.PlyPlotter.add_sankey" title="directional_clustering.plotters.PlyPlotter.add_sankey"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_sankey</span></code></a>([arrangement, customdata, …])</p></td>
+<td><p>Add a new Sankey trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_scatter.html#directional_clustering.plotters.PlyPlotter.add_scatter" title="directional_clustering.plotters.PlyPlotter.add_scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_scatter</span></code></a>([cliponaxis, connectgaps, …])</p></td>
+<td><p>Add a new Scatter trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_scatter3d.html#directional_clustering.plotters.PlyPlotter.add_scatter3d" title="directional_clustering.plotters.PlyPlotter.add_scatter3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_scatter3d</span></code></a>([connectgaps, customdata, …])</p></td>
+<td><p>Add a new Scatter3d trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_scattercarpet.html#directional_clustering.plotters.PlyPlotter.add_scattercarpet" title="directional_clustering.plotters.PlyPlotter.add_scattercarpet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_scattercarpet</span></code></a>([a, asrc, b, bsrc, …])</p></td>
+<td><p>Add a new Scattercarpet trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_scattergeo.html#directional_clustering.plotters.PlyPlotter.add_scattergeo" title="directional_clustering.plotters.PlyPlotter.add_scattergeo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_scattergeo</span></code></a>([connectgaps, customdata, …])</p></td>
+<td><p>Add a new Scattergeo trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_scattergl.html#directional_clustering.plotters.PlyPlotter.add_scattergl" title="directional_clustering.plotters.PlyPlotter.add_scattergl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_scattergl</span></code></a>([connectgaps, customdata, …])</p></td>
+<td><p>Add a new Scattergl trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_scattermapbox.html#directional_clustering.plotters.PlyPlotter.add_scattermapbox" title="directional_clustering.plotters.PlyPlotter.add_scattermapbox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_scattermapbox</span></code></a>([below, connectgaps, …])</p></td>
+<td><p>Add a new Scattermapbox trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_scatterpolar.html#directional_clustering.plotters.PlyPlotter.add_scatterpolar" title="directional_clustering.plotters.PlyPlotter.add_scatterpolar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_scatterpolar</span></code></a>([cliponaxis, connectgaps, …])</p></td>
+<td><p>Add a new Scatterpolar trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_scatterpolargl.html#directional_clustering.plotters.PlyPlotter.add_scatterpolargl" title="directional_clustering.plotters.PlyPlotter.add_scatterpolargl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_scatterpolargl</span></code></a>([connectgaps, …])</p></td>
+<td><p>Add a new Scatterpolargl trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_scatterternary.html#directional_clustering.plotters.PlyPlotter.add_scatterternary" title="directional_clustering.plotters.PlyPlotter.add_scatterternary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_scatterternary</span></code></a>([a, asrc, b, bsrc, c, …])</p></td>
+<td><p>Add a new Scatterternary trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_shape.html#directional_clustering.plotters.PlyPlotter.add_shape" title="directional_clustering.plotters.PlyPlotter.add_shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_shape</span></code></a>([arg, editable, fillcolor, …])</p></td>
+<td><p>Create and add a new shape to the figure’s layout</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_splom.html#directional_clustering.plotters.PlyPlotter.add_splom" title="directional_clustering.plotters.PlyPlotter.add_splom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_splom</span></code></a>([customdata, customdatasrc, …])</p></td>
+<td><p>Add a new Splom trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_streamtube.html#directional_clustering.plotters.PlyPlotter.add_streamtube" title="directional_clustering.plotters.PlyPlotter.add_streamtube"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_streamtube</span></code></a>([autocolorscale, cauto, …])</p></td>
+<td><p>Add a new Streamtube trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_sunburst.html#directional_clustering.plotters.PlyPlotter.add_sunburst" title="directional_clustering.plotters.PlyPlotter.add_sunburst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_sunburst</span></code></a>([branchvalues, count, …])</p></td>
+<td><p>Add a new Sunburst trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_surface.html#directional_clustering.plotters.PlyPlotter.add_surface" title="directional_clustering.plotters.PlyPlotter.add_surface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_surface</span></code></a>([autocolorscale, cauto, cmax, …])</p></td>
+<td><p>Add a new Surface trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_table.html#directional_clustering.plotters.PlyPlotter.add_table" title="directional_clustering.plotters.PlyPlotter.add_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_table</span></code></a>([cells, columnorder, …])</p></td>
+<td><p>Add a new Table trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_trace.html#directional_clustering.plotters.PlyPlotter.add_trace" title="directional_clustering.plotters.PlyPlotter.add_trace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_trace</span></code></a>(trace[, row, col, secondary_y, …])</p></td>
+<td><p>Add a trace to the figure</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_traces.html#directional_clustering.plotters.PlyPlotter.add_traces" title="directional_clustering.plotters.PlyPlotter.add_traces"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_traces</span></code></a>(data[, rows, cols, secondary_ys, …])</p></td>
+<td><p>Add traces to the figure</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_treemap.html#directional_clustering.plotters.PlyPlotter.add_treemap" title="directional_clustering.plotters.PlyPlotter.add_treemap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_treemap</span></code></a>([branchvalues, count, …])</p></td>
+<td><p>Add a new Treemap trace</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_violin.html#directional_clustering.plotters.PlyPlotter.add_violin" title="directional_clustering.plotters.PlyPlotter.add_violin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_violin</span></code></a>([alignmentgroup, bandwidth, box, …])</p></td>
+<td><p>Add a new Violin trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_vline.html#directional_clustering.plotters.PlyPlotter.add_vline" title="directional_clustering.plotters.PlyPlotter.add_vline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_vline</span></code></a>(x[, row, col, …])</p></td>
+<td><p>Add a vertical line to a plot or subplot that extends infinitely in the y-dimension.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_volume.html#directional_clustering.plotters.PlyPlotter.add_volume" title="directional_clustering.plotters.PlyPlotter.add_volume"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_volume</span></code></a>([autocolorscale, caps, cauto, …])</p></td>
+<td><p>Add a new Volume trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_vrect.html#directional_clustering.plotters.PlyPlotter.add_vrect" title="directional_clustering.plotters.PlyPlotter.add_vrect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_vrect</span></code></a>(x0, x1[, row, col, …])</p></td>
+<td><p>Add a rectangle to a plot or subplot that extends infinitely in the y-dimension.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.add_waterfall.html#directional_clustering.plotters.PlyPlotter.add_waterfall" title="directional_clustering.plotters.PlyPlotter.add_waterfall"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_waterfall</span></code></a>([alignmentgroup, base, …])</p></td>
+<td><p>Add a new Waterfall trace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.append_trace.html#directional_clustering.plotters.PlyPlotter.append_trace" title="directional_clustering.plotters.PlyPlotter.append_trace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">append_trace</span></code></a>(trace, row, col)</p></td>
+<td><p>Add a trace to the figure bound to axes at the specified row, col index.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.batch_animate.html#directional_clustering.plotters.PlyPlotter.batch_animate" title="directional_clustering.plotters.PlyPlotter.batch_animate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">batch_animate</span></code></a>([duration, easing])</p></td>
+<td><p>Context manager to animate trace / layout updates</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.batch_update.html#directional_clustering.plotters.PlyPlotter.batch_update" title="directional_clustering.plotters.PlyPlotter.batch_update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">batch_update</span></code></a>()</p></td>
+<td><p>A context manager that batches up trace and layout assignment operations into a singe plotly_update message that is executed when the context exits.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.for_each_annotation.html#directional_clustering.plotters.PlyPlotter.for_each_annotation" title="directional_clustering.plotters.PlyPlotter.for_each_annotation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">for_each_annotation</span></code></a>(fn[, selector, row, …])</p></td>
+<td><p>Apply a function to all annotations that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.for_each_coloraxis.html#directional_clustering.plotters.PlyPlotter.for_each_coloraxis" title="directional_clustering.plotters.PlyPlotter.for_each_coloraxis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">for_each_coloraxis</span></code></a>(fn[, selector, row, col])</p></td>
+<td><p>Apply a function to all coloraxis objects that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.for_each_geo.html#directional_clustering.plotters.PlyPlotter.for_each_geo" title="directional_clustering.plotters.PlyPlotter.for_each_geo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">for_each_geo</span></code></a>(fn[, selector, row, col])</p></td>
+<td><p>Apply a function to all geo objects that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.for_each_layout_image.html#directional_clustering.plotters.PlyPlotter.for_each_layout_image" title="directional_clustering.plotters.PlyPlotter.for_each_layout_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">for_each_layout_image</span></code></a>(fn[, selector, row, …])</p></td>
+<td><p>Apply a function to all images that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.for_each_mapbox.html#directional_clustering.plotters.PlyPlotter.for_each_mapbox" title="directional_clustering.plotters.PlyPlotter.for_each_mapbox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">for_each_mapbox</span></code></a>(fn[, selector, row, col])</p></td>
+<td><p>Apply a function to all mapbox objects that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.for_each_polar.html#directional_clustering.plotters.PlyPlotter.for_each_polar" title="directional_clustering.plotters.PlyPlotter.for_each_polar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">for_each_polar</span></code></a>(fn[, selector, row, col])</p></td>
+<td><p>Apply a function to all polar objects that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.for_each_scene.html#directional_clustering.plotters.PlyPlotter.for_each_scene" title="directional_clustering.plotters.PlyPlotter.for_each_scene"><code class="xref py py-obj docutils literal notranslate"><span class="pre">for_each_scene</span></code></a>(fn[, selector, row, col])</p></td>
+<td><p>Apply a function to all scene objects that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.for_each_shape.html#directional_clustering.plotters.PlyPlotter.for_each_shape" title="directional_clustering.plotters.PlyPlotter.for_each_shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">for_each_shape</span></code></a>(fn[, selector, row, col, …])</p></td>
+<td><p>Apply a function to all shapes that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.for_each_ternary.html#directional_clustering.plotters.PlyPlotter.for_each_ternary" title="directional_clustering.plotters.PlyPlotter.for_each_ternary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">for_each_ternary</span></code></a>(fn[, selector, row, col])</p></td>
+<td><p>Apply a function to all ternary objects that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.for_each_trace.html#directional_clustering.plotters.PlyPlotter.for_each_trace" title="directional_clustering.plotters.PlyPlotter.for_each_trace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">for_each_trace</span></code></a>(fn[, selector, row, col, …])</p></td>
+<td><p>Apply a function to all traces that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.for_each_xaxis.html#directional_clustering.plotters.PlyPlotter.for_each_xaxis" title="directional_clustering.plotters.PlyPlotter.for_each_xaxis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">for_each_xaxis</span></code></a>(fn[, selector, row, col])</p></td>
+<td><p>Apply a function to all xaxis objects that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.for_each_yaxis.html#directional_clustering.plotters.PlyPlotter.for_each_yaxis" title="directional_clustering.plotters.PlyPlotter.for_each_yaxis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">for_each_yaxis</span></code></a>(fn[, selector, row, col, …])</p></td>
+<td><p>Apply a function to all yaxis objects that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.full_figure_for_development.html#directional_clustering.plotters.PlyPlotter.full_figure_for_development" title="directional_clustering.plotters.PlyPlotter.full_figure_for_development"><code class="xref py py-obj docutils literal notranslate"><span class="pre">full_figure_for_development</span></code></a>([warn, as_dict])</p></td>
+<td><p>Compute default values for all attributes not specified in the input figure and returns the output as a “full” figure.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.get_subplot.html#directional_clustering.plotters.PlyPlotter.get_subplot" title="directional_clustering.plotters.PlyPlotter.get_subplot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_subplot</span></code></a>(row, col[, secondary_y])</p></td>
+<td><p>Return an object representing the subplot at the specified row and column.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.plotly_relayout.html#directional_clustering.plotters.PlyPlotter.plotly_relayout" title="directional_clustering.plotters.PlyPlotter.plotly_relayout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plotly_relayout</span></code></a>(relayout_data, **kwargs)</p></td>
+<td><p>Perform a Plotly relayout operation on the figure’s layout</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.plotly_restyle.html#directional_clustering.plotters.PlyPlotter.plotly_restyle" title="directional_clustering.plotters.PlyPlotter.plotly_restyle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plotly_restyle</span></code></a>(restyle_data[, trace_indexes])</p></td>
+<td><p>Perform a Plotly restyle operation on the figure’s traces</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.plotly_update.html#directional_clustering.plotters.PlyPlotter.plotly_update" title="directional_clustering.plotters.PlyPlotter.plotly_update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plotly_update</span></code></a>([restyle_data, relayout_data, …])</p></td>
+<td><p>Perform a Plotly update operation on the figure.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.pop.html#directional_clustering.plotters.PlyPlotter.pop" title="directional_clustering.plotters.PlyPlotter.pop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code></a>(key, *args)</p></td>
+<td><p>Remove the value associated with the specified key and return it</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.print_grid.html#directional_clustering.plotters.PlyPlotter.print_grid" title="directional_clustering.plotters.PlyPlotter.print_grid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_grid</span></code></a>()</p></td>
+<td><p>Print a visual layout of the figure’s axes arrangement.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.select_annotations.html#directional_clustering.plotters.PlyPlotter.select_annotations" title="directional_clustering.plotters.PlyPlotter.select_annotations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_annotations</span></code></a>([selector, row, col, …])</p></td>
+<td><p>Select annotations from a particular subplot cell and/or annotations that satisfy custom selection criteria.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.select_coloraxes.html#directional_clustering.plotters.PlyPlotter.select_coloraxes" title="directional_clustering.plotters.PlyPlotter.select_coloraxes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_coloraxes</span></code></a>([selector, row, col])</p></td>
+<td><p>Select coloraxis subplot objects from a particular subplot cell and/or coloraxis subplot objects that satisfy custom selection criteria.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.select_geos.html#directional_clustering.plotters.PlyPlotter.select_geos" title="directional_clustering.plotters.PlyPlotter.select_geos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_geos</span></code></a>([selector, row, col])</p></td>
+<td><p>Select geo subplot objects from a particular subplot cell and/or geo subplot objects that satisfy custom selection criteria.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.select_layout_images.html#directional_clustering.plotters.PlyPlotter.select_layout_images" title="directional_clustering.plotters.PlyPlotter.select_layout_images"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_layout_images</span></code></a>([selector, row, col, …])</p></td>
+<td><p>Select images from a particular subplot cell and/or images that satisfy custom selection criteria.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.select_mapboxes.html#directional_clustering.plotters.PlyPlotter.select_mapboxes" title="directional_clustering.plotters.PlyPlotter.select_mapboxes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_mapboxes</span></code></a>([selector, row, col])</p></td>
+<td><p>Select mapbox subplot objects from a particular subplot cell and/or mapbox subplot objects that satisfy custom selection criteria.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.select_polars.html#directional_clustering.plotters.PlyPlotter.select_polars" title="directional_clustering.plotters.PlyPlotter.select_polars"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_polars</span></code></a>([selector, row, col])</p></td>
+<td><p>Select polar subplot objects from a particular subplot cell and/or polar subplot objects that satisfy custom selection criteria.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.select_scenes.html#directional_clustering.plotters.PlyPlotter.select_scenes" title="directional_clustering.plotters.PlyPlotter.select_scenes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_scenes</span></code></a>([selector, row, col])</p></td>
+<td><p>Select scene subplot objects from a particular subplot cell and/or scene subplot objects that satisfy custom selection criteria.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.select_shapes.html#directional_clustering.plotters.PlyPlotter.select_shapes" title="directional_clustering.plotters.PlyPlotter.select_shapes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_shapes</span></code></a>([selector, row, col, secondary_y])</p></td>
+<td><p>Select shapes from a particular subplot cell and/or shapes that satisfy custom selection criteria.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.select_ternaries.html#directional_clustering.plotters.PlyPlotter.select_ternaries" title="directional_clustering.plotters.PlyPlotter.select_ternaries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_ternaries</span></code></a>([selector, row, col])</p></td>
+<td><p>Select ternary subplot objects from a particular subplot cell and/or ternary subplot objects that satisfy custom selection criteria.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.select_traces.html#directional_clustering.plotters.PlyPlotter.select_traces" title="directional_clustering.plotters.PlyPlotter.select_traces"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_traces</span></code></a>([selector, row, col, secondary_y])</p></td>
+<td><p>Select traces from a particular subplot cell and/or traces that satisfy custom selection criteria.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.select_xaxes.html#directional_clustering.plotters.PlyPlotter.select_xaxes" title="directional_clustering.plotters.PlyPlotter.select_xaxes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_xaxes</span></code></a>([selector, row, col])</p></td>
+<td><p>Select xaxis subplot objects from a particular subplot cell and/or xaxis subplot objects that satisfy custom selection criteria.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.select_yaxes.html#directional_clustering.plotters.PlyPlotter.select_yaxes" title="directional_clustering.plotters.PlyPlotter.select_yaxes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_yaxes</span></code></a>([selector, row, col, secondary_y])</p></td>
+<td><p>Select yaxis subplot objects from a particular subplot cell and/or yaxis subplot objects that satisfy custom selection criteria.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.set_subplots.html#directional_clustering.plotters.PlyPlotter.set_subplots" title="directional_clustering.plotters.PlyPlotter.set_subplots"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_subplots</span></code></a>([rows, cols])</p></td>
+<td><p>Add subplots to this figure.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.show.html#directional_clustering.plotters.PlyPlotter.show" title="directional_clustering.plotters.PlyPlotter.show"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Show a figure using either the default renderer(s) or the renderer(s) specified by the renderer argument</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.to_dict.html#directional_clustering.plotters.PlyPlotter.to_dict" title="directional_clustering.plotters.PlyPlotter.to_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dict</span></code></a>()</p></td>
+<td><p>Convert figure to a dictionary</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.to_html.html#directional_clustering.plotters.PlyPlotter.to_html" title="directional_clustering.plotters.PlyPlotter.to_html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_html</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Convert a figure to an HTML string representation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.to_image.html#directional_clustering.plotters.PlyPlotter.to_image" title="directional_clustering.plotters.PlyPlotter.to_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_image</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Convert a figure to a static image bytes string</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.to_json.html#directional_clustering.plotters.PlyPlotter.to_json" title="directional_clustering.plotters.PlyPlotter.to_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Convert a figure to a JSON string representation</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.to_ordered_dict.html#directional_clustering.plotters.PlyPlotter.to_ordered_dict" title="directional_clustering.plotters.PlyPlotter.to_ordered_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_ordered_dict</span></code></a>([skip_uid])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.to_plotly_json.html#directional_clustering.plotters.PlyPlotter.to_plotly_json" title="directional_clustering.plotters.PlyPlotter.to_plotly_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_plotly_json</span></code></a>()</p></td>
+<td><p>Convert figure to a JSON representation as a Python dict</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.update.html#directional_clustering.plotters.PlyPlotter.update" title="directional_clustering.plotters.PlyPlotter.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>([dict1, overwrite])</p></td>
+<td><p>Update the properties of the figure with a dict and/or with keyword arguments.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.update_annotations.html#directional_clustering.plotters.PlyPlotter.update_annotations" title="directional_clustering.plotters.PlyPlotter.update_annotations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_annotations</span></code></a>([patch, selector, row, …])</p></td>
+<td><p>Perform a property update operation on all annotations that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.update_coloraxes.html#directional_clustering.plotters.PlyPlotter.update_coloraxes" title="directional_clustering.plotters.PlyPlotter.update_coloraxes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_coloraxes</span></code></a>([patch, selector, …])</p></td>
+<td><p>Perform a property update operation on all coloraxis objects that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.update_geos.html#directional_clustering.plotters.PlyPlotter.update_geos" title="directional_clustering.plotters.PlyPlotter.update_geos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_geos</span></code></a>([patch, selector, overwrite, …])</p></td>
+<td><p>Perform a property update operation on all geo objects that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.update_layout.html#directional_clustering.plotters.PlyPlotter.update_layout" title="directional_clustering.plotters.PlyPlotter.update_layout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_layout</span></code></a>([dict1, overwrite])</p></td>
+<td><p>Update the properties of the figure’s layout with a dict and/or with keyword arguments.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.update_layout_images.html#directional_clustering.plotters.PlyPlotter.update_layout_images" title="directional_clustering.plotters.PlyPlotter.update_layout_images"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_layout_images</span></code></a>([patch, selector, row, …])</p></td>
+<td><p>Perform a property update operation on all images that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.update_mapboxes.html#directional_clustering.plotters.PlyPlotter.update_mapboxes" title="directional_clustering.plotters.PlyPlotter.update_mapboxes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_mapboxes</span></code></a>([patch, selector, …])</p></td>
+<td><p>Perform a property update operation on all mapbox objects that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.update_polars.html#directional_clustering.plotters.PlyPlotter.update_polars" title="directional_clustering.plotters.PlyPlotter.update_polars"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_polars</span></code></a>([patch, selector, overwrite, …])</p></td>
+<td><p>Perform a property update operation on all polar objects that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.update_scenes.html#directional_clustering.plotters.PlyPlotter.update_scenes" title="directional_clustering.plotters.PlyPlotter.update_scenes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_scenes</span></code></a>([patch, selector, overwrite, …])</p></td>
+<td><p>Perform a property update operation on all scene objects that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.update_shapes.html#directional_clustering.plotters.PlyPlotter.update_shapes" title="directional_clustering.plotters.PlyPlotter.update_shapes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_shapes</span></code></a>([patch, selector, row, col, …])</p></td>
+<td><p>Perform a property update operation on all shapes that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.update_ternaries.html#directional_clustering.plotters.PlyPlotter.update_ternaries" title="directional_clustering.plotters.PlyPlotter.update_ternaries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_ternaries</span></code></a>([patch, selector, …])</p></td>
+<td><p>Perform a property update operation on all ternary objects that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.update_traces.html#directional_clustering.plotters.PlyPlotter.update_traces" title="directional_clustering.plotters.PlyPlotter.update_traces"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_traces</span></code></a>([patch, selector, row, col, …])</p></td>
+<td><p>Perform a property update operation on all traces that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.update_xaxes.html#directional_clustering.plotters.PlyPlotter.update_xaxes" title="directional_clustering.plotters.PlyPlotter.update_xaxes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_xaxes</span></code></a>([patch, selector, overwrite, …])</p></td>
+<td><p>Perform a property update operation on all xaxis objects that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.update_yaxes.html#directional_clustering.plotters.PlyPlotter.update_yaxes" title="directional_clustering.plotters.PlyPlotter.update_yaxes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_yaxes</span></code></a>([patch, selector, overwrite, …])</p></td>
+<td><p>Perform a property update operation on all yaxis objects that satisfy the specified selection criteria</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.write_html.html#directional_clustering.plotters.PlyPlotter.write_html" title="directional_clustering.plotters.PlyPlotter.write_html"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_html</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Write a figure to an HTML file representation</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.write_image.html#directional_clustering.plotters.PlyPlotter.write_image" title="directional_clustering.plotters.PlyPlotter.write_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_image</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Convert a figure to a static image and write it to a file or writeable object</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="directional_clustering.plotters.PlyPlotter.write_json.html#directional_clustering.plotters.PlyPlotter.write_json" title="directional_clustering.plotters.PlyPlotter.write_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_json</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Convert a figure to JSON and write it to a file or writeable object</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+        
+      </main>
+      <!-- content -->
+      <!-- sidebar -->
+      <div class="col-12 col-md-3 compas-sidebar" role="navigation"> 
+        <form id="search" class="d-flex align-items-center compas-searchbox" action="../../search.html" method="get">
+          <input class="form-control" type="text" name="q" placeholder="Search docs" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+          <button class="navbar-toggler d-md-none" type="button" data-toggle="collapse" data-target="#compas-navigation" aria-controls="compas-navigation" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </form>
+        
+        
+          <div id="compas-navigation" class="collapse compas-navigation">
+          <ul class="nav flex-column active">
+<li class="nav-item"><a class="nav-link reference internal" href="../../intro.html">Introduction</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../gettingstarted.html">Getting Started</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../examples.html">Examples</a></li>
+<li class="nav-item active"><a class="nav-link reference internal" href="../../api.html">API Reference</a><ul class="nav flex-column active">
+<li class="nav-item active"><a class="nav-link reference internal" href="../directional_clustering.html">directional_clustering</a><ul class="nav flex-column active">
+<li class="nav-item"><a class="nav-link reference internal" href="../directional_clustering.clustering.html">directional_clustering.clustering</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../directional_clustering.fields.html">directional_clustering.fields</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../directional_clustering.mesh.html">directional_clustering.mesh</a></li>
+<li class="nav-item active"><a class="nav-link reference internal" href="../directional_clustering.plotters.html">directional_clustering.plotters</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../directional_clustering.transformations.html">directional_clustering.transformations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../license.html">License</a></li>
+</ul>
+
+          </div>
+        
+      </div>
+      <!-- sidebar -->
+      <!-- toc -->
+      <div class="d-none d-xl-block col-xl-2 compas-toc" role="toc">
+        
+        <ul class="nav flex-column" id="compas-toc">
+<li class="nav-item"><a class="nav-link reference internal" href="#">PlyPlotter</a><ul class="nav flex-column">
+</ul>
+</li>
+</ul>
+
+      </div>
+      <!-- toc -->
+    </div>
+  </div>
+  <!-- main -->
+  <!-- footer -->
+  <!-- footer -->
+  <div class="below py-5" style="background-color: #222;">
+    <div class="container">
+      <div class="row flex-column">
+      <div class="col-12 col-md-6 mx-md-auto text-center">
+        <h4 class="pb-3 footer-text">COMPAS</h4>
+        <p class="footer-text">
+          A computational framework for collaboration and research
+          in Architecture, Engineering, Fabrication, and Construction.
+        </p>
+        <nav class="nav justify-content-center pb-3">
+          <a class="nav-link mx-2 px-0 footer-link" href="http://github.com/compas-dev" target="_blank">
+            <span class="fab fa-github fa-1x"></span>
+          </a>
+          <a class="nav-link mx-2 px-0 footer-link" href="http://forum.compas-framework.org" target="_blank">
+            <span class="fab fa-discourse fa-1x"></span>
+          </a>
+          <a class="nav-link mx-2 px-0 footer-link" href="https://pypi.org/project/COMPAS/" target="_blank">
+            <span class="fab fa-python fa-1x"></span>
+          </a>
+        </nav>
+      </div>
+      </div>
+      <div class="row">
+      <div class="col text-center">
+        <p class="p-0 m-0 footer-text">Copyright &copy; 2017-2020 compas-dev</p>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+  var DOCUMENTATION_OPTIONS = {
+  URL_ROOT          : '',
+  VERSION           : '0.1.0',
+  COLLAPSE_INDEX    : false,
+  FILE_SUFFIX       : '.html',
+  HAS_SOURCE        : 'false',
+  SOURCELINK_SUFFIX : '.txt'
+  };
+  </script>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="https:////cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.1/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.0.0/anchor.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
+
+  <script src="../../_static/underscore.js"></script>
+  <script src="../../_static/doctools.js"></script>
+  <script src="../../_static/js/searchtools_.js"></script>
+
+  <script>
+  $(document).ready(function() {
+    $(".language-default code").addClass("python");
+    $(".language-python code").addClass("python");
+    $(".language-bash code").addClass("bash");
+    $(".language-cpp code").addClass("cpp");
+    $(".language-json code").addClass("json");
+    $(".language-none code").addClass("plaintext");
+
+    hljs.initHighlighting();
+    anchors.add();
+
+    $('.nav-versions .dropdown-item').filter(function(i, ver) {
+      return window.location.href.startsWith(ver.href);
+    }).addClass("active");
+
+  });
+
+
+  var url = $("#doc_versions").data("url");
+  var docs_site = $("#doc_versions").data("docs");
+
+  if (url) {
+    $.get(url, res=>{
+      var lines = res.match(/[^\r\n]+/g);
+      lines.forEach(version => {
+        $("#doc_version_list").append("<a class=\"dropdown-item\" href=\""+ docs_site + version + "\">" + version + "</a>");
+      });
+    })
+  }
+
+  </script>
+  
+  
+</body>
+</html>

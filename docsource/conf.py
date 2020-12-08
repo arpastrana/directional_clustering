@@ -44,7 +44,7 @@ extensions = [
 # autodoc options
 
 autodoc_default_flags = [
-    "undoc-members",
+    "undoc-members"
     "show-inheritance",
 ]
 

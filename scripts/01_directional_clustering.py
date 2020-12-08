@@ -83,7 +83,7 @@ smooth_iters = 10  # how many iterations to run the smoothing for
 damping = 0.5  # damping coefficient, a value from 0 to 1
 
 # kmeans clustering
-clustering_name = "variational kmeans" # algorithm name
+clustering_name = "cosine kmeans" # algorithm name
 n_clusters = 5  # number of clusters to produce
 tol = 1e-6  # loss function threshold for early stopping
 iters = 30 # number of epochs to run kmeans clustering for

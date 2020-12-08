@@ -1,6 +1,9 @@
 from directional_clustering.fields import Field
 
 
+__all__ = ["VectorField"]
+
+
 class VectorField(Field):
     """
     A field with a fixed dimensionality of 3.
@@ -24,14 +27,14 @@ class VectorField(Field):
         ----------
         key : `int`
             The key to store the vector with.
-        vector : `list` of `field``
+        vector : `list` of `float`
             A vector in 3d space.
         """
         self[key] = vector
 
     def remove_vector(self, key):
         """
-        Deletes a vector from the field.
+        Deletes a vector from the vector field.
 
         Parameters
         ----------
@@ -48,6 +51,11 @@ class VectorField(Field):
         ----------
         key : `int`
             The key of the vector to retrieve.
+
+        Returns
+        -------
+        vector : `list` of `float`
+            A vector.
         """
         return self[key]
 
@@ -120,7 +128,7 @@ class VectorField(Field):
 
         Returns
         -------
-        vector_field : `VectorField`
+        vector_field : `directional_clustering.fields.VectorField`
             A vector field.
 
         Notes
@@ -142,7 +150,7 @@ class VectorField(Field):
 
         Parameters
         ----------
-        mesh : `Mesh`
+        mesh : `directional_clustering.mesh.MeshPlus`
             A mesh.
         name : `str`
             The name of the face attribute to query.
@@ -154,6 +162,7 @@ class VectorField(Field):
 
         Notes
         -----
+        Deprecated.
         Every vector is stored with the mesh face keys as access keys.
         """
         vector_field = cls()

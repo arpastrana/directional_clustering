@@ -1,6 +1,6 @@
 """
 directional_clustering.plotters
-****************************
+*******************************
 
 .. currentmodule:: directional_clustering.plotters
 
@@ -12,14 +12,7 @@ Classes
     :toctree: generated/
     :nosignatures:
 
-
-Functions
-=========
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
+    PlyPlotter
 """
 
 from __future__ import absolute_import
@@ -30,8 +23,6 @@ from __future__ import print_function
 # from .<module> import *
 from .geometry import *
 from .colors import *
-from .cluster_plotter import *
-from .plot_vectors import *
 from .plot_data_struct import *
 from .ply_plotter import *
 

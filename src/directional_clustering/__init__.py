@@ -9,7 +9,11 @@ directional_clustering
 .. toctree::
     :maxdepth: 1
 
-
+    directional_clustering.clustering
+    directional_clustering.fields
+    directional_clustering.mesh
+    directional_clustering.plotters
+    directional_clustering.transformations
 """
 
 from __future__ import print_function
