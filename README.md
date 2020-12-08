@@ -2,6 +2,8 @@
 
 Directional clustering of vector fields on meshes.
 
+![Clustered stress field on a perimeter-supported slab](data/images/five_clusters.png)
+
 ## Introduction
 
 The initial motivation of this work revolved around principal stress fields.
@@ -26,12 +28,9 @@ what we want is to find the lowest possible amount of different vectors that
 encode the maximum amount of directional information about a principal stress
 field. We leverage clustering methods to this end.
 
-Zooming out a bit, this work can be extended to consider other non-structural
-vector fields such as curvature, or combinations thereof.
-
 ## How to I use this thing?
 
-****PLACEHOLDER. Please provide instructions on how to use the two driver codes.**.
+**PLACEHOLDER. Please provide instructions on how to use the two driver codes.**.
 
 ## Installation
 
