@@ -98,9 +98,9 @@ class MeshPlus(Mesh):
                 self.face_attribute(fkey, name, label)
             
 
-
-
 if __name__ == "__main__":
+    pass
+
     from directional_clustering import JSON
     name_in = "perimeter_supported_slab.json"
 
