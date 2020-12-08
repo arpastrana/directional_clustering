@@ -113,3 +113,5 @@ temp/**
 
 .DS_Store
 
+# docs
+docs/
