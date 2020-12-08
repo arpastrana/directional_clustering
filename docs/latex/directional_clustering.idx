@@ -1,0 +1,222 @@
+\indexentry{module@\spxentry{module}!directional\_clustering@\spxentry{directional\_clustering}|hyperpage}{5}
+\indexentry{directional\_clustering@\spxentry{directional\_clustering}!module@\spxentry{module}|hyperpage}{5}
+\indexentry{module@\spxentry{module}!directional\_clustering.clustering@\spxentry{directional\_clustering.clustering}|hyperpage}{5}
+\indexentry{directional\_clustering.clustering@\spxentry{directional\_clustering.clustering}!module@\spxentry{module}|hyperpage}{5}
+\indexentry{KMeans (class in directional\_clustering.clustering)@\spxentry{KMeans}\spxextra{class in directional\_clustering.clustering}|hyperpage}{5}
+\indexentry{\_\_init\_\_() (directional\_clustering.clustering.KMeans method)@\spxentry{\_\_init\_\_()}\spxextra{directional\_clustering.clustering.KMeans method}|hyperpage}{6}
+\indexentry{cluster() (directional\_clustering.clustering.KMeans method)@\spxentry{cluster()}\spxextra{directional\_clustering.clustering.KMeans method}|hyperpage}{6}
+\indexentry{CosineKMeans (class in directional\_clustering.clustering)@\spxentry{CosineKMeans}\spxextra{class in directional\_clustering.clustering}|hyperpage}{6}
+\indexentry{\_\_init\_\_() (directional\_clustering.clustering.CosineKMeans method)@\spxentry{\_\_init\_\_()}\spxextra{directional\_clustering.clustering.CosineKMeans method}|hyperpage}{7}
+\indexentry{cluster() (directional\_clustering.clustering.CosineKMeans method)@\spxentry{cluster()}\spxextra{directional\_clustering.clustering.CosineKMeans method}|hyperpage}{7}
+\indexentry{VariationalKMeans (class in directional\_clustering.clustering)@\spxentry{VariationalKMeans}\spxextra{class in directional\_clustering.clustering}|hyperpage}{7}
+\indexentry{\_\_init\_\_() (directional\_clustering.clustering.VariationalKMeans method)@\spxentry{\_\_init\_\_()}\spxextra{directional\_clustering.clustering.VariationalKMeans method}|hyperpage}{8}
+\indexentry{cluster() (directional\_clustering.clustering.VariationalKMeans method)@\spxentry{cluster()}\spxextra{directional\_clustering.clustering.VariationalKMeans method}|hyperpage}{9}
+\indexentry{ClusteringFactory (class in directional\_clustering.clustering)@\spxentry{ClusteringFactory}\spxextra{class in directional\_clustering.clustering}|hyperpage}{9}
+\indexentry{create() (directional\_clustering.clustering.ClusteringFactory class method)@\spxentry{create()}\spxextra{directional\_clustering.clustering.ClusteringFactory class method}|hyperpage}{10}
+\indexentry{register() (directional\_clustering.clustering.ClusteringFactory class method)@\spxentry{register()}\spxextra{directional\_clustering.clustering.ClusteringFactory class method}|hyperpage}{10}
+\indexentry{\_\_init\_\_() (directional\_clustering.clustering.ClusteringFactory method)@\spxentry{\_\_init\_\_()}\spxextra{directional\_clustering.clustering.ClusteringFactory method}|hyperpage}{10}
+\indexentry{ClusteringAlgorithm (class in directional\_clustering.clustering)@\spxentry{ClusteringAlgorithm}\spxextra{class in directional\_clustering.clustering}|hyperpage}{10}
+\indexentry{cluster() (directional\_clustering.clustering.ClusteringAlgorithm method)@\spxentry{cluster()}\spxextra{directional\_clustering.clustering.ClusteringAlgorithm method}|hyperpage}{11}
+\indexentry{\_\_init\_\_() (directional\_clustering.clustering.ClusteringAlgorithm method)@\spxentry{\_\_init\_\_()}\spxextra{directional\_clustering.clustering.ClusteringAlgorithm method}|hyperpage}{11}
+\indexentry{module@\spxentry{module}!directional\_clustering.fields@\spxentry{directional\_clustering.fields}|hyperpage}{11}
+\indexentry{directional\_clustering.fields@\spxentry{directional\_clustering.fields}!module@\spxentry{module}|hyperpage}{11}
+\indexentry{Field (class in directional\_clustering.fields)@\spxentry{Field}\spxextra{class in directional\_clustering.fields}|hyperpage}{12}
+\indexentry{\_\_init\_\_() (directional\_clustering.fields.Field method)@\spxentry{\_\_init\_\_()}\spxextra{directional\_clustering.fields.Field method}|hyperpage}{12}
+\indexentry{dimensionality() (directional\_clustering.fields.Field method)@\spxentry{dimensionality()}\spxextra{directional\_clustering.fields.Field method}|hyperpage}{12}
+\indexentry{size() (directional\_clustering.fields.Field method)@\spxentry{size()}\spxextra{directional\_clustering.fields.Field method}|hyperpage}{12}
+\indexentry{VectorField (class in directional\_clustering.fields)@\spxentry{VectorField}\spxextra{class in directional\_clustering.fields}|hyperpage}{13}
+\indexentry{\_\_init\_\_() (directional\_clustering.fields.VectorField method)@\spxentry{\_\_init\_\_()}\spxextra{directional\_clustering.fields.VectorField method}|hyperpage}{13}
+\indexentry{add\_vector() (directional\_clustering.fields.VectorField method)@\spxentry{add\_vector()}\spxextra{directional\_clustering.fields.VectorField method}|hyperpage}{13}
+\indexentry{from\_mesh\_faces() (directional\_clustering.fields.VectorField class method)@\spxentry{from\_mesh\_faces()}\spxextra{directional\_clustering.fields.VectorField class method}|hyperpage}{13}
+\indexentry{from\_sequence() (directional\_clustering.fields.VectorField class method)@\spxentry{from\_sequence()}\spxextra{directional\_clustering.fields.VectorField class method}|hyperpage}{14}
+\indexentry{items() (directional\_clustering.fields.VectorField method)@\spxentry{items()}\spxextra{directional\_clustering.fields.VectorField method}|hyperpage}{14}
+\indexentry{keys() (directional\_clustering.fields.VectorField method)@\spxentry{keys()}\spxextra{directional\_clustering.fields.VectorField method}|hyperpage}{14}
+\indexentry{remove\_vector() (directional\_clustering.fields.VectorField method)@\spxentry{remove\_vector()}\spxextra{directional\_clustering.fields.VectorField method}|hyperpage}{14}
+\indexentry{to\_sequence() (directional\_clustering.fields.VectorField method)@\spxentry{to\_sequence()}\spxextra{directional\_clustering.fields.VectorField method}|hyperpage}{15}
+\indexentry{vector() (directional\_clustering.fields.VectorField method)@\spxentry{vector()}\spxextra{directional\_clustering.fields.VectorField method}|hyperpage}{15}
+\indexentry{vectors() (directional\_clustering.fields.VectorField method)@\spxentry{vectors()}\spxextra{directional\_clustering.fields.VectorField method}|hyperpage}{15}
+\indexentry{dimensionality() (directional\_clustering.fields.VectorField method)@\spxentry{dimensionality()}\spxextra{directional\_clustering.fields.VectorField method}|hyperpage}{15}
+\indexentry{size() (directional\_clustering.fields.VectorField method)@\spxentry{size()}\spxextra{directional\_clustering.fields.VectorField method}|hyperpage}{15}
+\indexentry{AbstractField (class in directional\_clustering.fields)@\spxentry{AbstractField}\spxextra{class in directional\_clustering.fields}|hyperpage}{16}
+\indexentry{dimensionality() (directional\_clustering.fields.AbstractField method)@\spxentry{dimensionality()}\spxextra{directional\_clustering.fields.AbstractField method}|hyperpage}{16}
+\indexentry{size() (directional\_clustering.fields.AbstractField method)@\spxentry{size()}\spxextra{directional\_clustering.fields.AbstractField method}|hyperpage}{16}
+\indexentry{\_\_init\_\_() (directional\_clustering.fields.AbstractField method)@\spxentry{\_\_init\_\_()}\spxextra{directional\_clustering.fields.AbstractField method}|hyperpage}{16}
+\indexentry{module@\spxentry{module}!directional\_clustering.mesh@\spxentry{directional\_clustering.mesh}|hyperpage}{16}
+\indexentry{directional\_clustering.mesh@\spxentry{directional\_clustering.mesh}!module@\spxentry{module}|hyperpage}{16}
+\indexentry{MeshPlus (class in directional\_clustering.mesh)@\spxentry{MeshPlus}\spxextra{class in directional\_clustering.mesh}|hyperpage}{17}
+\indexentry{clustering\_label() (directional\_clustering.mesh.MeshPlus method)@\spxentry{clustering\_label()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{17}
+\indexentry{vector\_field() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vector\_field()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{18}
+\indexentry{vector\_fields() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vector\_fields()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{18}
+\indexentry{\_\_init\_\_() (directional\_clustering.mesh.MeshPlus method)@\spxentry{\_\_init\_\_()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{23}
+\indexentry{add\_face() (directional\_clustering.mesh.MeshPlus method)@\spxentry{add\_face()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{23}
+\indexentry{add\_vertex() (directional\_clustering.mesh.MeshPlus method)@\spxentry{add\_vertex()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{23}
+\indexentry{area() (directional\_clustering.mesh.MeshPlus method)@\spxentry{area()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{24}
+\indexentry{bounding\_box() (directional\_clustering.mesh.MeshPlus method)@\spxentry{bounding\_box()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{24}
+\indexentry{bounding\_box\_xy() (directional\_clustering.mesh.MeshPlus method)@\spxentry{bounding\_box\_xy()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{24}
+\indexentry{centroid() (directional\_clustering.mesh.MeshPlus method)@\spxentry{centroid()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{25}
+\indexentry{clear() (directional\_clustering.mesh.MeshPlus method)@\spxentry{clear()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{25}
+\indexentry{collapse\_edge() (directional\_clustering.mesh.MeshPlus method)@\spxentry{collapse\_edge()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{25}
+\indexentry{connected\_components() (directional\_clustering.mesh.MeshPlus method)@\spxentry{connected\_components()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{25}
+\indexentry{copy() (directional\_clustering.mesh.MeshPlus method)@\spxentry{copy()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{26}
+\indexentry{cull\_vertices() (directional\_clustering.mesh.MeshPlus method)@\spxentry{cull\_vertices()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{26}
+\indexentry{cut() (directional\_clustering.mesh.MeshPlus method)@\spxentry{cut()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{26}
+\indexentry{delete\_face() (directional\_clustering.mesh.MeshPlus method)@\spxentry{delete\_face()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{26}
+\indexentry{delete\_vertex() (directional\_clustering.mesh.MeshPlus method)@\spxentry{delete\_vertex()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{27}
+\indexentry{dual() (directional\_clustering.mesh.MeshPlus method)@\spxentry{dual()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{27}
+\indexentry{edge\_attribute() (directional\_clustering.mesh.MeshPlus method)@\spxentry{edge\_attribute()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{28}
+\indexentry{edge\_attributes() (directional\_clustering.mesh.MeshPlus method)@\spxentry{edge\_attributes()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{28}
+\indexentry{edge\_coordinates() (directional\_clustering.mesh.MeshPlus method)@\spxentry{edge\_coordinates()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{28}
+\indexentry{edge\_direction() (directional\_clustering.mesh.MeshPlus method)@\spxentry{edge\_direction()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{29}
+\indexentry{edge\_faces() (directional\_clustering.mesh.MeshPlus method)@\spxentry{edge\_faces()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{29}
+\indexentry{edge\_length() (directional\_clustering.mesh.MeshPlus method)@\spxentry{edge\_length()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{29}
+\indexentry{edge\_loop() (directional\_clustering.mesh.MeshPlus method)@\spxentry{edge\_loop()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{29}
+\indexentry{edge\_midpoint() (directional\_clustering.mesh.MeshPlus method)@\spxentry{edge\_midpoint()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{30}
+\indexentry{edge\_point() (directional\_clustering.mesh.MeshPlus method)@\spxentry{edge\_point()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{30}
+\indexentry{edge\_strip() (directional\_clustering.mesh.MeshPlus method)@\spxentry{edge\_strip()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{30}
+\indexentry{edge\_vector() (directional\_clustering.mesh.MeshPlus method)@\spxentry{edge\_vector()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{30}
+\indexentry{edges() (directional\_clustering.mesh.MeshPlus method)@\spxentry{edges()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{31}
+\indexentry{edges\_attribute() (directional\_clustering.mesh.MeshPlus method)@\spxentry{edges\_attribute()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{31}
+\indexentry{edges\_attributes() (directional\_clustering.mesh.MeshPlus method)@\spxentry{edges\_attributes()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{31}
+\indexentry{edges\_on\_boundaries() (directional\_clustering.mesh.MeshPlus method)@\spxentry{edges\_on\_boundaries()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{32}
+\indexentry{edges\_on\_boundary() (directional\_clustering.mesh.MeshPlus method)@\spxentry{edges\_on\_boundary()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{32}
+\indexentry{edges\_where() (directional\_clustering.mesh.MeshPlus method)@\spxentry{edges\_where()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{32}
+\indexentry{edges\_where\_predicate() (directional\_clustering.mesh.MeshPlus method)@\spxentry{edges\_where\_predicate()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{32}
+\indexentry{euler() (directional\_clustering.mesh.MeshPlus method)@\spxentry{euler()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{33}
+\indexentry{face\_adjacency() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_adjacency()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{33}
+\indexentry{face\_adjacency\_halfedge() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_adjacency\_halfedge()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{33}
+\indexentry{face\_adjacency\_vertices() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_adjacency\_vertices()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{34}
+\indexentry{face\_area() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_area()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{34}
+\indexentry{face\_aspect\_ratio() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_aspect\_ratio()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{34}
+\indexentry{face\_attribute() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_attribute()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{34}
+\indexentry{face\_attributes() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_attributes()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{35}
+\indexentry{face\_center() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_center()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{35}
+\indexentry{face\_centroid() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_centroid()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{35}
+\indexentry{face\_coordinates() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_coordinates()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{35}
+\indexentry{face\_corners() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_corners()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{36}
+\indexentry{face\_curvature() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_curvature()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{36}
+\indexentry{face\_degree() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_degree()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{36}
+\indexentry{face\_flatness() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_flatness()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{36}
+\indexentry{face\_halfedges() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_halfedges()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{37}
+\indexentry{face\_max\_degree() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_max\_degree()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{37}
+\indexentry{face\_min\_degree() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_min\_degree()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{37}
+\indexentry{face\_neighborhood() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_neighborhood()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{37}
+\indexentry{face\_neighbors() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_neighbors()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{37}
+\indexentry{face\_normal() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_normal()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{38}
+\indexentry{face\_plane() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_plane()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{38}
+\indexentry{face\_skewness() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_skewness()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{38}
+\indexentry{face\_vertex\_ancestor() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_vertex\_ancestor()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{38}
+\indexentry{face\_vertex\_descendant() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_vertex\_descendant()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{39}
+\indexentry{face\_vertices() (directional\_clustering.mesh.MeshPlus method)@\spxentry{face\_vertices()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{39}
+\indexentry{faces() (directional\_clustering.mesh.MeshPlus method)@\spxentry{faces()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{39}
+\indexentry{faces\_attribute() (directional\_clustering.mesh.MeshPlus method)@\spxentry{faces\_attribute()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{39}
+\indexentry{faces\_attributes() (directional\_clustering.mesh.MeshPlus method)@\spxentry{faces\_attributes()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{40}
+\indexentry{faces\_on\_boundary() (directional\_clustering.mesh.MeshPlus method)@\spxentry{faces\_on\_boundary()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{40}
+\indexentry{faces\_where() (directional\_clustering.mesh.MeshPlus method)@\spxentry{faces\_where()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{40}
+\indexentry{faces\_where\_predicate() (directional\_clustering.mesh.MeshPlus method)@\spxentry{faces\_where\_predicate()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{40}
+\indexentry{flip\_cycles() (directional\_clustering.mesh.MeshPlus method)@\spxentry{flip\_cycles()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{41}
+\indexentry{from\_data() (directional\_clustering.mesh.MeshPlus class method)@\spxentry{from\_data()}\spxextra{directional\_clustering.mesh.MeshPlus class method}|hyperpage}{41}
+\indexentry{from\_json() (directional\_clustering.mesh.MeshPlus class method)@\spxentry{from\_json()}\spxextra{directional\_clustering.mesh.MeshPlus class method}|hyperpage}{41}
+\indexentry{from\_lines() (directional\_clustering.mesh.MeshPlus class method)@\spxentry{from\_lines()}\spxextra{directional\_clustering.mesh.MeshPlus class method}|hyperpage}{42}
+\indexentry{from\_obj() (directional\_clustering.mesh.MeshPlus class method)@\spxentry{from\_obj()}\spxextra{directional\_clustering.mesh.MeshPlus class method}|hyperpage}{42}
+\indexentry{from\_off() (directional\_clustering.mesh.MeshPlus class method)@\spxentry{from\_off()}\spxextra{directional\_clustering.mesh.MeshPlus class method}|hyperpage}{43}
+\indexentry{from\_ply() (directional\_clustering.mesh.MeshPlus class method)@\spxentry{from\_ply()}\spxextra{directional\_clustering.mesh.MeshPlus class method}|hyperpage}{43}
+\indexentry{from\_points() (directional\_clustering.mesh.MeshPlus class method)@\spxentry{from\_points()}\spxextra{directional\_clustering.mesh.MeshPlus class method}|hyperpage}{43}
+\indexentry{from\_polygons() (directional\_clustering.mesh.MeshPlus class method)@\spxentry{from\_polygons()}\spxextra{directional\_clustering.mesh.MeshPlus class method}|hyperpage}{44}
+\indexentry{from\_polyhedron() (directional\_clustering.mesh.MeshPlus class method)@\spxentry{from\_polyhedron()}\spxextra{directional\_clustering.mesh.MeshPlus class method}|hyperpage}{44}
+\indexentry{from\_polylines() (directional\_clustering.mesh.MeshPlus class method)@\spxentry{from\_polylines()}\spxextra{directional\_clustering.mesh.MeshPlus class method}|hyperpage}{44}
+\indexentry{from\_shape() (directional\_clustering.mesh.MeshPlus class method)@\spxentry{from\_shape()}\spxextra{directional\_clustering.mesh.MeshPlus class method}|hyperpage}{45}
+\indexentry{from\_stl() (directional\_clustering.mesh.MeshPlus class method)@\spxentry{from\_stl()}\spxextra{directional\_clustering.mesh.MeshPlus class method}|hyperpage}{45}
+\indexentry{from\_vertices\_and\_faces() (directional\_clustering.mesh.MeshPlus class method)@\spxentry{from\_vertices\_and\_faces()}\spxextra{directional\_clustering.mesh.MeshPlus class method}|hyperpage}{45}
+\indexentry{genus() (directional\_clustering.mesh.MeshPlus method)@\spxentry{genus()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{46}
+\indexentry{get\_any\_face() (directional\_clustering.mesh.MeshPlus method)@\spxentry{get\_any\_face()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{46}
+\indexentry{get\_any\_face\_vertex() (directional\_clustering.mesh.MeshPlus method)@\spxentry{get\_any\_face\_vertex()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{46}
+\indexentry{get\_any\_vertex() (directional\_clustering.mesh.MeshPlus method)@\spxentry{get\_any\_vertex()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{46}
+\indexentry{get\_any\_vertices() (directional\_clustering.mesh.MeshPlus method)@\spxentry{get\_any\_vertices()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{46}
+\indexentry{gkey\_key() (directional\_clustering.mesh.MeshPlus method)@\spxentry{gkey\_key()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{47}
+\indexentry{halfedge\_face() (directional\_clustering.mesh.MeshPlus method)@\spxentry{halfedge\_face()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{47}
+\indexentry{has\_edge() (directional\_clustering.mesh.MeshPlus method)@\spxentry{has\_edge()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{47}
+\indexentry{has\_face() (directional\_clustering.mesh.MeshPlus method)@\spxentry{has\_face()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{47}
+\indexentry{has\_halfedge() (directional\_clustering.mesh.MeshPlus method)@\spxentry{has\_halfedge()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{48}
+\indexentry{has\_vertex() (directional\_clustering.mesh.MeshPlus method)@\spxentry{has\_vertex()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{48}
+\indexentry{index\_key() (directional\_clustering.mesh.MeshPlus method)@\spxentry{index\_key()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{48}
+\indexentry{index\_vertex() (directional\_clustering.mesh.MeshPlus method)@\spxentry{index\_vertex()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{48}
+\indexentry{insert\_vertex() (directional\_clustering.mesh.MeshPlus method)@\spxentry{insert\_vertex()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{48}
+\indexentry{is\_connected() (directional\_clustering.mesh.MeshPlus method)@\spxentry{is\_connected()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{49}
+\indexentry{is\_edge\_on\_boundary() (directional\_clustering.mesh.MeshPlus method)@\spxentry{is\_edge\_on\_boundary()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{49}
+\indexentry{is\_empty() (directional\_clustering.mesh.MeshPlus method)@\spxentry{is\_empty()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{50}
+\indexentry{is\_face\_on\_boundary() (directional\_clustering.mesh.MeshPlus method)@\spxentry{is\_face\_on\_boundary()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{50}
+\indexentry{is\_manifold() (directional\_clustering.mesh.MeshPlus method)@\spxentry{is\_manifold()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{50}
+\indexentry{is\_orientable() (directional\_clustering.mesh.MeshPlus method)@\spxentry{is\_orientable()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{50}
+\indexentry{is\_quadmesh() (directional\_clustering.mesh.MeshPlus method)@\spxentry{is\_quadmesh()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{50}
+\indexentry{is\_regular() (directional\_clustering.mesh.MeshPlus method)@\spxentry{is\_regular()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{51}
+\indexentry{is\_trimesh() (directional\_clustering.mesh.MeshPlus method)@\spxentry{is\_trimesh()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{51}
+\indexentry{is\_valid() (directional\_clustering.mesh.MeshPlus method)@\spxentry{is\_valid()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{51}
+\indexentry{is\_vertex\_connected() (directional\_clustering.mesh.MeshPlus method)@\spxentry{is\_vertex\_connected()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{51}
+\indexentry{is\_vertex\_on\_boundary() (directional\_clustering.mesh.MeshPlus method)@\spxentry{is\_vertex\_on\_boundary()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{52}
+\indexentry{join() (directional\_clustering.mesh.MeshPlus method)@\spxentry{join()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{52}
+\indexentry{key\_gkey() (directional\_clustering.mesh.MeshPlus method)@\spxentry{key\_gkey()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{52}
+\indexentry{key\_index() (directional\_clustering.mesh.MeshPlus method)@\spxentry{key\_index()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{53}
+\indexentry{normal() (directional\_clustering.mesh.MeshPlus method)@\spxentry{normal()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{53}
+\indexentry{number\_of\_edges() (directional\_clustering.mesh.MeshPlus method)@\spxentry{number\_of\_edges()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{53}
+\indexentry{number\_of\_faces() (directional\_clustering.mesh.MeshPlus method)@\spxentry{number\_of\_faces()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{53}
+\indexentry{number\_of\_vertices() (directional\_clustering.mesh.MeshPlus method)@\spxentry{number\_of\_vertices()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{53}
+\indexentry{quads\_to\_triangles() (directional\_clustering.mesh.MeshPlus method)@\spxentry{quads\_to\_triangles()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{53}
+\indexentry{remove\_unused\_vertices() (directional\_clustering.mesh.MeshPlus method)@\spxentry{remove\_unused\_vertices()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{53}
+\indexentry{smooth\_area() (directional\_clustering.mesh.MeshPlus method)@\spxentry{smooth\_area()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{53}
+\indexentry{smooth\_centroid() (directional\_clustering.mesh.MeshPlus method)@\spxentry{smooth\_centroid()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{54}
+\indexentry{split\_edge() (directional\_clustering.mesh.MeshPlus method)@\spxentry{split\_edge()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{54}
+\indexentry{split\_face() (directional\_clustering.mesh.MeshPlus method)@\spxentry{split\_face()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{55}
+\indexentry{summary() (directional\_clustering.mesh.MeshPlus method)@\spxentry{summary()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{55}
+\indexentry{to\_data() (directional\_clustering.mesh.MeshPlus method)@\spxentry{to\_data()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{56}
+\indexentry{to\_json() (directional\_clustering.mesh.MeshPlus method)@\spxentry{to\_json()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{56}
+\indexentry{to\_lines() (directional\_clustering.mesh.MeshPlus method)@\spxentry{to\_lines()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{56}
+\indexentry{to\_obj() (directional\_clustering.mesh.MeshPlus method)@\spxentry{to\_obj()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{56}
+\indexentry{to\_off() (directional\_clustering.mesh.MeshPlus method)@\spxentry{to\_off()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{56}
+\indexentry{to\_ply() (directional\_clustering.mesh.MeshPlus method)@\spxentry{to\_ply()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{57}
+\indexentry{to\_points() (directional\_clustering.mesh.MeshPlus method)@\spxentry{to\_points()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{57}
+\indexentry{to\_polygons() (directional\_clustering.mesh.MeshPlus method)@\spxentry{to\_polygons()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{57}
+\indexentry{to\_polylines() (directional\_clustering.mesh.MeshPlus method)@\spxentry{to\_polylines()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{57}
+\indexentry{to\_quadmesh() (directional\_clustering.mesh.MeshPlus method)@\spxentry{to\_quadmesh()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{57}
+\indexentry{to\_stl() (directional\_clustering.mesh.MeshPlus method)@\spxentry{to\_stl()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{57}
+\indexentry{to\_trimesh() (directional\_clustering.mesh.MeshPlus method)@\spxentry{to\_trimesh()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{58}
+\indexentry{to\_vertices\_and\_faces() (directional\_clustering.mesh.MeshPlus method)@\spxentry{to\_vertices\_and\_faces()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{58}
+\indexentry{transform() (directional\_clustering.mesh.MeshPlus method)@\spxentry{transform()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{58}
+\indexentry{transform\_numpy() (directional\_clustering.mesh.MeshPlus method)@\spxentry{transform\_numpy()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{59}
+\indexentry{transformed() (directional\_clustering.mesh.MeshPlus method)@\spxentry{transformed()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{59}
+\indexentry{unify\_cycles() (directional\_clustering.mesh.MeshPlus method)@\spxentry{unify\_cycles()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{59}
+\indexentry{unset\_edge\_attribute() (directional\_clustering.mesh.MeshPlus method)@\spxentry{unset\_edge\_attribute()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{60}
+\indexentry{unset\_face\_attribute() (directional\_clustering.mesh.MeshPlus method)@\spxentry{unset\_face\_attribute()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{60}
+\indexentry{unset\_vertex\_attribute() (directional\_clustering.mesh.MeshPlus method)@\spxentry{unset\_vertex\_attribute()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{60}
+\indexentry{update\_default\_edge\_attributes() (directional\_clustering.mesh.MeshPlus method)@\spxentry{update\_default\_edge\_attributes()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{61}
+\indexentry{update\_default\_face\_attributes() (directional\_clustering.mesh.MeshPlus method)@\spxentry{update\_default\_face\_attributes()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{61}
+\indexentry{update\_default\_vertex\_attributes() (directional\_clustering.mesh.MeshPlus method)@\spxentry{update\_default\_vertex\_attributes()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{61}
+\indexentry{validate\_data() (directional\_clustering.mesh.MeshPlus method)@\spxentry{validate\_data()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{62}
+\indexentry{validate\_json() (directional\_clustering.mesh.MeshPlus method)@\spxentry{validate\_json()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{62}
+\indexentry{vertex\_area() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertex\_area()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{62}
+\indexentry{vertex\_attribute() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertex\_attribute()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{62}
+\indexentry{vertex\_attributes() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertex\_attributes()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{63}
+\indexentry{vertex\_coordinates() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertex\_coordinates()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{63}
+\indexentry{vertex\_curvature() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertex\_curvature()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{63}
+\indexentry{vertex\_degree() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertex\_degree()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{64}
+\indexentry{vertex\_faces() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertex\_faces()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{64}
+\indexentry{vertex\_index() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertex\_index()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{64}
+\indexentry{vertex\_laplacian() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertex\_laplacian()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{64}
+\indexentry{vertex\_max\_degree() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertex\_max\_degree()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{65}
+\indexentry{vertex\_min\_degree() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertex\_min\_degree()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{65}
+\indexentry{vertex\_neighborhood() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertex\_neighborhood()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{65}
+\indexentry{vertex\_neighborhood\_centroid() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertex\_neighborhood\_centroid()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{65}
+\indexentry{vertex\_neighbors() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertex\_neighbors()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{66}
+\indexentry{vertex\_normal() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertex\_normal()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{66}
+\indexentry{vertices() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertices()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{66}
+\indexentry{vertices\_attribute() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertices\_attribute()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{67}
+\indexentry{vertices\_attributes() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertices\_attributes()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{67}
+\indexentry{vertices\_on\_boundaries() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertices\_on\_boundaries()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{67}
+\indexentry{vertices\_on\_boundary() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertices\_on\_boundary()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{68}
+\indexentry{vertices\_where() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertices\_where()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{68}
+\indexentry{vertices\_where\_predicate() (directional\_clustering.mesh.MeshPlus method)@\spxentry{vertices\_where\_predicate()}\spxextra{directional\_clustering.mesh.MeshPlus method}|hyperpage}{68}
+\indexentry{module@\spxentry{module}!directional\_clustering.plotters@\spxentry{directional\_clustering.plotters}|hyperpage}{69}
+\indexentry{directional\_clustering.plotters@\spxentry{directional\_clustering.plotters}!module@\spxentry{module}|hyperpage}{69}
+\indexentry{module@\spxentry{module}!directional\_clustering.transformations@\spxentry{directional\_clustering.transformations}|hyperpage}{69}
+\indexentry{directional\_clustering.transformations@\spxentry{directional\_clustering.transformations}!module@\spxentry{module}|hyperpage}{69}
+\indexentry{align\_vector\_field() (in module directional\_clustering.transformations)@\spxentry{align\_vector\_field()}\spxextra{in module directional\_clustering.transformations}|hyperpage}{69}
+\indexentry{smoothen\_vector\_field() (in module directional\_clustering.transformations)@\spxentry{smoothen\_vector\_field()}\spxextra{in module directional\_clustering.transformations}|hyperpage}{69}

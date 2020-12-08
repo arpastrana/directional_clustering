@@ -1,8 +1,0 @@
-.. rst-class:: detail
-
-PlyPlotter.add_volume
-=====================================================
-
-.. currentmodule:: directional_clustering.plotters
-
-.. automethod:: PlyPlotter.add_volume

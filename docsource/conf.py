@@ -13,8 +13,8 @@ import sphinx_compas_theme
 # -- General configuration ------------------------------------------------
 
 project = "directional_clustering"
-copyright = "Rafael Pastrana"
-author = "Rafael Pastrana"
+copyright = "Princeton University"
+author = "Rafael Pastrana, Isabel Moreira, Alex Papamatthaiou, Hui Yuan"
 release = "0.1.0"
 version = ".".join(release.split(".")[0:2])
 
@@ -43,10 +43,7 @@ extensions = [
 
 # autodoc options
 
-autodoc_default_flags = [
-    "undoc-members"
-    "show-inheritance",
-]
+autodoc_default_flags = ["undoc-members"]# , "show-inheritance"]
 
 autodoc_member_order = "alphabetical"
 
@@ -86,21 +83,26 @@ plot_html_show_formats = False
 
 # intersphinx options
 
-intersphinx_mapping = {
-    "python": ("https://docs.python.org/", None),
-    "compas": ("https://compas-dev.github.io/main", "https://compas-dev.github.io/main/objects.inv"),
-}
+# intersphinx_mapping = {
+#     "python": ("https://docs.python.org/", None),
+#     "compas": ("https://compas-dev.github.io/main", "https://compas-dev.github.io/main/objects.inv"),
+# }
 
 
 # -- Options for HTML output ----------------------------------------------
 
-html_theme = "compaspkg"
-html_theme_path = sphinx_compas_theme.get_html_theme_path()
+# html_theme = "compaspkg"
+# html_theme_path = sphinx_compas_theme.get_html_theme_path()
 
+# html_theme_options = {
+#     "package_name"    : "directional_clustering",
+#     "package_title"   : project,
+#     "package_version" : release,
+# }
+#
 html_theme_options = {
-    "package_name"    : "directional_clustering",
-    "package_title"   : project,
-    "package_version" : release,
+    "sidebar_width": "30%",
+    "page_width": "70%"
 }
 
 html_context = {}

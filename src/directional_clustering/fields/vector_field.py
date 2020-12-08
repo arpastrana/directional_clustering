@@ -12,8 +12,7 @@ class VectorField(Field):
         """
         The constructor.
         """
-        dimensionality = 3
-        super(VectorField, self).__init__(dimensionality)
+        super(VectorField, self).__init__(dimensionality=3)
 
     # --------------------------------------------------------------------------
     # Vector operations

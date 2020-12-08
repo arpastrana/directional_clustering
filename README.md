@@ -92,7 +92,7 @@ This will take care of installing additional dependencies like `sphinx` and `pyt
 
 ### Testing
 
-To run the `pytest` testing suite automatically, type from the command line;
+To run the `pytest` suite automatically, type from the command line;
 
 ```bash
 invoke test
@@ -109,14 +109,14 @@ invoke docs
 
 You'll find the generated `html` data in the `docs/` folder.
 
-If instead what we needd is a manual in `pdf` format, let's run:
+If instead what we need is a manual in `pdf` format, let's run:
 
 
 ```bash
 invoke pdf
 ```
 
-The manual will be saved in `docs/latex` as `directional_clustering.pdf` 
+The manual will be saved in `docs/latex` as `directional_clustering.pdf`. 
 
 ## License
 

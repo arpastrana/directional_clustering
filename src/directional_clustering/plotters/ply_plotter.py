@@ -22,6 +22,9 @@ __all__ = ["PlyPlotter"]
 # TODO: see decorator style
 class PlyPlotter(go.Figure):
     """
+    .. autoclass:: PlyPlotter
+
+
     A web plotter for 3D geometry.
 
     Parameters
@@ -56,7 +59,7 @@ class PlyPlotter(go.Figure):
                            showlegend=False,
                            scene=dict(aspectmode='data'))
 
-    def plot_vector_field_lines(self, mesh, vector_field, color, uniform, scale, width=0.5):
+    def plot_vector_field_lines(self, mesh, vector_field, color, uniform, scale, width):
         """
         Plots a vector field.
 
