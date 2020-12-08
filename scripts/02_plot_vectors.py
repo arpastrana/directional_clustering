@@ -18,10 +18,11 @@ from compas.geometry import length_vector
 # this are custom-written functions part of this library
 # which you can find in the src/directional_clustering folder
 from directional_clustering import JSON
-from directional_clustering.geometry import laplacian_smoothed
-from directional_clustering.geometry import cosine_similarity
-from directional_clustering.clusters import init_kmeans_farthest
-from directional_clustering.clusters import kmeans
+from directional_clustering.transformations import smoothen_vector_field
+#from directional_clustering.geometry import laplacian_smoothed
+#from directional_clustering.geometry import cosine_similarity
+#from directional_clustering.clusters import init_kmeans_farthest
+#from directional_clustering.clusters import kmeans
 from directional_clustering.plotters import ClusterPlotter
 from directional_clustering.plotters import rgb_colors
 from directional_clustering.plotters import plot_kmeans_vectors
@@ -118,8 +119,9 @@ fkey_idx = {fkey: index for index, fkey in enumerate(mesh.faces())}
 
 # store vector field in a dictionary where keys are the mesh face keys
 # and the values are the vectors located at every face
-vectors = {}
-for fkey in mesh.faces():
+
+#vectors = {}
+#for fkey in mesh.faces():
     # this is a mesh method that will query info stored the faces of the mesh
     vectors[fkey] = mesh.face_attribute(fkey, vectorfield_tag)
 
@@ -169,7 +171,8 @@ if align_vectors:
 # so smoothing is something to use with care
 
 if smooth_iters:
-    vectors = laplacian_smoothed(mesh, vectors, smooth_iters, damping)
+    #vectors = laplacian_smoothed(mesh, vectors, smooth_iters, damping)
+    smoothen_vector_field(vectors, mesh.face_adjacency(), smooth_iters, damping)
 
 # ==============================================================================
 # Do K-means Clustering ================================================================================
@@ -207,6 +210,7 @@ print("Clustering started...")
 #
 # These seeds will be used later on as input to start the final kmeans run.
 
+ClusteringFactory.create("cosine kmeans")
 seeds = init_kmeans_farthest(vectors_array, n_clusters, mode, epochs_seeds, eps)
 
 # do kmeans clustering
