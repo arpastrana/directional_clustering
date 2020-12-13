@@ -11,6 +11,8 @@ Classes
 .. autosummary::
     :toctree: generated/
     :nosignatures:
+
+    PlyPlotter
 """
 
 from __future__ import absolute_import

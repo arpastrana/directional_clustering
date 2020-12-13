@@ -22,9 +22,6 @@ __all__ = ["PlyPlotter"]
 # TODO: see decorator style
 class PlyPlotter(go.Figure):
     """
-    .. autoclass:: PlyPlotter
-
-
     A web plotter for 3D geometry.
 
     Parameters
