@@ -48,7 +48,7 @@ class PlyPlotter(go.Figure):
         Parameters
         ----------
         title : `str`
-            Title of the plot.
+            The title of the plot.
 
         Notes
         -----
@@ -68,17 +68,13 @@ class PlyPlotter(go.Figure):
         ----------
         mesh : `compas.datastructures.Mesh`
             A COMPAS mesh with 3D vertices.
-
-        vector_field  : `directional_clustering.fields.VectorField`
+        vector_field : `directional_clustering.fields.VectorField`
             The vector field to plot.
-
         color : `rbg`
-            Sets the line color. Refer to `plotly.graph_objects.scatter3d.Line`
-            for more color type options.
-
+            The color of the line. Refer to `plotly.graph_objects.scatter3d.Line`
+            for more options.
         uniform : `bool`
             Sets same length equals to `scale` to all lines if `True`.
-
         scale : `float`
             Scales vector lines.
         """
@@ -125,12 +121,21 @@ class PlyPlotter(go.Figure):
 
         Parameters
         ----------
-        mesh : compas.datastructures.Mesh`
+        mesh : `compas.datastructures.Mesh`
             A COMPAS mesh with 3D vertices.
+        paint_clusters : `bool`
+            Flag to add colors to mesh faces.
+            \nDefaults to `True`.
+        plot_edges : `bool`, optional
+            Flag to plot edges of the mesh.
+            \nDefaults to `False`.
+        opacity : `float`
+            A value between 0.0 and 1.0 to control opacity of the mesh.
+            \nDefautls to 0.8.
 
         Notes
         -----
-        The colors of the mesh faces are based their the cluster labels.
+        The colors of the mesh faces are based on their the cluster labels.
         """
         # color up the faces of the COMPAS mesh according to their cluster
         # make a dictionary with all labels
@@ -157,7 +162,7 @@ class PlyPlotter(go.Figure):
             z=v_z,
             simplices=asarray(mesh_faces),
             color_func=face_colors
-            )
+        )
 
         self.add_trace(figure_mesh.data[0]) # adds mesh faces
 
@@ -172,8 +177,10 @@ class PlyPlotter(go.Figure):
 
         Parameters
         ----------
-        mesh : compas.datastructures.Mesh`
+        mesh : `compas.datastructures.Mesh`
             A COMPAS mesh with 3D vertices.
+        vector_field : `directional_clustering.fields.VectorField`
+            The vector field to plot.
 
         Notes
         -----
