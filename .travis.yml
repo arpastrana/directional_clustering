@@ -1,15 +1,22 @@
 language: python
 
+# python versions to test in
 python:
-- "2.7"
-- "3.6"
+- "3.7"
 
 before_install:
 - pip install --upgrade pip
 - pip install Cython --install-option="--no-cython-compile"
 
 install:
-- pip install --process-dependency-links --no-cache-dir -r requirements-dev.txt
+- pip install --no-cache-dir -r requirements-dev.txt
 
+# this will run all tests in the ./tests folder 
 script:
 - invoke test
+
+# safe list (specifies what branches to build on github)
+branches:
+  only:
+  - master
+  - develop

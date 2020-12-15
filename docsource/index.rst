@@ -8,6 +8,5 @@ directional_clustering
 
    intro
    gettingstarted
-   examples
    api
    license

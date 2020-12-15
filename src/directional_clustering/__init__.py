@@ -9,7 +9,11 @@ directional_clustering
 .. toctree::
     :maxdepth: 1
 
-
+    directional_clustering.clustering
+    directional_clustering.fields
+    directional_clustering.mesh
+    directional_clustering.plotters
+    directional_clustering.transformations
 """
 
 from __future__ import print_function
@@ -18,10 +22,8 @@ import os
 import sys
 
 
-__author__ = ["Rafael Pastrana"]
-__copyright__ = "Rafael Pastrana"
+__copyright__ = "Princeton University"
 __license__ = "MIT License"
-__email__ = "arpj@princeton.edu"
 __version__ = "0.1.0"
 
 
@@ -30,7 +32,10 @@ HERE = os.path.dirname(__file__)
 HOME = os.path.abspath(os.path.join(HERE, "../../"))
 DATA = os.path.abspath(os.path.join(HOME, "data"))
 DOCS = os.path.abspath(os.path.join(HOME, "docs"))
+JSON = os.path.abspath(os.path.join(HOME, 'data/json_files/'))
+SCRIPTS = os.path.abspath(os.path.join(HOME, 'scripts'))
 TEMP = os.path.abspath(os.path.join(HOME, "temp"))
+TESTS = os.path.abspath(os.path.join(HOME, 'tests'))
 
 # Check if package is installed from git
 # If that's the case, try to append the current head's hash to __version__
@@ -53,4 +58,4 @@ try:
 except Exception:
     pass
 
-__all__ = ["HOME", "DATA", "DOCS", "TEMP"]
+__all__ = ["HOME", "DATA", "DOCS", "TEMP", "TESTS"]
