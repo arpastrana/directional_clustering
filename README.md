@@ -31,7 +31,7 @@ field. We leverage clustering methods to this end.
 ## Installation
 
 The simplest way to install `directional_clustering` is to build it from source
-after cloning this repo. For developer mode, please jump to the next section.
+after cloning this repo. For developer mode, please jump to the developer section.
 
 1. First, we would need to install the latest version of
 [Anaconda](https://www.continuum.io/). Anaconda will take care, among many other
@@ -84,14 +84,17 @@ First, `01_clustering.py` takes care of importing a mesh from a JSON file,
 clustering on a vector field and exporting both the mesh the clustering results
 into a new JSON file. Our script assumes that there is at least one vector field 
 living on the mesh, stored as attributes on their faces. For further details on this,
-please refer to the [COMPAS](https://compas.dev/) documentation on meshes.
+please refer to the [COMPAS](https://compas.dev/) documentation on meshes. We have
+provided amount of ready-made examples in the `data/json_files` folder. Feel free
+to try them all out. Here, we will be using the `perimeter_supported_slab.json` 
+by default.
 
 Second, `01_plotting.py` takes care of simply displaying the clustering results 
 from the JSON file we exported in with `01_clustering.py` on your browser.
 
 Instructions on how to run these two are as follows.
 
-1. Go to the directory where scripts are stored:
+1. Go to the scripts directory:
 
 ```bash
 cd scripts
@@ -123,7 +126,7 @@ JSON file in the `data/json_files` folder. The filename is hard-coded as
 `mesh_filename`_`vectorfield_name`_`clustering_algo_name`_`n_clusters.json`.
 
 5. To visualize the results of the clustering process, run `01_plotting.py`.
-Don't forget, to use the `--help` flag to see the documentation the available 
+Don't forget to use the `--help` flag to see the documentation the available 
 command line arguments.
 
 ```
@@ -173,7 +176,7 @@ invoke pdf
 
 The manual will be saved in `docs/latex` as `directional_clustering.pdf`.
 
-### Final Report
+## Final Report
 
 Hop to the `report` branch for more information about this.
 
