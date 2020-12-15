@@ -59,8 +59,7 @@ class PlyPlotter(go.Figure):
                            showlegend=False,
                            scene=dict(aspectmode='data'))
 
-    def plot_vector_field_lines(self, mesh, vector_field,
-        color, uniform, scale):
+    def plot_vector_field_lines(self, mesh, vector_field, color, uniform, scale):
         """
         Plots a vector field as lines.
 
@@ -99,21 +98,15 @@ class PlyPlotter(go.Figure):
         s_x, s_y, s_z, e_x, e_y, e_z = lines_to_start_end_xyz(lines)
 
         # "cse" is shorthand for connected start and end
-        cse_x, cse_y, cse_z = lines_start_end_connect(
-            s_x, s_y, s_z, e_x, e_y, e_z
-        )
+        cse_x, cse_y, cse_z = lines_start_end_connect(s_x, s_y, s_z, e_x, e_y, e_z)
 
         # add lines to plot
-        self.add_trace(
-            go.Scatter3d(
-                x=cse_x,
-                y=cse_y,
-                z=cse_z,
-                mode='lines',
-                line=dict(width=2, color=color),
-                opacity=1
-            )
-        )
+        self.add_trace(go.Scatter3d(x=cse_x,
+                                    y=cse_y,
+                                    z=cse_z,
+                                    mode='lines',
+                                    line=dict(width=2, color=color),
+                                    opacity=1))
 
     def plot_trimesh(self, mesh, paint_clusters, plot_edges=False, opacity=0.8):
         """
@@ -125,13 +118,13 @@ class PlyPlotter(go.Figure):
             A COMPAS mesh with 3D vertices.
         paint_clusters : `bool`
             Flag to add colors to mesh faces.
-            \nDefaults to `True`.
+            Defaults to `True`.
         plot_edges : `bool`, optional
             Flag to plot edges of the mesh.
-            \nDefaults to `False`.
+            Defaults to `False`.
         opacity : `float`
             A value between 0.0 and 1.0 to control opacity of the mesh.
-            \nDefautls to 0.8.
+            Defautls to 0.8.
 
         Notes
         -----
@@ -191,16 +184,12 @@ class PlyPlotter(go.Figure):
 
         c_x, c_y, c_z = face_centroids(mesh)
 
-        self.add_trace(
-            go.Cone(
-                x=c_x,
-                y=c_y,
-                z=c_z,
-                u=field[:, 0],
-                v=field[:, 1],
-                w=field[:, 2]
-            )
-        )
+        self.add_trace(go.Cone(x=c_x,
+                               y=c_y,
+                               z=c_z,
+                               u=field[:, 0],
+                               v=field[:, 1],
+                               w=field[:, 2]))
 
 
 if __name__ == "__main__":
