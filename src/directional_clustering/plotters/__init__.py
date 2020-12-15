@@ -4,15 +4,8 @@ directional_clustering.plotters
 
 .. currentmodule:: directional_clustering.plotters
 
-
-Classes
-=======
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    PlyPlotter
+.. autoclass:: directional_clustering.plotters::PlyPlotter
+    :members:
 """
 
 from __future__ import absolute_import

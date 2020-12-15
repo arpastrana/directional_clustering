@@ -31,7 +31,7 @@ field. We leverage clustering methods to this end.
 ## Installation
 
 The simplest way to install `directional_clustering` is to build it from source
-after cloning this repo. For developer mode, please jump to the next section.
+after cloning this repo. For developer mode, please jump to the developer section.
 
 1. First, we would need to install the latest version of
 [Anaconda](https://www.continuum.io/). Anaconda will take care, among many other
@@ -69,65 +69,71 @@ interface, let's type the following and hit enter:
 python -c "import directional_clustering"
 ```
 
-If no errors occur, smile 🙂! You have a working installation of
+If no errors occur, smile! You have a working installation of
 `directional_clustering`.
 
 ## How to use this library?
 
-After installation completed, we are able to play around with this library to realize 
-a bunch of cool tasks related to directional clustering! We provide an example of how 
-to utilize our library. Example scripts `01_clustering.py` and `01_plotting.py` are in 
-folder `directional_clustering/scripts`.
+After installation completed, we will be able to play around with this library
+and do a bunch of cool tasks related to directional clustering! We provide two
+examples scripts, `01_clustering.py` and `01_plotting.py`, which live under 
+`directional_clustering/scripts`. If you are unsure of what arguments to pass in,
+append the `--help` flag at the end to see what options are available.
 
-`01_clustering.py` takes care of importing a mesh from JSON file, doing clustering on 
-the choosen vector field and exporting the clustering results into another JSON file.
+First, `01_clustering.py` takes care of importing a mesh from a JSON file,
+clustering on a vector field and exporting both the mesh the clustering results
+into a new JSON file. Our script assumes that there is at least one vector field 
+living on the mesh, stored as attributes on their faces. For further details on this,
+please refer to the [COMPAS](https://compas.dev/) documentation on meshes. We have
+provided amount of ready-made examples in the `data/json_files` folder. Feel free
+to try them all out. Here, we will be using the `perimeter_supported_slab.json` 
+by default.
 
-`01_plotting.py` takes care of resuming the previous clustering results from JSON file 
-and visualizing the results.
+Second, `01_plotting.py` takes care of simply displaying the clustering results 
+from the JSON file we exported in with `01_clustering.py` on your browser.
 
-Instuctions on how to run these two are as follows.
+Instructions on how to run these two are as follows.
 
-1. Go to the directory where scripts live (suppose you're currently at 
-`directional_clustering`):
+1. Go to the scripts directory:
 
 ```bash
 cd scripts
 ```
 
-2.Run `01_clustering.py` with default command line arguments by typing the following.
-In addition, you can pass customized values of command line arguments by `--flag` syntax
-or taking them as positional arguments.
-As usual, `--help` will lead you to our documentation for arguments.
+2. Run `01_clustering.py` from the command line. You can change specific arguments
+by passing in the`--flag` syntax before their name. As usual, `--help` will prompt 
+you with information of what arguments are expected and what is assumed by default.
+Is a good idea to check this before running the script!
 
 ```
-python 01_clustering.py
+python 01_clustering.py --help
 ```
 
-3.There will be an inquriy about which vector filed do you want to do clustering on while 
-`01_clustering.py` running (for exmaple you're choosing attribute `m_1`, input `m_1` will 
-be passed to `vectorfield_tag`):
+3. Next, the script will prompt you with the names of the vector field that currently
+live on the mesh. The program require you to select only **one** of them onto wich
+the clustering will be done. Such an scenario would look as follows. 
 
 ```bash
 supported vector field attributes are:
  ['ps_2_top', 'ps_2_bot', 'ps_1_top', 'm_1', 'm_2', 'n_1', 'n_2', 'custom_2', 'ps_2_mid', 
  'ps_1_bot', 'ps_1_mid', 'custom_1']
-please choose one attribute:m_1
+please choose one attribute
 ```
 
-4.Wait till the running process is over! The results will be automatically stored in a JSON
-file named after `filename`_`vectorfield_tag`_`clustering_name`_`n_clusters`in folder 
-`data/json_files`.
+4. After you type in the name of the vector field to cluster, we'd just need to 
+wait for a few seconds till the process is over! The results will be stored in a
+JSON file in the `data/json_files` folder. The filename is hard-coded as 
+`mesh_filename`_`vectorfield_name`_`clustering_algo_name`_`n_clusters.json`.
 
-5. Run `01_plotting.py` with default command line arguments by typing the following.
-In addition, you can pass customized values of command line arguments by `--flag` syntax
-or taking them as positional arguments. 
-As usual, `--help` will lead you to our documentation for arguments.
+5. To visualize the results of the clustering process, run `01_plotting.py`.
+Don't forget to use the `--help` flag to see the documentation the available 
+command line arguments.
 
 ```
-python 01_plotting.py
+python 01_plotting.py --help
 ```
 
-6.Plot will be shown as html.
+6. A 3D plot should automatically open in your browser. Zoom in and orbit as you wish!
 
 ## Developer Mode
 
@@ -169,6 +175,10 @@ invoke pdf
 ```
 
 The manual will be saved in `docs/latex` as `directional_clustering.pdf`.
+
+## Final Report
+
+Hop to the `report` branch for more information about this.
 
 ## License
 
