@@ -66,6 +66,7 @@ JSON_OUT = os.path.abspath(os.path.join(JSON, name_out))
 
 # vector field
 vectorfield_tag = "m_1"  # the vector field to base the clustering on
+vectorfield_tag_90 = "m_2"  # the vector field orthogonal to tag
 
 # reference vector for alignment
 align_vectors = False
@@ -87,8 +88,10 @@ epochs_kmeans = 100  # number of epochs to run kmeans clustering for
 export_json = False
 
 # plotter flags
-draw_faces = True
-draw_vector_fields = False
+draw_faces = False
+draw_colored_faces = False
+draw_dots = False
+draw_vector_fields = True
 
 # ==============================================================================
 # Import a COMPAS mesh
@@ -108,9 +111,11 @@ fkey_idx = {fkey: index for index, fkey in enumerate(mesh.faces())}
 # store vector field in a dictionary where keys are the mesh face keys
 # and the values are the vectors located at every face
 vectors = {}
+vectors_90 = {}
 for fkey in mesh.faces():
     # this is a mesh method that will query info stored the faces of the mesh
-    vectors[fkey] = mesh.face_attribute(fkey, vectorfield_tag) 
+    vectors[fkey] = mesh.face_attribute(fkey, vectorfield_tag)
+    vectors_90[fkey] = mesh.face_attribute(fkey, vectorfield_tag_90)
 
 # ==============================================================================
 # Align vector field to a reference vector
@@ -123,17 +128,17 @@ for fkey in mesh.faces():
 # concretely, a vector can be pointing to [1, 1] or to [-1, 1] but for archi-
 # tectural and structural reasons this would be the same, because both versions
 # are colinear.
-# 
+
 # in short, mitigating directional duplicity is something we are kind of 
 # sorting out with a heuristic. this will eventually improve the quality of the
 # clustering
-#
+
 # how to pick the reference vector is arbitrary ("user-defined") and something
 # where there's more work to be done on. in the meantime, i've used the global
 # x and global y vectors as references, which have worked ok for my purposes.
 
 if align_vectors:
-    for fkey, vector in vectors.items():    
+    for fkey, vector in vectors.items():
         # if vectors don't point in the same direction
         if dot_vectors(alignment_ref, vector) < 0.0:
             vectors[fkey] = scale_vector(vector, -1)  # reverse it
@@ -161,7 +166,8 @@ if smooth_iters:
     vectors = laplacian_smoothed(mesh, vectors, smooth_iters, damping)
 
 # ==============================================================================
-# Do K-means Clustering ================================================================================
+# Do K-means Clustering
+# ==============================================================================
 
 # functions related to kmeans are in src/directional_clustering/clusters/
 
@@ -173,10 +179,14 @@ if smooth_iters:
 # 2d mesh, carrying out clustering directly in 2d, and then reconstructing
 # the results back into the 3d mesh ("reparametrizing it back")
 
-# convert vectors dictionary into a numpy array 
+# convert vectors dictionary into a numpy array
 vectors_array = np.zeros((mesh.number_of_faces(), 3))
 for fkey, vec in vectors.items():
     vectors_array[fkey, :] = vec
+
+vectors_array_90 = np.zeros((mesh.number_of_faces(), 3))
+for fkey, vec in vectors_90.items():
+    vectors_array_90[fkey, :] = vec
 
 print("Clustering started...")
 
@@ -275,22 +285,54 @@ plotter = ClusterPlotter(mesh, figsize=(12, 9))
 # draw only the boundary edges of the COMPAS Mesh
 plotter.draw_edges(keys=list(mesh.edges_on_boundary()))
 
+# color up the faces of the COMPAS mesh according to their cluster
+# make a dictionary with all labels
+labels_to_color = {}
+for fkey in mesh.faces():
+    labels_to_color[fkey] = mesh.face_attribute(key=fkey, name="cluster")
+# convert labels to rgb colors
+face_colors = rgb_colors(labels_to_color, invert=False)
+
 if draw_faces:
-    # color up the faces of the COMPAS mesh according to their cluster
-    # make a dictionary with all labels
-    labels_to_color = {}
-    for fkey in mesh.faces():
-        labels_to_color[fkey] = mesh.face_attribute(key=fkey, name="cluster")
-    # convert labels to rgb colors
-    face_colors = rgb_colors(labels_to_color, invert=False)
     # draw faces
-    plotter.draw_faces(facecolor=face_colors)
+    edgewidth = 0.01
+    facecolors = None
+    if draw_colored_faces:
+        facecolors = face_colors
+    plotter.draw_faces(facecolor=facecolors, edgewidth=edgewidth)
+
+if draw_dots:
+    points = []
+    radius = 0.025
+    edge_width = 0.10  # default 1.0
+
+    for fkey in mesh.faces():
+        point = {}
+        point["pos"] = mesh.face_centroid(fkey)
+        point["facecolor"] = face_colors[fkey]
+
+        point["radius"] = radius
+        point["edgewidth"] = edge_width
+        points.append(point)
+
+    plotter.draw_points(points)
 
 # draw vector fields on mesh as lines
 if draw_vector_fields:
     # original vector field
     va = vectors_array  # shorthand
-    plotter.draw_vector_field_array(va, (50, 50, 50), True, 0.07, 0.5)
+    va_90 = vectors_array_90
+
+    same_length = True
+    width = 0.5
+    length = 0.05
+
+    color_0 = (255, 0, 0) # (255, 51, 153)
+    color_90 = (0, 0, 255)  # (0, 153, 51)
+
+    plotter.draw_vector_field_array(va, color_0, same_length, length, width)
+    plotter.draw_vector_field_array(va_90, color_90, same_length, length, width)
+
     # clustered vector field
     # plotter.draw_vector_field_array(clusters, (0, 0, 255), True, 0.07, 1.0)
 

@@ -2,6 +2,7 @@ from directional_clustering.geometry import line_tuple_to_dict
 from directional_clustering.geometry import vector_lines_on_faces
 from directional_clustering.geometry import line_sdl
 
+from compas.geometry import length_vector
 from compas_plotters import MeshPlotter
 
 
@@ -32,11 +33,9 @@ class ClusterPlotter(MeshPlotter):
     def draw_vector_field_array(self, field, color, uniform, scale, width=0.5):
         mesh = self.mesh
         lines = []
-
-    
         _lines = []
 
-        rows, cols = field.shape
+        rows, _ = field.shape
         for fkey in range(rows):
             vector = field[fkey]
             vector = vector.tolist()
@@ -46,8 +45,7 @@ class ClusterPlotter(MeshPlotter):
             else:
                 vec_length = length_vector(vector) * scale
 
-            pt = mesh.face_centroid(fkey)
-            _lines.append(line_sdl(pt, vector, vec_length))
+            _lines.append(line_sdl(mesh.face_centroid(fkey), vector, vec_length))
 
         _lines = [line for line in map(line_tuple_to_dict, _lines)]
 
