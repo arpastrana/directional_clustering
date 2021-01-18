@@ -3,6 +3,7 @@ import os
 
 # good ol' numpy
 import numpy as np
+import matplotlib.pyplot as plt
 
 # this are ready-made functions from COMPAS (https://compas.dev)
 from compas.datastructures import Mesh
@@ -12,10 +13,15 @@ from compas.geometry import dot_vectors
 from compas.geometry import subtract_vectors
 from compas.geometry import length_vector_sqrd
 
+from compas.geometry import angle_vectors
+from compas.geometry import cross_vectors
+from compas.geometry import angle_vectors_signed
+
 # this are custom-written functions part of this library
 # which you can find in the src/directional_clustering folder
 from directional_clustering import JSON
 from directional_clustering.geometry import laplacian_smoothed
+from directional_clustering.geometry import cosine_similarity
 from directional_clustering.clusters import init_kmeans_farthest
 from directional_clustering.clusters import kmeans
 from directional_clustering.plotters import ClusterPlotter
@@ -36,7 +42,7 @@ from directional_clustering.plotters import rgb_colors
 #
 # First and second principal vectors are always orthogonal to each other.
 
-vectorfield_tags= [
+vectorfield_tags = [
     "n_1",  # axial forces in first principal direction
     "n_2",  # axial forces in second principal direction
     "m_1",  # bending moments in first principal direction
@@ -59,7 +65,10 @@ vectorfield_tags= [
 # The JSON files are stored in the data/json_files folder
 # I am working on MacOS, so the format might be slightly different on Windows
 name_in = "perimeter_supported_slab.json"
-name_out = "perimeter_supported_slab_k_5.json"
+name_in = "three_point_circle_slab.json"
+
+name_out = "perimeter_supported_slab_k_3.json"
+img_path = "./fig.png"
 
 JSON_IN = os.path.abspath(os.path.join(JSON, name_in))
 JSON_OUT = os.path.abspath(os.path.join(JSON, name_out))
@@ -80,16 +89,18 @@ damping = 0.5  # damping coefficient, a value from 0 to 1
 # kmeans clustering
 n_clusters = 3  # number of clusters to produce
 mode = "cosine"  # "cosine" or "euclidean"
-eps = 1e-6  # loss function threshold for early stopping
+eps = 1e-3  # loss function threshold for early stopping
 epochs_seeds = 100  # number of epochs to run the farthest seeding for
 epochs_kmeans = 100  # number of epochs to run kmeans clustering for
 
 # exporting
 export_json = False
+save_img = False
 
 # plotter flags
 draw_faces = False
-draw_colored_faces = False
+color_scheme = "cluster"  # cosine_distance, cluster
+draw_colored_faces = True
 draw_dots = False
 draw_vector_fields = True
 
@@ -248,16 +259,24 @@ print("Clustered Field MSE: {}".format(mse))
 # ==============================================================================
 
 # this is for visualization and exporting purposes
-attr_name = vectorfield_tag + "_k_{}".format(n_clusters)  # name for storage
+attr_name = vectorfield_tag + "_k" # name for storage
+attr_name_90 = vectorfield_tag_90 + "_k"
 
 # iterate over the faces of the COMPAS mesh
 for fkey in mesh.faces():
     c_vector = clusters[fkey, :].tolist()  # convert numpy array to list
     c_label = labels[fkey]
+    c_angle = angle_vectors_signed([1.0, 0.0, 0.0], c_vector, normal=[0.0, 0.0, 1.0])
+
+    # second direction
+    c_vector_90 = cross_vectors(c_vector, [0.0, 0.0, 1.0])
 
     # store clustered vector in COMPAS mesh as a face attribute
     mesh.face_attribute(key=fkey, name=attr_name, value=c_vector)
+    mesh.face_attribute(key=fkey, name=attr_name_90, value=c_vector_90)
+
     mesh.face_attribute(key=fkey, name="cluster", value=c_label)
+    mesh.face_attribute(key=fkey, name="cluster_angle_x", value=c_angle)
 
 # ==============================================================================
 # Export new JSON file for further processing
@@ -272,7 +291,7 @@ if export_json:
 # =============================================================================
 
 # there is a lot of potential work to do for visualization!
-# below there is the simplest snippet, but you can see more stuff 
+# below there is the simplest snippet, but you can see more stuff
 # in the scripts/visualization folder
 
 # ClusterPlotter is a custom wrapper around a COMPAS MeshPlotter
@@ -289,7 +308,14 @@ plotter.draw_edges(keys=list(mesh.edges_on_boundary()))
 # make a dictionary with all labels
 labels_to_color = {}
 for fkey in mesh.faces():
-    labels_to_color[fkey] = mesh.face_attribute(key=fkey, name="cluster")
+    if color_scheme == "cluster":
+        label_to_color = mesh.face_attribute(key=fkey, name="cluster")
+    elif color_scheme == "cosine_distance":
+        vector = mesh.face_attribute(key=fkey, name=vectorfield_tag)
+        label_to_color = angle_vectors_signed([1.0, 0.0, 0.0], vector, normal=[0.0, 0.0, 1.0])
+        # label_to_color = cosine_similarity([1.0, 0.0, 0.0], vector)
+    labels_to_color[fkey] = label_to_color
+
 # convert labels to rgb colors
 face_colors = rgb_colors(labels_to_color, invert=False)
 
@@ -321,6 +347,7 @@ if draw_dots:
 if draw_vector_fields:
     # original vector field
     va = vectors_array  # shorthand
+    # va = clusters
     va_90 = vectors_array_90
 
     same_length = True
@@ -335,6 +362,10 @@ if draw_vector_fields:
 
     # clustered vector field
     # plotter.draw_vector_field_array(clusters, (0, 0, 255), True, 0.07, 1.0)
+
+if save_img:
+    plt.tight_layout()
+    plotter.save(img_path, bbox_inches='tight', pad_inches=0)
 
 #  show to screen
 plotter.show()

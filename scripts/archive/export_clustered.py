@@ -9,14 +9,14 @@ from math import radians
 from sklearn.cluster import KMeans
 from sklearn.cluster import SpectralClustering
 
-from directional_clustering.geometry import clockwise
+# from directional_clustering.geometry import clockwise
 from directional_clustering.geometry import laplacian_smoothed
 from directional_clustering.geometry import cosine_similarity
-from directional_clustering.geometry import contour_polygons
+# from directional_clustering.geometry import contour_polygons
 
-from directional_clustering.clusters import kmeans_fit
+# from directional_clustering.clusters import kmeans_fit
 from directional_clustering.clusters import init_kmeans_farthest
-from directional_clustering.clusters import _kmeans
+from directional_clustering.clusters import kmeans
 
 from directional_clustering.plotters import ClusterPlotter
 from directional_clustering.plotters import rgb_colors
@@ -63,12 +63,12 @@ tags = [
 # HERE = "../data/json_files/square_wall_cantilever"  # michell
 # HERE = "../data/json_files/square_wall_down_res_005"  # schlaich
 
-HERE = "../data/json_files/perimeter_supported_vault_z500mm"  #vault
+# HERE = "../data/json_files/perimeter_supported_vault_z500mm"  #vault
  
 # HERE = "../data/json_files/four_point_slab"
-# HERE = "../data/json_files/perimeter_supported_slab"
+HERE = "../data/json_files/perimeter_supported_slab"
 
-tag = "n_1"
+tag = "m_1"
 x_lim = -10.0  # faces stay if x coord of their centroid is larger than x_lim
 y_lim = -10.0  # faces stay if y coord of their centroid is larger than y_lim
 
@@ -119,7 +119,7 @@ for fkey in mesh.faces():
 # mode. double mode distributions arise aligning with global y, whereas the good
 # former one, with global x alignment.
 
-align = True
+align = False
 align_ref = [1.0, 0.0, 0.0]  # global x
 # align_ref = [0.0, 1.0, 0.0]  # global y
 
@@ -183,7 +183,7 @@ for fkey, vec in vectors.items():
 # Smoothen vectors
 # =============================================================================
 
-smooth_iters = 10
+smooth_iters = 0
 damping = 0.5
 
 if smooth_iters:
@@ -198,7 +198,7 @@ ref_cosim = [0.0, 1.0, 0.0]  # global y - for full systems
 
 cosim = np.zeros(mesh.number_of_faces())
 for fkey, vec in vectors.items():
-    cs = cosine_similarity(ref_cosim, vec) 
+    cs = cosine_similarity(ref_cosim, vec)
     cosim[fkey] = cs
 
 # =============================================================================
@@ -257,11 +257,11 @@ if do_kmeans:
 
     # furthest seed initialization
     mode = "cosine"  # euclidean or cosine
-    eps = 1e-3
-    epochs = 200
+    eps = 1e-6
+    epochs = 100
     seeds = init_kmeans_farthest(data, n_clusters, mode, epochs, eps)
-    epochs = 200
-    km = _kmeans(data, seeds, mode, epochs, eps, early_stopping=False, verbose=True)
+    epochs = 100
+    km = kmeans(data, seeds, mode, epochs, eps, early_stopping=False, verbose=True)
     
     labels, centers, losses = km
 
@@ -282,7 +282,7 @@ if do_kmeans:
 
     recalibrated_values = np.zeros(clustered_values.shape)
     for i in range(n_clusters):
-        face_indices = np.nonzero(labels==i)
+        face_indices = np.nonzero(labels == i)
         new_vector = np.mean(base[face_indices], axis=0)
         recalibrated_values[face_indices] = new_vector
 
@@ -330,7 +330,7 @@ for fkey in mesh.faces():
 # =============================================================================
 
 losses = np.zeros(mesh.number_of_faces())
-for fkey in mesh.faces():    
+for fkey in mesh.faces():
     losses[fkey] = length_vector_sqrd(subtract_vectors(base[fkey], target[fkey]))
 
 print("MSE Loss: {}".format(np.mean(deviations)))
@@ -355,7 +355,7 @@ plotter.draw_edges(keys=list(mesh.edges_on_boundary()))
 # Draw vector fields
 # =============================================================================
 
-draw_vector_fields = True
+draw_vector_fields = False
 
 if draw_vector_fields:
     # plotter.draw_vector_field_array(target, (0, 0, 0), True, 0.07, width=1.0)
@@ -368,12 +368,12 @@ if draw_vector_fields:
 # Data to color
 # =============================================================================
 
-dataset = "labels"
+dataset = "cosim"
 
 data_collection = {
     "labels": {"values": labels, "cmap": "jet"},
     "deviations": {"values": deviations, "cmap": "RdPu"},  # also cmap: Grays
-    "cosim": {"values": cosim, "cmap": "RdBu"},  # also cmap: Spectral
+    "cosim": {"values": cosim, "cmap": "Spectral"},  # also cmap: Spectral, RdBu
     "magnitudes": {"values": magnitudes, "cmap": "Blues"}
 }
 
@@ -386,7 +386,7 @@ cmap = data_collection[dataset]["cmap"]
 
 collection = plotter.draw_faces()
 collection.set(array=data, cmap=cmap)
-colorbar = plotter.figure.colorbar(collection)
+# colorbar = plotter.figure.colorbar(collection)
 
 # =============================================================================
 # Draw cluster contours

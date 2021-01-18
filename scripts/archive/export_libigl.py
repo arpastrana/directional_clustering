@@ -1,52 +1,10 @@
 import numpy as np
-import matplotlib.pyplot as plt
-
-# plt.style.use("dark_background")
-
-from matplotlib.patches import Polygon
-from matplotlib.collections import PatchCollection
-from matplotlib.collections import PolyCollection
-
-from mpl_toolkits.axes_grid1 import AxesGrid
-
-# import mpl_toolkits
-
-# = mpl_toolkits.legacy_colorbar
-
-# legacy_colorbar.rcParam = False
-
-from math import acos
-from math import degrees
-from math import fabs
-
-from sklearn.cluster import KMeans
-from sklearn.cluster import SpectralClustering
-
-from directional_clustering.geometry import clockwise
-from directional_clustering.geometry import laplacian_smoothed
-from directional_clustering.geometry import cosine_similarity
-from directional_clustering.geometry import contour_polygons
-
-from directional_clustering.clusters import kmeans_fit
-from directional_clustering.clusters import init_kmeans_farthest
-from directional_clustering.clusters import _kmeans
-
-from directional_clustering.plotters import ClusterPlotter
-from directional_clustering.plotters import rgb_colors
-from directional_clustering.plotters import plot_kmeans_vectors
 
 from compas.datastructures import Mesh
 from compas.datastructures import mesh_unify_cycles
 
-from compas.geometry import dot_vectors
-from compas.geometry import scale_vector
-from compas.geometry import normalize_vector
-from compas.geometry import length_vector
-from compas.geometry import angle_vectors
-from compas.geometry import length_vector_sqrd
-from compas.geometry import subtract_vectors
-
 from compas.utilities import geometric_key
+from compas.geometry import normalize_vector
 
 # =============================================================================
 # Constants
@@ -77,17 +35,17 @@ THERE = "/Users/arpj/code/libraries/libigl/tutorial/508_ARP_MIQ/"
 # HERE = "../data/json_files/square_wall_down"  # schlaich
 # HERE = "../data/json_files/perimeter_supported_slab"
 
-HERE = "../data/json_files/four_point_slab"
+# HERE = "../data/json_files/four_point_slab"
 # HERE = "../data/json_files/four_point_slab_k_7"
-# HERE = "../data/json_files/perimeter_supported_slab_k_5"
+HERE = "../data/json_files/perimeter_supported_slab_k_3"
 # HERE = "../data/json_files/perimeter_supported_slab"
-HERE = "../data/json_files/perimeter_supported_vault_z500mm_k_3"  #vault
+# HERE = "../data/json_files/perimeter_supported_vault_z500mm_k_3"  #vault
 
-tag = "n_1_k"
-tag_2 = "n_2_k"
+# tag = "n_1_k"
+# tag_2 = "n_2_k"
 
-# tag = "m_1_k"
-# tag_2 = "m_2_k"
+tag = "m_1_k"
+tag_2 = "m_2_k"
 
 x_lim = -10.0  # faces stay if x coord of their centroid is larger than x_lim
 y_lim = -10.0  # faces stay if y coord of their centroid is larger than y_lim
