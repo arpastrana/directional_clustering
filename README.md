@@ -1,6 +1,6 @@
 # Directional Clustering
 
-https://www.travis-ci.com/arpastrana/directional_clustering.svg?branch=master
+[![Build Status](https://www.travis-ci.com/arpastrana/directional_clustering.svg?branch=master)](https://www.travis-ci.com/arpastrana/directional_clustering)
 
 Directional clustering of vector fields on meshes.
 
