@@ -178,10 +178,6 @@ invoke pdf
 
 The manual will be saved in `docs/latex` as `directional_clustering.pdf`.
 
-## Final Report
-
-Hop to the `report` branch for more information about this.
-
 ## License
 
 MIT
