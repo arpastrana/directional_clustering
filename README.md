@@ -1,5 +1,7 @@
 # Directional Clustering
 
+https://www.travis-ci.com/arpastrana/directional_clustering.svg?branch=master
+
 Directional clustering of vector fields on meshes.
 
 ![Clustered stress field on a perimeter-supported slab](data/images/five_clusters.png)
