@@ -24,7 +24,7 @@ def distance_cosine(A, B):
     -----
     The cosine distance can be expressed 1 - AB.
     """
-    return 1.0 - np.dot(A, np.transpose(B))
+    return 1.0 - np.dot(A, np.transpose(B)) / (np.linalg.norm(A) * np.linalg.norm(B))
 
 
 if __name__ == "__main__":
