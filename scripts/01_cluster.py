@@ -40,12 +40,12 @@ from directional_clustering.transformations import smoothen_vector_field
 
 def directional_clustering(filename,
                            algo_name="cosine_kmeans",
-                           n_clusters=5,
-                           iters=30,
+                           n_clusters,
+                           iters=100,
                            tol=1e-6,
-                           align_vectors=True,
+                           align_vectors=False,
                            alignment_ref=[1.0, 0.0, 0.0],
-                           smooth_iters=10,
+                           smooth_iters=0,
                            damping=0.5):
     """
     Clusters a vector field that has been defined on a mesh. Exports a JSON file.
@@ -54,21 +54,17 @@ def directional_clustering(filename,
     ----------
     filename : `str`
         The name of the JSON file that encodes a mesh.
-        \nAll JSON files must reside in this repo's data/json folder.
-        Defaults to "perimeter_supported_slab".
+        All JSON files must reside in this repo's data/json folder.
 
     algo_name : `str`
         The name of the algorithm to cluster the vector field.
         \nSupported options are `cosine_kmeans` and `variational_kmeans`.
-        Defaults to `cosine kmeans`.
 
     n_clusters : `int`
         The number of clusters to generate.
-        \nDefaults to 5.
 
     iters : `int`
         The number of iterations to run the clustering algorithm for.
-        \nDefaults to 30.
 
     tol : `float`
         A small threshold value that marks clustering convergence.
@@ -85,7 +81,7 @@ def directional_clustering(filename,
     smooth_iters : `int`
         The number iterations of Laplacian smoothing on the vector field.
         \nIf set to 0, no smoothing will take place.
-        Defaults to 10.
+        Defaults to 0.
 
     damping : `float`
         A value between 0.0 and 1.0 to control the intensity of the smoothing.
