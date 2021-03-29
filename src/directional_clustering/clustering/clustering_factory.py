@@ -51,8 +51,8 @@ class ClusteringFactory(object):
 
 
 # Register supported algorithms
-ClusteringFactory.register("cosine kmeans", CosineKMeans)
-ClusteringFactory.register("variational kmeans", VariationalKMeans)
+ClusteringFactory.register("cosine_kmeans", CosineKMeans)
+ClusteringFactory.register("variational_kmeans", VariationalKMeans)
 
 
 if __name__ == "__main__":
