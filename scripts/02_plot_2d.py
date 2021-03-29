@@ -4,6 +4,9 @@ import os
 # argument parsing helper
 import fire
 
+# python standard libraries
+from itertools import cycle
+
 #JSON file directory
 from directional_clustering import JSON
 
@@ -14,11 +17,11 @@ from directional_clustering.mesh import MeshPlus
 from directional_clustering.fields import VectorField
 
 #plotters
-from directional_clustering.plotters import ClusterPlotter
+from directional_clustering.plotters import MeshPlusPlotter
 
 
 # ==============================================================================
-# Main function: directional_clustering
+# Plot stuff in 2d
 # ==============================================================================
 
 def plot_2d(filename,
@@ -58,12 +61,7 @@ def plot_2d(filename,
     plot_cones : `bool`
         Plots the cones atop of the input mesh.
         \nDefaults to False.
-   """
-
-    # ============================================================================
-    # Plot stuff
-    # ============================================================================
-
+    """
     # load a mesh from a JSON file
     name_in = filename + ".json"
     json_in = os.path.abspath(os.path.join(JSON, name_in))
@@ -71,9 +69,7 @@ def plot_2d(filename,
     mesh = MeshPlus.from_json(json_in)
 
     # ClusterPlotter is a custom wrapper around a COMPAS MeshPlotter
-    plotter = ClusterPlotter()
-
-    # draw the edges at the boundary
+    plotter = MeshPlusPlotter(mesh, figsize=(16, 9))
     if draw_boundary_edges:
         plotter.draw_edges(keys=list(mesh.edges_on_boundary()))
 
@@ -91,11 +87,11 @@ def plot_2d(filename,
         print("Avaliable vector fields on the mesh are:\n", available_vf)
 
         # the name of the vector field to cluster.
-        vf_names = []
+        vf_names = set()
         while True:
             vf_name = input("Please select the vector fields to cluster. Type 'ok' to stop adding vector fields: ")
             if vf_name in available_vf:
-                vf_names.append(vf_name)
+                vf_names.add(vf_name)
             elif vf_name == "ok":
                 break
             else:
@@ -105,10 +101,11 @@ def plot_2d(filename,
         width = 0.5
         length = 0.05
         same_length = True
-        color = (150, 150, 150)
+        colors = cycle([(255, 0, 0), (0, 0, 255), (0, 255, 0), (0, 0, 0)])
 
         for vf_name in vf_names:
             vf = mesh.vector_field(vf_name)
+            color = next(colors)
             plotter.draw_vector_field(vf, color, same_length, length, width)
 
     # show to screen

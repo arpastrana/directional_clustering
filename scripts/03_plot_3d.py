@@ -99,11 +99,11 @@ def results_plotting(filename,
         print("Avaliable vector fields on the mesh are:\n", available_vf)
 
         # the name of the vector field to cluster.
-        vf_names = []
+        vf_names = set()
         while True:
             vf_name = input("Please select the vector fields to cluster. Type 'ok' to stop adding vector fields: ")
             if vf_name in available_vf:
-                vf_names.append(vf_name)
+                vf_names.add(vf_name)
             elif vf_name == "ok":
                 break
             else:

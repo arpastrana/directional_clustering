@@ -16,6 +16,7 @@ from __future__ import print_function
 # from .<module> import *
 from .geometry import *
 from .colors import *
+from .mesh_plotter import *
 from .plot_data_struct import *
 from .ply_plotter import *
 

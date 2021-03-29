@@ -40,7 +40,7 @@ from directional_clustering.transformations import smoothen_vector_field
 
 def directional_clustering(filename,
                            algo_name="cosine_kmeans",
-                           n_clusters,
+                           n_clusters=4,
                            iters=100,
                            tol=1e-6,
                            align_vectors=False,
