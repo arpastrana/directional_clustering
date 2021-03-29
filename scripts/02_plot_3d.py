@@ -4,9 +4,6 @@ import os
 # argument parsing helper
 import fire
 
-# these are custom-written functions part of this library
-# which you can find in the src/directional_clustering folder
-
 #JSON file directory
 from directional_clustering import JSON
 
@@ -27,7 +24,7 @@ from directional_clustering.plotters import PlyPlotter
 # Main function: directional_clustering
 # ==============================================================================
 
-def results_plotting(filename="perimeter_supported_slab_m_1_variational kmeans_5",
+def results_plotting(filename,
                      vectorfield_tag="m_1",
                      plot_faces=True,
                      paint_clusters=True,
@@ -36,18 +33,16 @@ def results_plotting(filename="perimeter_supported_slab_m_1_variational kmeans_5
                      plot_original_field=False,
                      plot_cones=False):
     """
-    Plot clustering results stored in JSON file.
+    Makes a 3d plot of a mesh with a vector field.
 
     Parameters
     ----------
     filename : `str`
         The name of the JSON file that stores the clustering resultes w.r.t certain
         \n mesh, attribute, alglrithm and number of clusters.
-        \nAll JSON files must reside in this repo's data/json folder.
-        Defaults to "perimeter_supported_slab_m_1_variational kmeans_5".
 
     vectorfield_tag : `str`
-        The name of the vector field on which clustering has been done, should corresponds
+        The name of the vector field on which clustering has been done, should correspond
         to the `filename`.
         Defaults to "m_1"
 
@@ -104,15 +99,14 @@ def results_plotting(filename="perimeter_supported_slab_m_1_variational kmeans_5
 
     # plot vector fields on mesh as lines
     if plot_vector_fields:
-        clustered_field_name = vectorfield_tag + "_clustered"
+        clustered_field_name = vectorfield_tag + "_k"
         clustered_field_to_plot = mesh_to_plot.vector_field(
             clustered_field_name)
-        plotter.plot_vector_field_lines(mesh_to_plot, clustered_field_to_plot,
-            (0, 0, 255), True, 0.07)
+        plotter.plot_vector_field_lines(mesh_to_plot, clustered_field_to_plot, (0, 0, 255), True, 0.07)
+
     if plot_original_field:
         vectors = mesh_to_plot.vector_field(vectorfield_tag)
-        plotter.plot_vector_field_lines(mesh_to_plot, vectors, (50, 50, 50),
-            True, 0.07)
+        plotter.plot_vector_field_lines(mesh_to_plot, vectors, (50, 50, 50), True, 0.07)
 
     # plot cones
     if plot_cones:

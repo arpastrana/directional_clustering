@@ -1,3 +1,5 @@
+from math import sqrt
+
 # os
 import os
 
@@ -22,6 +24,7 @@ from directional_clustering.mesh import MeshPlus
 
 # clustering algorithms factory
 from directional_clustering.clustering import ClusteringFactory
+from directional_clustering.clustering import distance_cosine
 
 # vector field
 from directional_clustering.fields import VectorField
@@ -35,7 +38,7 @@ from directional_clustering.transformations import smoothen_vector_field
 # Main function: directional_clustering
 # ==============================================================================
 
-def directional_clustering(filename="perimeter_supported_slab",
+def directional_clustering(filename,
                            algo_name="cosine_kmeans",
                            n_clusters=5,
                            iters=30,
@@ -236,12 +239,14 @@ def directional_clustering(filename="perimeter_supported_slab",
         # for every face compute difference between clustering output and
         # aligned+smoothed vector, might be better to compare against the
         # raw vector
-        difference_vector = subtract_vectors(clustered_field.vector(fkey), vectors.vector(fkey))
-        errors[fkey] = length_vector_sqrd(difference_vector)
+        # difference_vector = subtract_vectors(clustered_field.vector(fkey), vectors.vector(fkey))
+        # errors[fkey] = length_vector_sqrd(difference_vector)
+        error = distance_cosine(clustered_field.vector(fkey), vectors.vector(fkey))
+        errors[fkey] = error
 
-    mse = np.mean(errors)
 
-    print("Clustered Field MSE: {}".format(mse))
+    mse = sqrt(np.mean(errors))
+    print("Clustered Field RMSE: {}".format(mse))
 
     # ==============================================================================
     # Assign clusters back to mesh
