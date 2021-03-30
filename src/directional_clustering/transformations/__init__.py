@@ -25,5 +25,9 @@ from __future__ import print_function
 from .align import *
 from .smooth import *
 
+import compas
+if not compas.IPY:
+    from .comb import *
+
 
 __all__ = [name for name in dir() if not name.startswith('_')]

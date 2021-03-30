@@ -9,6 +9,9 @@ import fire
 # good ol' numpy
 import numpy as np
 
+# the almighty libigl giving us a hand
+from igl import comb_cross_field
+
 # geometry helpers
 from compas.geometry import cross_vectors
 from compas.geometry import length_vector
@@ -34,6 +37,7 @@ from directional_clustering.fields import VectorField
 # transformations
 from directional_clustering.transformations import align_vector_field
 from directional_clustering.transformations import smoothen_vector_field
+from directional_clustering.transformations import comb_vector_field
 
 
 # ==============================================================================
@@ -45,6 +49,7 @@ def directional_clustering(filename,
                            n_clusters=4,
                            iters=100,
                            tol=1e-6,
+                           comb_vectors=False,
                            align_vectors=False,
                            alignment_ref=[1.0, 0.0, 0.0],
                            smooth_iters=0,
@@ -151,6 +156,13 @@ def directional_clustering(filename,
 
     if align_vectors:
         align_vector_field(vectors, alignment_ref)
+
+    # ==========================================================================
+    # Comb the vector field -- remember the hair ball theorem (seams exist)
+    # ==========================================================================
+
+    if comb_vectors:
+        vectors = comb_vector_field(vectors, mesh)
 
     # ==========================================================================
     # Apply smoothing to the vector field

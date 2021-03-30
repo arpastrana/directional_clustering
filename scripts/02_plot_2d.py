@@ -16,6 +16,9 @@ import random
 # python standard libraries
 from itertools import cycle
 
+# the almighty libigl giving us a hand
+from igl import comb_line_field
+
 # compas & co
 from compas.utilities import geometric_key_xy
 
@@ -30,6 +33,7 @@ from directional_clustering.fields import VectorField
 
 # transformations
 from directional_clustering.transformations import align_vector_field
+from directional_clustering.transformations import comb_vector_field
 
 #plotters
 from directional_clustering.plotters import MeshPlusPlotter
@@ -40,6 +44,7 @@ from directional_clustering.plotters import MeshPlusPlotter
 # ==============================================================================
 
 def plot_2d(filename,
+            draw_clusters=True,
             draw_vector_fields=True,
             draw_vector_lines=False,
             draw_streamlines=False,
@@ -47,6 +52,7 @@ def plot_2d(filename,
             draw_faces=True,
             draw_edges=False,
             draw_faces_colored=True,
+            comb_fields=False,
             density=1.0
             ):
     """
@@ -133,6 +139,10 @@ def plot_2d(filename,
 
             for vf_name in vf_names:
                 vf = mesh.vector_field(vf_name)
+
+                if comb_fields:
+                    vf = comb_vector_field(vf, mesh)
+
                 color = next(colors)
                 plotter.draw_vector_field(vf, color, same_length, length, width)
 
@@ -162,12 +172,17 @@ def plot_2d(filename,
             XX = XX[1::2, 1::2]
             YY = YY[::2, ::2]
 
+            # do for every vector field
             for vf_name in vf_names:
 
                 vf = mesh.vector_field(vf_name)
 
-                alignment_ref = [0, 1, 0]
-                align_vector_field(vf, alignment_ref)
+                # comb the line field prior to streamlines tracing
+                if comb_fields:
+                    vf = comb_vector_field(vf, mesh)
+
+                # alignment_ref = [0, 1, 0]
+                # align_vector_field(vf, alignment_ref)
 
                 # query vectors from vector field
                 U = []
