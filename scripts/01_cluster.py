@@ -10,13 +10,15 @@ import fire
 import numpy as np
 
 # geometry helpers
-from compas.geometry import subtract_vectors
-from compas.geometry import length_vector_sqrd
+from compas.geometry import cross_vectors
+from compas.geometry import length_vector
+from compas.geometry import scale_vector
+from compas.geometry import dot_vectors
 
 # these are custom-written functions part of this library
 # which you can find in the src/directional_clustering folder
 
-#JSON file directory
+# JSON file directory
 from directional_clustering import JSON
 
 # extended version of Mesh
@@ -89,9 +91,9 @@ def directional_clustering(filename,
         Defaults to 0.5.
     """
 
-    # ==============================================================================
+    # ==========================================================================
     # Set directory of input JSON files
-    # ==============================================================================
+    # ==========================================================================
 
     # Relative path to the JSON file stores the vector fields and the mesh info
     # The JSON files must be stored in the data/json_files folder
@@ -99,15 +101,15 @@ def directional_clustering(filename,
     name_in = filename + ".json"
     json_in = os.path.abspath(os.path.join(JSON, name_in))
 
-    # ==============================================================================
+    # ==========================================================================
     # Import a mesh as an instance of MeshPlus
-    # ==============================================================================
+    # ==========================================================================
 
     mesh = MeshPlus.from_json(json_in)
 
-    # ==============================================================================
+    # ==========================================================================
     # Search for supported vector field attributes and take one choice from user
-    # ==============================================================================
+    # ==========================================================================
 
     # supported vector field attributes
     available_vf = mesh.vector_fields()
@@ -121,15 +123,15 @@ def directional_clustering(filename,
         else:
             print("This vector field is not available. Please try again.")
 
-    # ==============================================================================
+    # ==========================================================================
     # Extract vector field from mesh for clustering
-    # ==============================================================================
+    # ==========================================================================
 
     vectors = mesh.vector_field(vf_name)
 
-    # ==============================================================================
+    # ==========================================================================
     # Align vector field to a reference vector
-    # ==============================================================================
+    # ==========================================================================
 
     # the output of the FEA creates vector fields that are oddly oriented.
     # Eventually, what we want is to create "lines" from this vector
@@ -150,9 +152,9 @@ def directional_clustering(filename,
     if align_vectors:
         align_vector_field(vectors, alignment_ref)
 
-    # ==============================================================================
+    # ==========================================================================
     # Apply smoothing to the vector field
-    # ==============================================================================
+    # ==========================================================================
 
     # moreover, depending on the quality of the initial mesh, the FEA-produced
     # vector field will be very noisy, especially around "singularities".
@@ -172,9 +174,9 @@ def directional_clustering(filename,
     if smooth_iters:
         smoothen_vector_field(vectors, mesh.face_adjacency(), smooth_iters, damping)
 
-    # ==============================================================================
+    # ==========================================================================
     # Do K-means Clustering
-    # ==============================================================================
+    # ==========================================================================
 
     # now we need to put the vector field into numpy arrays to carry out clustering
     # current limitation: at the moment this only works in planar 2d meshes!
@@ -222,9 +224,9 @@ def directional_clustering(filename,
     clustered_field = clusterer.clustered_field
     labels = clusterer.labels
 
-    # ==============================================================================
+    # ==========================================================================
     # Compute mean squared error "loss" of clustering
-    # ==============================================================================
+    # ==========================================================================
 
     # probably would be better to encapsulate this in a function or in a Loss object
     # clustering_error = MeanSquaredError(vector_field, clustered_field)
@@ -244,18 +246,51 @@ def directional_clustering(filename,
     mse = sqrt(np.mean(errors))
     print("Clustered Field RMSE: {}".format(mse))
 
-    # ==============================================================================
-    # Assign clusters back to mesh
-    # ==============================================================================
+    # ==========================================================================
+    # Assign clustered fieldsto mesh
+    # ==========================================================================
 
     # add the clustered vector field as an attribute on the mesh faces
     clustered_field_name = vf_name + "_k"
     mesh.vector_field(clustered_field_name, clustered_field)
     mesh.cluster_labels("cluster", labels)
 
-    # ==============================================================================
+    # add perpendicular field tha preserves magnitude
+    # assumes that vector field name has format foo_bar_1 or baz_2
+    vf_name_parts = vf_name.split("_")
+    for idx, entry in enumerate(vf_name_parts):
+        # exits at the first entry
+        if entry.isnumeric():
+            dir_idx = idx
+            direction = entry
+
+    n_90 = 2
+    if direction == n_90:
+        n_90 = 1
+
+    vf_name_parts[dir_idx] = str(n_90)
+    vf_name_90 = "_".join(vf_name_parts)
+
+    vectors_90 = mesh.vector_field(vf_name_90)
+    clustered_field_90 = VectorField()
+
+    for fkey, vector in clustered_field.items():
+        cvec_90 = cross_vectors(clustered_field[fkey], [0, 0, 1])
+
+        scale = length_vector(vectors_90[fkey])
+
+        if dot_vectors(cvec_90, vectors_90[fkey]):
+            scale *= -1.0
+
+        cvec_90 = scale_vector(cvec_90, scale)
+        clustered_field_90.add_vector(fkey, cvec_90)
+
+    clustered_field_name_90 = vf_name_90 + "_k"
+    mesh.vector_field(clustered_field_name_90, clustered_field_90)
+
+    # ==========================================================================
     # Export new JSON file for further processing
-    # ==============================================================================
+    # ==========================================================================
 
     name_out = "{}_k{}_{}.json".format(filename, n_clusters, vf_name)
     json_out = os.path.abspath(os.path.join(JSON, "clustered", algo_name, name_out))
