@@ -1,7 +1,7 @@
 import numpy as np
 
 
-__all__ = ["distance_cosine"]
+__all__ = ["distance_cosine", "distance_cosine_abs"]
 
 
 def distance_cosine(A, B):
@@ -22,9 +22,39 @@ def distance_cosine(A, B):
 
     Notes
     -----
-    The cosine distance can be expressed 1 - AB.
+    Cosine distance is bounded between 0 and 2, where 2 means the most distant.
+    The cosine distance can be expressed 1 - cosine similarity.
+    The cosine similarity is given by AB / (||A||||B||)
     """
-    return 1.0 - np.dot(A, np.transpose(B)) / (np.linalg.norm(A) * np.linalg.norm(B))
+    cos_sim = np.dot(A, np.transpose(B)) / (np.linalg.norm(A) * np.linalg.norm(B))
+    return 1.0 - cos_sim
+
+
+def distance_cosine_abs(A, B):
+    """
+    Computes the absolute cosine distance between two arrays.
+    Here the absolute value of the cosine similarity is taken.
+
+    Parameters
+    ----------
+    A : `np.array` (n, d)
+        The first array.
+    B : `np.array` (k, d)
+        The second array.
+
+    Returns
+    -------
+    distance : `np.array` (n, k)
+        The distance of each entry in `A` (rows) to every entry in `B` (columns).
+
+    Notes
+    -----
+    The absolute cosine distance is bounded between 0 and 1. 1 means the most distant.
+    The absolute cosine distance can be expressed 1 - abs(cosine similarity).
+    The cosine similarity is given by AB / (||A||||B||)
+    """
+    cos_sim = np.dot(A, np.transpose(B)) / (np.linalg.norm(A) * np.linalg.norm(B))
+    return 1.0 - np.abs(cos_sim)
 
 
 if __name__ == "__main__":

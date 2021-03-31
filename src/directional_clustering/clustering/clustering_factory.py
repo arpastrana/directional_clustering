@@ -1,5 +1,6 @@
 from directional_clustering.clustering import ClusteringAlgorithm
 from directional_clustering.clustering import CosineKMeans
+from directional_clustering.clustering import CosineAbsoluteKMeans
 from directional_clustering.clustering import VariationalKMeans
 
 
@@ -52,6 +53,7 @@ class ClusteringFactory(object):
 
 # Register supported algorithms
 ClusteringFactory.register("cosine_kmeans", CosineKMeans)
+ClusteringFactory.register("cosine_abs_kmeans", CosineAbsoluteKMeans)
 ClusteringFactory.register("variational_kmeans", VariationalKMeans)
 
 
