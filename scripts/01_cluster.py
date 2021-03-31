@@ -9,9 +9,6 @@ import fire
 # good ol' numpy
 import numpy as np
 
-# the almighty libigl giving us a hand
-from igl import comb_cross_field
-
 # geometry helpers
 from compas.geometry import cross_vectors
 from compas.geometry import length_vector
@@ -29,7 +26,7 @@ from directional_clustering.mesh import MeshPlus
 
 # clustering algorithms factory
 from directional_clustering.clustering import ClusteringFactory
-from directional_clustering.clustering import distance_cosine
+from directional_clustering.clustering import distance_cosine_abs
 
 # vector field
 from directional_clustering.fields import VectorField
@@ -251,7 +248,7 @@ def directional_clustering(filename,
         # raw vector
         # difference_vector = subtract_vectors(clustered_field.vector(fkey), vectors.vector(fkey))
         # errors[fkey] = length_vector_sqrd(difference_vector)
-        error = distance_cosine(clustered_field.vector(fkey), vectors.vector(fkey))
+        error = distance_cosine_abs(clustered_field.vector(fkey), vectors.vector(fkey))
         errors[fkey] = error
 
 
