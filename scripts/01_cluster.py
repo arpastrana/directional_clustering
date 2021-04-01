@@ -26,6 +26,7 @@ from directional_clustering.mesh import MeshPlus
 
 # clustering algorithms factory
 from directional_clustering.clustering import ClusteringFactory
+from directional_clustering.clustering import distance_cosine
 from directional_clustering.clustering import distance_cosine_abs
 
 # vector field
@@ -35,6 +36,7 @@ from directional_clustering.fields import VectorField
 from directional_clustering.transformations import align_vector_field
 from directional_clustering.transformations import smoothen_vector_field
 from directional_clustering.transformations import comb_vector_field
+from directional_clustering.transformations import transformed_stress_vector_fields
 
 
 # ==============================================================================
@@ -50,7 +52,9 @@ def directional_clustering(filename,
                            align_vectors=False,
                            alignment_ref=[1.0, 0.0, 0.0],
                            smooth_iters=0,
-                           damping=0.5):
+                           damping=0.5,
+                           stress_type=None,
+                           stress_transf_ref=[1.0, 0.0, 0.0]):
     """
     Clusters a vector field that has been defined on a mesh. Exports a JSON file.
 
@@ -248,21 +252,21 @@ def directional_clustering(filename,
         # raw vector
         # difference_vector = subtract_vectors(clustered_field.vector(fkey), vectors.vector(fkey))
         # errors[fkey] = length_vector_sqrd(difference_vector)
-        error = distance_cosine_abs(clustered_field.vector(fkey), vectors.vector(fkey))
+        error = distance_cosine(clustered_field.vector(fkey), vectors.vector(fkey))
         errors[fkey] = error
 
-
-    mse = sqrt(np.mean(errors))
-    print("Clustered Field RMSE: {}".format(mse))
+    mse = np.mean(errors)
+    print("Clustered Field Mean Error (Cosine Distances): {}".format(mse))
 
     # ==========================================================================
-    # Assign clustered fieldsto mesh
+    # Assign cluster labels to mesh
     # ==========================================================================
 
-    # add the clustered vector field as an attribute on the mesh faces
-    clustered_field_name = vf_name + "_k"
-    mesh.vector_field(clustered_field_name, clustered_field)
     mesh.cluster_labels("cluster", labels)
+
+    # ==========================================================================
+    # Generate field orthogonal to the clustered field
+    # ==========================================================================
 
     # add perpendicular field tha preserves magnitude
     # assumes that vector field name has format foo_bar_1 or baz_2
@@ -293,6 +297,20 @@ def directional_clustering(filename,
 
         cvec_90 = scale_vector(cvec_90, scale)
         clustered_field_90.add_vector(fkey, cvec_90)
+
+    # ==========================================================================
+    # Scale fields based on stress transformations
+    # ==========================================================================
+
+    args = [mesh, (clustered_field, clustered_field_90), stress_type, stress_transf_ref]
+    clustered_field, clustered_field_90 = transformed_stress_vector_fields(*args)
+
+    # ==========================================================================
+    # Assign clustered fields to mesh
+    # ==========================================================================
+
+    clustered_field_name = vf_name + "_k"
+    mesh.vector_field(clustered_field_name, clustered_field)
 
     clustered_field_name_90 = vf_name_90 + "_k"
     mesh.vector_field(clustered_field_name_90, clustered_field_90)
