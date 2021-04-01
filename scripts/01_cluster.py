@@ -109,6 +109,9 @@ def directional_clustering(filename,
 
     mesh = MeshPlus.from_json(json_in)
 
+    for vkey, attrs in mesh.vertex.items():
+        print(vkey, attrs)
+
     # ==========================================================================
     # Search for supported vector field attributes and take one choice from user
     # ==========================================================================

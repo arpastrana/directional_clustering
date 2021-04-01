@@ -56,9 +56,11 @@ def plot_2d(filename,
             draw_colorbar=False,
             draw_edges=False,
             comb_fields=False,
-            align_fields_to=None,
+            align_field_1_to=None,
+            align_field_2_to=None,
             streamlines_density=0.75,
             save_img=False,
+            pad_inches=0.0,
             show_img=True
             ):
     """
@@ -99,6 +101,7 @@ def plot_2d(filename,
     json_in = os.path.abspath(os.path.join(JSON, name_in))
 
     mesh = MeshPlus.from_json(json_in)
+
 
     # ClusterPlotter is a custom wrapper around a COMPAS MeshPlotter
     plotter = MeshPlusPlotter(mesh, figsize=(16, 9), dpi=300)
@@ -162,10 +165,7 @@ def plot_2d(filename,
             cbar_label = clm["cbar_label"]
 
             for fkey in mesh.faces():
-
                 data[fkey] = f(vf_a[fkey], vf_b[fkey])
-                # data[fkey] = distance_cosine_abs(vf_a[fkey], vf_b[fkey])
-                # data[fkey] = angle_vectors(vf_a[fkey], vf_b[fkey], deg=True)
 
             ticks = np.linspace(data.min(), data.max(), 7)
             ticks_labels = [np.round(x, 2) for x in ticks]
@@ -223,8 +223,8 @@ def plot_2d(filename,
                 print("This vector field is not available. Please try again.")
 
         if draw_vector_fields:
-            # colors = cycle([(0, 0, 255), (255, 0, 0), (0, 255, 0), (0, 0, 0)])
-            colors = cycle([(235, 45, 125), (0, 165, 0), (0, 0, 255), (0, 0, 0)])
+            colors = cycle([(0, 0, 255), (255, 0, 0), (0, 255, 0), (0, 0, 0)])
+            # colors = cycle([(235, 45, 125), (0, 165, 0), (0, 0, 255), (0, 0, 0)])
             # colors for all vector related matters
 
             # vector field drawing parameters -- better of being exposed?
@@ -244,29 +244,50 @@ def plot_2d(filename,
         if draw_streamlines:
             colors = cycle([(0, 0, 255), (255, 0, 0), (0, 255, 0), (0, 0, 0)])
 
-            # gather all x and y coordinates
-            xs = set()
-            ys = set()
+            # get bounding box for all the mesh vertices
+            vx = []
+            vy = []
+            for vkey in mesh.vertices():
+                vx.append(mesh.vertex_attribute(vkey, name="x"))
+                vy.append(mesh.vertex_attribute(vkey, name="y"))
+
+            vxmin = min(vx)
+            vxmax = max(vx)
+            vymin = min(vy)
+            vymax = max(vy)
+
+            # create linear spaces on x and y
+            pe = 0.01
+            vxdiff = vxmax - vxmin
+            vydiff = vymax - vymin
+
+            X = np.linspace(vxmin + pe * vxdiff, vxmax - pe * vxdiff, len(set(vx)))
+            Y = np.linspace(vymin + pe * vydiff, vymax - pe * vydiff, len(set(vy)))
+            XX, YY = np.meshgrid(X, Y)
+
+            # gather gkey maps
             gkey_fkey = {}
             gkey_xyz = {}
-
+            xyz = []
             for fkey in mesh.faces():
+
+                xyz.append(mesh.face_centroid(fkey))
                 gkey = geometric_key_xy(mesh.face_centroid(fkey))
                 gkey_xyz[gkey] = mesh.face_centroid(fkey)
                 gkey_fkey[gkey] = fkey
 
-                x, y = gkey.split(",")
-                xs.add(float(x))
-                ys.add(float(y))
+            # build search tree
+            search_tree = KDTree(objects=xyz)
 
-            # make a grid out of x and y
-            X = sorted(list(xs))
-            Y = sorted(list(ys))
-            XX, YY = np.meshgrid(X, Y)
+            # select vectors for dot product alignment
+            alignment_vectors = []
+            alignment_map_xy = {"X": [1.0, 0.0, 0.0], "Y": [0.0, 1.0, 0.0]}
+            for align_to in (align_field_1_to, align_field_2_to):
+                if align_to in alignment_map_xy:
+                    alignment_vectors.append(alignment_map_xy[align_to])
 
-            # TODO: hack for triangular square-ish meshes
-            XX = XX[1::2, 1::2]
-            YY = YY[::2, ::2]
+            if len(alignment_vectors) > 0:
+                alignment_vectors_cycle = cycle(alignment_vectors)
 
             # do for every vector field
             for vf_name in vf_names:
@@ -277,23 +298,24 @@ def plot_2d(filename,
                 if comb_fields:
                     vf = comb_vector_field(vf, mesh)
 
-                if align_fields_to:
-                    alignment_ref = align_fields_to
-                    align_vector_field(vf, alignment_ref)
+                if len(alignment_vectors) > 0:
+                    print("aligning")
+                    alignment_vector = next(alignment_vectors_cycle)
+                    align_vector_field(vf, alignment_vector)
 
                 # query vectors from vector field
                 U = []
                 V = []
                 for xx, yy in zip(XX.flatten(), YY.flatten()):
-                    gkey = geometric_key_xy([xx, yy, 0.0])
+                    # strictly 2d
+                    test_xyz = [xx, yy, 0.0]
+                    near_xyz, _, _ = search_tree.nearest_neighbor(test_xyz)
 
-                    try:
-                        fkey = gkey_fkey[gkey]
-                        # grab only the first two coordinates
-                        u, v = vf[fkey][:2]
-                    except KeyError:
-                        u = np.nan
-                        v = np.nan
+                    # generate grid gkey
+                    # gkey = geometric_key_xy([xx, yy, 0.0])
+                    gkey = geometric_key_xy(near_xyz)
+                    fkey = gkey_fkey[gkey]
+                    u, v = vf[fkey][:2]
 
                     U.append(u)
                     V.append(v)
@@ -315,7 +337,7 @@ def plot_2d(filename,
         img_name = filename.split("/")[-1] + "_" + dt + ".png"
         img_path = os.path.abspath(os.path.join(DATA, "images", img_name))
         plt.tight_layout()
-        plotter.save(img_path, bbox_inches='tight', pad_inches=0)
+        plotter.save(img_path, bbox_inches='tight', pad_inches=pad_inches)
         print("Saved image to : {}".format(img_path))
 
     # show to screen
