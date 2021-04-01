@@ -19,6 +19,7 @@ from datetime import datetime
 
 # compas & co
 from compas.geometry import angle_vectors
+from compas.geometry import length_vector
 from compas.geometry import KDTree
 from compas.utilities import geometric_key_xy
 
@@ -39,8 +40,6 @@ from directional_clustering.transformations import comb_vector_field
 
 # plotters
 from directional_clustering.plotters import MeshPlusPlotter
-from directional_clustering.plotters import rgb_colors
-
 
 # ==============================================================================
 # Plot a lot of information in 2d
@@ -59,6 +58,9 @@ def plot_2d(filename,
             align_field_1_to=None,
             align_field_2_to=None,
             streamlines_density=0.75,
+            streamlines_lw=None,
+            vector_fields_scale=0.05,
+            vector_fields_same_scale=True,
             save_img=False,
             pad_inches=0.0,
             show_img=True
@@ -71,37 +73,13 @@ def plot_2d(filename,
     filename : `str`
         The name of the JSON file that stores the clustering resultes w.r.t certain
         \n mesh, attribute, alglrithm and number of clusters.
-
-    plot_faces : `bool`
-        Plots the faces of the input mesh.
-        \nDefaults to True.
-
-    paint_clusters : `bool`
-        Color up the faces according to their cluster
-        \nDefaults to True.
-
-    plot_mesh_edges : `bool`
-        Plots the edges of the input mesh.
-        \nDefaults to False.
-
-    plot_vector_fields : `bool`
-        Plots the clustered vector field atop of the input mesh.
-        \nDefaults to True.
-
-    plot_original_field : `bool`
-        Plots the original vector field before clustering atop of the input mesh.
-        \nDefaults to False.
-
-    plot_cones : `bool`
-        Plots the cones atop of the input mesh.
-        \nDefaults to False.
     """
+
     # load a mesh from a JSON file
     name_in = filename + ".json"
     json_in = os.path.abspath(os.path.join(JSON, name_in))
 
     mesh = MeshPlus.from_json(json_in)
-
 
     # ClusterPlotter is a custom wrapper around a COMPAS MeshPlotter
     plotter = MeshPlusPlotter(mesh, figsize=(16, 9), dpi=300)
@@ -229,8 +207,8 @@ def plot_2d(filename,
 
             # vector field drawing parameters -- better of being exposed?
             width = 0.5
-            length = 0.05
-            same_length = True
+            scale = vector_fields_scale
+            same_scale = vector_fields_same_scale
 
             for vf_name in vf_names:
                 vf = mesh.vector_field(vf_name)
@@ -239,7 +217,7 @@ def plot_2d(filename,
                     vf = comb_vector_field(vf, mesh)
 
                 color = next(colors)
-                plotter.draw_vector_field(vf, color, same_length, length, width)
+                plotter.draw_vector_field(vf, color, same_scale, scale, width)
 
         if draw_streamlines:
             colors = cycle([(0, 0, 255), (255, 0, 0), (0, 255, 0), (0, 0, 0)])
@@ -257,6 +235,7 @@ def plot_2d(filename,
             vymax = max(vy)
 
             # create linear spaces on x and y
+            # offset inwards by 1%
             pe = 0.01
             vxdiff = vxmax - vxmin
             vydiff = vymax - vymin
@@ -270,7 +249,6 @@ def plot_2d(filename,
             gkey_xyz = {}
             xyz = []
             for fkey in mesh.faces():
-
                 xyz.append(mesh.face_centroid(fkey))
                 gkey = geometric_key_xy(mesh.face_centroid(fkey))
                 gkey_xyz[gkey] = mesh.face_centroid(fkey)
@@ -299,20 +277,23 @@ def plot_2d(filename,
                     vf = comb_vector_field(vf, mesh)
 
                 if len(alignment_vectors) > 0:
-                    print("aligning")
                     alignment_vector = next(alignment_vectors_cycle)
                     align_vector_field(vf, alignment_vector)
 
                 # query vectors from vector field
                 U = []
                 V = []
+                LV = []
+
+                if streamlines_lw is not None:
+                    streamlines_lw = float(streamlines_lw)
+
                 for xx, yy in zip(XX.flatten(), YY.flatten()):
                     # strictly 2d
                     test_xyz = [xx, yy, 0.0]
                     near_xyz, _, _ = search_tree.nearest_neighbor(test_xyz)
 
                     # generate grid gkey
-                    # gkey = geometric_key_xy([xx, yy, 0.0])
                     gkey = geometric_key_xy(near_xyz)
                     fkey = gkey_fkey[gkey]
                     u, v = vf[fkey][:2]
@@ -320,8 +301,27 @@ def plot_2d(filename,
                     U.append(u)
                     V.append(v)
 
+                    # compute lineweights
+                    LV.append(length_vector(vf[fkey]))
+
                 U = np.reshape(U, XX.shape)
                 V = np.reshape(V, XX.shape)
+
+
+                LW = []
+                if streamlines_lw:
+
+                    for value in LV:
+                        centered_val = (value - min(LV))  # in case min is not 0
+                        ratio = centered_val / max(LV)
+                        ratio = streamlines_lw * ratio
+                        LW.append(ratio + 1)  # add one to not have invisible lines
+
+                    LW = np.reshape(LW, XX.shape)
+
+                # filter lineweights for match streamplot's signature
+                if len(LW) == 0:
+                    LW = None
 
                 # plot streamlines
                 plt.streamplot(XX, YY, U, V,
@@ -329,7 +329,8 @@ def plot_2d(filename,
                                arrowsize=0.2,
                                maxlength=20.0,
                                minlength=0.1,
-                               density=streamlines_density)
+                               density=streamlines_density,
+                               linewidth=LW)
 
     # save image
     if save_img:

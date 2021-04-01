@@ -1,0 +1,372 @@
+# mathilicious
+from math import fabs
+
+# os
+import os
+
+# argument parsing helper
+import fire
+
+# hello numpy, my old friend
+import numpy as np
+
+# plots and beyond
+import matplotlib.pyplot as plt
+
+# python standard libraries
+from itertools import cycle
+from functools import partial
+
+# time is running out
+from datetime import datetime
+
+# compas & co
+from compas.geometry import angle_vectors
+from compas.geometry import length_vector
+from compas.geometry import KDTree
+from compas.utilities import geometric_key_xy
+
+# Library file directories
+from directional_clustering import DATA
+from directional_clustering import JSON
+
+# extended version of Mesh
+from directional_clustering.mesh import MeshPlus
+
+# clustering distances
+from directional_clustering.clustering import distance_cosine
+
+# transformations
+from directional_clustering.transformations import align_vector_field
+from directional_clustering.transformations import comb_vector_field
+
+# analysis
+from directional_clustering.analysis import principal_stresses_and_angles
+from directional_clustering.analysis import transformed_stresses
+from directional_clustering.analysis import bending_stresses
+
+# plotters
+from directional_clustering.plotters import MeshPlusPlotter
+from directional_clustering.plotters import rgb_colors
+
+# ==============================================================================
+# Plot a lot of information in 2d
+# ==============================================================================
+
+def plot_2d(filename,
+            draw_vector_fields=False,
+            draw_streamlines=False,
+            draw_boundary_edges=True,
+            draw_faces=False,
+            draw_faces_centroids=False,
+            color_faces=None,
+            draw_colorbar=False,
+            draw_edges=False,
+            comb_fields=False,
+            align_field_1_to=None,
+            align_field_2_to=None,
+            streamlines_density=0.75,
+            save_img=False,
+            pad_inches=0.0,
+            show_img=True
+            ):
+    """
+    Makes a 3d plot of a mesh with a vector field.
+
+    Parameters
+    ----------
+    filename : `str`
+        The name of the JSON file that stores the clustering resultes w.r.t certain
+        \n mesh, attribute, alglrithm and number of clusters.
+
+    plot_faces : `bool`
+        Plots the faces of the input mesh.
+        \nDefaults to True.
+
+    paint_clusters : `bool`
+        Color up the faces according to their cluster
+        \nDefaults to True.
+
+    plot_mesh_edges : `bool`
+        Plots the edges of the input mesh.
+        \nDefaults to False.
+
+    plot_vector_fields : `bool`
+        Plots the clustered vector field atop of the input mesh.
+        \nDefaults to True.
+
+    plot_original_field : `bool`
+        Plots the original vector field before clustering atop of the input mesh.
+        \nDefaults to False.
+
+    plot_cones : `bool`
+        Plots the cones atop of the input mesh.
+        \nDefaults to False.
+    """
+    # load a mesh from a JSON file
+    name_in = filename + ".json"
+    json_in = os.path.abspath(os.path.join(JSON, name_in))
+
+    mesh = MeshPlus.from_json(json_in)
+
+    # ClusterPlotter is a custom wrapper around a COMPAS MeshPlotter
+    plotter = MeshPlusPlotter(mesh, figsize=(16, 9), dpi=300)
+    if draw_boundary_edges:
+        plotter.draw_edges(keys=list(mesh.edges_on_boundary()))
+
+    # draw mesh edges
+    if draw_edges:
+        plotter.draw_edges()
+
+    # color up the faces of the mesh according to their cluster
+    if draw_faces or draw_faces_centroids:
+        cmap = None
+        data = np.zeros(mesh.number_of_faces())
+        sorted_fkeys = sorted(list(mesh.faces()))
+
+        if color_faces == "bending_stress":
+            HEIGHT = 0.15 * 100  # shell thickness, centimeters
+            REF_VECTOR = [1.0, 0.0, 0.0]
+            moment_names = ["mx", "my", "mxy"]
+
+            # select a vector field to take as the basis for transformation
+            available_vf = mesh.vector_fields()
+            print("Avaliable vector fields on the mesh are:\n", available_vf)
+
+            while True:
+                vf_name = input("Please select a vector field to take as the basis for transformation: ")
+                if vf_name in available_vf:
+                    break
+                else:
+                    print("This vector field is not available. Please try again.")
+
+            vf = mesh.vector_field(vf_name)
+            # TODO: taking m_1 as reference. does it always hold?
+            vf_ref = mesh.vector_field("m_1")
+
+            # choose the bending moment to display
+            print("Avaliable bending moments on the mesh are:\n", moment_names)
+
+            while True:
+                b_name = input("Please select the bending moment to display: ")
+                if b_name in moment_names:
+                    break
+                else:
+                    print("This bending moment is not available. Please try again.")
+
+            # choose the layer to compute the stresses at
+            shell_layers = {"top": 1.0, "bottom": -1.0, "bending": 0.0}
+            print("Avaliable bending moments on the mesh are:\n", shell_layers)
+
+            while True:
+                l_name = input("Please select the layer to compute the stresses at: ")
+                if l_name in shell_layers:
+                    z_factor = shell_layers[l_name]
+                    break
+                else:
+                    print("This layer is not available. Please try again.")
+
+            # transform bending moments
+            data = np.zeros(mesh.number_of_faces())
+            sorted_fkeys = sorted(list(mesh.faces()))
+
+            for fkey in sorted_fkeys:
+                # get bending information
+                mx, my, mxy = mesh.face_attributes(fkey, names=moment_names)
+                # generate principal bending moments
+                m1a, m2a = principal_stresses_and_angles(mx, my, mxy)
+                m1, angle1 = m1a
+                # compute delta between reference vector and principal bending vector
+                # TODO: will take m1 as reference. does this always hold?
+                vec_ref = vf_ref[fkey]
+                delta = angle1 - angle_vectors(vec_ref, REF_VECTOR)
+
+                # add delta to target transformation vector field
+                vec = vf[fkey]
+                theta = delta + angle_vectors(vec, REF_VECTOR)
+
+                # transform bending moments with theta
+                btrans = transformed_stresses(mx, my, mxy, theta)
+
+                # convert bending moments into stress
+                if z_factor:
+                    bx, by, bxy = [b * 1.0 for b in btrans]
+                    z = HEIGHT * z_factor * 0.5
+                    btrans = bending_stresses(bx, by, bxy, z, HEIGHT)
+
+                bmap = {k: v for k, v in zip(moment_names, btrans)}
+
+                # store the relevant transformed bending
+                data[fkey] = bmap[b_name]
+
+                # convert name for display
+                bname_map = {"mx": "m1", "my": "m2", "mxy": "m12"}
+                bname_out = bname_map[b_name]
+
+                # create label for color map
+                if draw_colorbar:
+                    if l_name == "bending":
+                        cbar_label = "{}: Bending Moment [kNm/m]".format(bname_out)
+                    else:
+                        cbar_label = "{}: {}: Stress [kN/cm2]".format(bname_out, l_name)
+
+            cmap = "Spectral"  # Spectral, BrBG, viridis, PiYG
+            ticks = np.linspace(data.min(), data.max(), 7)
+            ticks_labels = [np.round(x, 2) for x in ticks]
+            extend = "both"
+
+        if draw_faces:
+
+            collection = plotter.draw_faces(keys=sorted_fkeys)
+
+        elif draw_faces_centroids:
+
+            points = []
+            for fkey in sorted_fkeys:
+                point = {}
+                point["pos"] = mesh.face_centroid(fkey)
+                point["radius"] = 0.03
+                point["edgewidth"] = 0.10
+                points.append(point)
+
+            collection = plotter.draw_points(points)
+
+        collection.set(array=data, cmap=cmap)
+        collection.set_linewidth(lw=0.0)
+
+        if draw_colorbar:
+            colorbar = plt.colorbar(collection,
+                                    shrink=0.9,
+                                    pad=0.01,
+                                    extend=extend,
+                                    extendfrac=0.05,
+                                    ax=plotter.axes,
+                                    aspect=30,
+                                    orientation="vertical")
+
+            colorbar.set_ticks(ticks)
+            colorbar.ax.set_yticklabels(ticks_labels)
+            colorbar.set_label(cbar_label, fontsize="xx-large")
+
+    # plot vector fields on mesh as lines
+    if draw_streamlines:
+        # supported vector field attributes
+        available_vf = mesh.vector_fields()
+        print("Avaliable vector fields on the mesh are:\n", available_vf)
+
+        # the name of the vector field to cluster.
+        vf_names = []
+        while True:
+            vf_name = input("Please select the vector fields to draw. Type 'ok' to stop adding vector fields: ")
+            if vf_name in available_vf:
+                if vf_name not in vf_names:
+                    vf_names.append(vf_name)
+            elif vf_name == "ok":
+                break
+            else:
+                print("This vector field is not available. Please try again.")
+
+            colors = cycle([(0, 0, 255), (255, 0, 0), (0, 255, 0), (0, 0, 0)])
+
+        # get bounding box for all the mesh vertices
+        vx = []
+        vy = []
+        for vkey in mesh.vertices():
+            vx.append(mesh.vertex_attribute(vkey, name="x"))
+            vy.append(mesh.vertex_attribute(vkey, name="y"))
+
+        vxmin = min(vx)
+        vxmax = max(vx)
+        vymin = min(vy)
+        vymax = max(vy)
+
+        # create linear spaces on x and y
+        pe = 0.01
+        vxdiff = vxmax - vxmin
+        vydiff = vymax - vymin
+
+        X = np.linspace(vxmin + pe * vxdiff, vxmax - pe * vxdiff, len(set(vx)))
+        Y = np.linspace(vymin + pe * vydiff, vymax - pe * vydiff, len(set(vy)))
+        XX, YY = np.meshgrid(X, Y)
+
+        # gather gkey maps
+        gkey_fkey = {}
+        gkey_xyz = {}
+        xyz = []
+        for fkey in mesh.faces():
+
+            xyz.append(mesh.face_centroid(fkey))
+            gkey = geometric_key_xy(mesh.face_centroid(fkey))
+            gkey_xyz[gkey] = mesh.face_centroid(fkey)
+            gkey_fkey[gkey] = fkey
+
+        # build search tree
+        search_tree = KDTree(objects=xyz)
+
+        # select vectors for dot product alignment
+        alignment_vectors = []
+        alignment_map_xy = {"X": [1.0, 0.0, 0.0], "Y": [0.0, 1.0, 0.0]}
+        for align_to in (align_field_1_to, align_field_2_to):
+            if align_to in alignment_map_xy:
+                alignment_vectors.append(alignment_map_xy[align_to])
+
+        if len(alignment_vectors) > 0:
+            alignment_vectors_cycle = cycle(alignment_vectors)
+
+        # do for every vector field
+        for vf_name in vf_names:
+
+            vf = mesh.vector_field(vf_name)
+
+            # comb the line field prior to streamlines tracing
+            if comb_fields:
+                vf = comb_vector_field(vf, mesh)
+
+            if len(alignment_vectors) > 0:
+                print("aligning")
+                alignment_vector = next(alignment_vectors_cycle)
+                align_vector_field(vf, alignment_vector)
+
+            # query vectors from vector field
+            U = []
+            V = []
+            for xx, yy in zip(XX.flatten(), YY.flatten()):
+                # strictly 2d
+                test_xyz = [xx, yy, 0.0]
+                near_xyz, _, _ = search_tree.nearest_neighbor(test_xyz)
+
+                # generate grid gkey
+                gkey = geometric_key_xy(near_xyz)
+                fkey = gkey_fkey[gkey]
+                u, v = vf[fkey][:2]
+
+                U.append(u)
+                V.append(v)
+
+            U = np.reshape(U, XX.shape)
+            V = np.reshape(V, XX.shape)
+
+            # plot streamlines
+            plt.streamplot(XX, YY, U, V,
+                           color=[i / 255.0 for i in next(colors)],
+                           arrowsize=0.2,
+                           maxlength=20.0,
+                           minlength=0.1,
+                           density=streamlines_density)
+    # save image
+    if save_img:
+        dt = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+        img_name = filename.split("/")[-1] + "_" + dt + ".png"
+        img_path = os.path.abspath(os.path.join(DATA, "images", img_name))
+        plt.tight_layout()
+        plotter.save(img_path, bbox_inches='tight', pad_inches=pad_inches)
+        print("Saved image to : {}".format(img_path))
+
+    # show to screen
+    if show_img:
+        plotter.show()
+
+
+
+if __name__ == '__main__':
+    fire.Fire(plot_2d)
