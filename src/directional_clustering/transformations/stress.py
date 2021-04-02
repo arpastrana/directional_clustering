@@ -138,11 +138,7 @@ if __name__ == "__main__":
     sigmax = -80
     sigmay = 50
     sigmaxy = -25
-    theta = -30  # degrees
-
-    for i in (0.0, pi, 2*pi):
-        sigmai = transformed_stresses(sigmax, sigmay, sigmaxy, i)
-        print(i, sigmai)
+    theta = -30  # -30 degrees
 
     for i in (45, 135, 225, 315):
         sigmai = transformed_stresses(sigmax, sigmay, sigmaxy, radians(i))

@@ -49,10 +49,10 @@ def plot_2d(filename,
             draw_vector_fields=False,
             draw_streamlines=False,
             draw_boundary_edges=True,
-            draw_faces=False,
-            draw_faces_centroids=False,
-            color_faces=None,
-            draw_colorbar=False,
+            draw_faces=True,
+            draw_faces_centroids=True,
+            color_faces="clusters",
+            draw_colorbar=True,
             draw_edges=False,
             comb_fields=False,
             align_field_1_to=None,
@@ -61,9 +61,9 @@ def plot_2d(filename,
             streamlines_lw=None,
             vector_fields_scale=0.05,
             vector_fields_same_scale=True,
-            save_img=False,
+            save_img=True,
             pad_inches=0.0,
-            show_img=True
+            show_img=False
             ):
     """
     Makes a 3d plot of a mesh with a vector field.

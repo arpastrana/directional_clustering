@@ -1,6 +1,3 @@
-# mathilicious
-from math import fabs
-
 # os
 import os
 

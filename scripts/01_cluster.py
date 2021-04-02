@@ -1,5 +1,3 @@
-from math import sqrt
-
 # os
 import os
 
@@ -14,9 +12,6 @@ from compas.geometry import cross_vectors
 from compas.geometry import length_vector
 from compas.geometry import scale_vector
 from compas.geometry import dot_vectors
-
-# these are custom-written functions part of this library
-# which you can find in the src/directional_clustering folder
 
 # JSON file directory
 from directional_clustering import JSON
@@ -43,6 +38,7 @@ from directional_clustering.transformations import transformed_stress_vector_fie
 # Main function: directional_clustering
 # ==============================================================================
 
+
 def directional_clustering(filename,
                            algo_name="cosine_kmeans",
                            n_clusters=4,
@@ -53,7 +49,6 @@ def directional_clustering(filename,
                            alignment_ref=[1.0, 0.0, 0.0],
                            smooth_iters=0,
                            damping=0.5,
-                           stress_type=None,
                            stress_transf_ref=[1.0, 0.0, 0.0]):
     """
     Clusters a vector field that has been defined on a mesh. Exports a JSON file.
@@ -301,6 +296,14 @@ def directional_clustering(filename,
     # ==========================================================================
     # Scale fields based on stress transformations
     # ==========================================================================
+
+    while True:
+        stress_type = input("What stress type are we looking at, bending or axial? ")
+
+        if stress_type in ["bending", "axial"]:
+            break
+        else:
+            print("Hmm...That's neither axial nor bending. Please try again.")
 
     args = [mesh, (clustered_field, clustered_field_90), stress_type, stress_transf_ref]
     clustered_field, clustered_field_90 = transformed_stress_vector_fields(*args)
