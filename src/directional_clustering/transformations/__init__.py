@@ -25,6 +25,9 @@ from __future__ import print_function
 from .align import *
 from .smooth import *
 from .stress import *
+from .strain import *
+from .work import *
+from .volume import *
 
 import compas
 if not compas.IPY:
