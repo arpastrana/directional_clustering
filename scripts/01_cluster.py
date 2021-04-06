@@ -322,7 +322,7 @@ def directional_clustering(filename,
     # Export new JSON file for further processing
     # ==========================================================================
 
-    name_out = "{}_k{}_{}.json".format(filename, n_clusters, vf_name)
+    name_out = "{}_k{}_{}_smooth{}.json".format(filename, n_clusters, vf_name, smooth_iters)
     json_out = os.path.abspath(os.path.join(JSON, "clustered", algo_name, name_out))
     mesh.to_json(json_out)
     print("Exported clustered vector field with mesh to: {}".format(json_out))

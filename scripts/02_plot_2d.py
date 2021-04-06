@@ -41,6 +41,25 @@ from directional_clustering.transformations import comb_vector_field
 # plotters
 from directional_clustering.plotters import MeshPlusPlotter
 
+
+# ==============================================================================
+# Matplotlib beautification
+# ==============================================================================
+
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif', size=20)
+plt.rc('axes', linewidth=1.5)
+plt.rc('axes', labelsize=15)
+plt.rc('xtick', labelsize=20, direction="in")
+plt.rc('ytick', labelsize=20, direction="in")
+plt.rc('legend', fontsize=15)
+
+# setting xtick parameters:
+plt.rc('xtick.major', size=10, pad=4)
+plt.rc('xtick.minor', size=5, pad=4)
+plt.rc('ytick.major', size=10)
+plt.rc('ytick.minor', size=5)
+
 # ==============================================================================
 # Plot a lot of information in 2d
 # ==============================================================================
@@ -59,7 +78,7 @@ def plot_2d(filename,
             align_field_2_to=None,
             streamlines_density=0.75,
             streamlines_lw=None,
-            vector_fields_scale=0.05,
+            vector_fields_scale=0.03,
             vector_fields_same_scale=True,
             save_img=True,
             pad_inches=0.0,
@@ -82,7 +101,7 @@ def plot_2d(filename,
     mesh = MeshPlus.from_json(json_in)
 
     # ClusterPlotter is a custom wrapper around a COMPAS MeshPlotter
-    plotter = MeshPlusPlotter(mesh, figsize=(16, 9), dpi=300)
+    plotter = MeshPlusPlotter(mesh, figsize=(16, 9), dpi=600)
     if draw_boundary_edges:
         plotter.draw_edges(keys=list(mesh.edges_on_boundary()))
 
@@ -118,8 +137,8 @@ def plot_2d(filename,
                                           "cbar_label": "Angular Difference [Deg]",
                                           "func": partial(angle_vectors, deg=True)},
                                "cosine_distance":  {"cmap": "RdPu",
-                                                    "cbar_label": "Cosine Distance [0 - 1]",
-                                                    "func": distance_cosine_abs}}
+                                                    "cbar_label": "Cosine Distance",
+                                                    "func": distance_cosine}}
 
             available_vf = mesh.vector_fields()
             print("Avaliable vector fields on the mesh are:\n", available_vf)
@@ -180,7 +199,7 @@ def plot_2d(filename,
 
             colorbar.set_ticks(ticks)
             colorbar.ax.set_yticklabels(ticks_labels)
-            colorbar.set_label(cbar_label, fontsize="xx-large")
+            colorbar.set_label(cbar_label, fontsize="large")
 
     # plot vector fields on mesh as lines
     if draw_vector_fields or draw_streamlines:

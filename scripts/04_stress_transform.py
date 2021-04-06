@@ -31,6 +31,25 @@ from directional_clustering.transformations import bending_stresses
 # plotters
 from directional_clustering.plotters import MeshPlusPlotter
 
+
+# ==============================================================================
+# Matplotlib beautification
+# ==============================================================================
+
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif', size=20)
+plt.rc('axes', linewidth=1.5)
+plt.rc('axes', labelsize=15)
+plt.rc('xtick', labelsize=20)
+plt.rc('ytick', labelsize=20)
+plt.rc('legend', fontsize=15)
+
+# setting xtick parameters:
+plt.rc('xtick.major', size=10, pad=4)
+plt.rc('xtick.minor', size=5, pad=4)
+plt.rc('ytick.major', size=10)
+plt.rc('ytick.minor', size=5)
+
 # ==============================================================================
 # Plot a lot of information in 2d
 # ==============================================================================
@@ -228,7 +247,7 @@ def plot_2d(filename,
 
             colorbar.set_ticks(ticks)
             colorbar.ax.set_yticklabels(ticks_labels)
-            colorbar.set_label(cbar_label, fontsize="xx-large")
+            colorbar.set_label(cbar_label, fontsize="large")
 
     # save image
     if save_img:

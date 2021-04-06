@@ -40,23 +40,48 @@ from directional_clustering.fields import VectorField
 from directional_clustering.transformations import align_vector_field
 from directional_clustering.transformations import smoothen_vector_field
 from directional_clustering.transformations import comb_vector_field
+from directional_clustering.transformations import transformed_stress_vector_fields
 
 # plotters
 from directional_clustering.plotters import MeshPlusPlotter
 from directional_clustering.plotters import rgb_colors
 
 
-plt.rcParams.update({
-    "font.family": "sans-serif",
-    "font.sans-serif": ["Helvetica"]})
+# ==============================================================================
+# Matplotlib beautification
+# ==============================================================================
 
+# plt.rcParams.update({
+#     "font.family": "sans-serif",
+#     "font.sans-serif": ["Helvetica"]})
+
+plt.rcParams['figure.facecolor'] = 'white'
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif', size=20)
+plt.rc('axes', linewidth=1.5)
+plt.rc('axes', labelsize=15)
+plt.rc('xtick', labelsize=20, direction="in")
+plt.rc('ytick', labelsize=20, direction="in")
+plt.rc('legend', fontsize=15)
+
+# setting xtick parameters:
+plt.rc('xtick.major', size=10, pad=4)
+plt.rc('xtick.minor', size=5, pad=4)
+plt.rc('ytick.major', size=10)
+plt.rc('ytick.minor', size=5)
+
+# ==============================================================================
+# Additional Functions
+# ==============================================================================
 
 def plot_mesh_clusters(mesh, labels, draw_faces, filename, save_img):
+    """
+    Plot the cluster labels of a mesh.
+    """
+
     # ClusterPlotter is a custom wrapper around a COMPAS MeshPlotter
     plotter = MeshPlusPlotter(mesh, figsize=(16, 9), dpi=100)
     plotter.draw_edges(keys=list(mesh.edges_on_boundary()))
-    # face_colors = rgb_colors(labels)
-    # plotter.draw_faces(facecolor=face_colors)
 
     data = np.zeros(mesh.number_of_faces())
     sorted_fkeys = sorted(list(mesh.faces()))
@@ -98,7 +123,7 @@ def plot_mesh_clusters(mesh, labels, draw_faces, filename, save_img):
 
     colorbar.set_ticks(ticks)
     colorbar.ax.set_yticklabels(ticks_labels)
-    colorbar.set_label("Directional Clusters", fontsize="xx-large")
+    colorbar.set_label("Directional Clusters", fontsize="large")
 
     if save_img:
         dt = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
@@ -117,16 +142,18 @@ def plot_mesh_clusters(mesh, labels, draw_faces, filename, save_img):
 def directional_clustering(filenames,
                            vf_name,
                            algo_name="cosine_kmeans",
+                           n_init=5,
                            n_clusters_max=10,
+                           eps=1,
                            iters=100,
                            tol=1e-6,
+                           stop_early=False,
                            comb_vectors=False,
                            align_vectors=False,
                            alignment_ref=[1.0, 0.0, 0.0],
                            smooth_iters=0,
                            damping=0.5,
-                           stop_early=False,
-                           eps=1,
+                           save_json=True,
                            save_img=False,
                            draw_faces=True):
     """
@@ -175,7 +202,7 @@ def directional_clustering(filenames,
     # Make a plot
     # ==========================================================================
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(9, 6))
 
     # ==========================================================================
     # Set directory of input JSON files
@@ -187,97 +214,108 @@ def directional_clustering(filenames,
     if isinstance(filenames, str):
         filenames = [filenames]
 
-    for filename in filenames:
+    if isinstance(smooth_iters, int):
+        smooth_iters = [smooth_iters] * len(filenames)
+
+    for filename, smooth_iter in zip(filenames, smooth_iters):
+
+        print("\nWorking now with: {}".format(filename))
 
         name_in = filename + ".json"
         json_in = os.path.abspath(os.path.join(JSON, name_in))
 
-        # ==========================================================================
-        # Import a mesh as an instance of MeshPlus
-        # ==========================================================================
+    # ==========================================================================
+    # Import a mesh as an instance of MeshPlus
+    # ==========================================================================
 
         mesh = MeshPlus.from_json(json_in)
 
-        # ==========================================================================
-        # Search for supported vector field attributes and take one choice from user
-        # ==========================================================================
-
-        # supported vector field attributes
-        # available_vf = mesh.vector_fields()
-        # print("Avaliable vector fields on the mesh are:\n", available_vf)
-
-        # # the name of the vector field to cluster.
-        # while True:
-        #     vf_name = input("Please choose one vector field to cluster:")
-        #     if vf_name in available_vf:
-        #         break
-        #     else:
-        #         print("This vector field is not available. Please try again.")
-
-        # ==========================================================================
-        # Extract vector field from mesh for clustering
-        # ==========================================================================
+    # ==========================================================================
+    # Extract vector field from mesh for clustering
+    # ==========================================================================
 
         vectors = mesh.vector_field(vf_name)
         vectors_raw = mesh.vector_field(vf_name)
 
-        # ==========================================================================
-        # Align vector field to a reference vector
-        # ==========================================================================
+    # ==========================================================================
+    # Align vector field to a reference vector
+    # ==========================================================================
 
         if align_vectors:
             align_vector_field(vectors, alignment_ref)
 
-        # ==========================================================================
-        # Comb the vector field -- remember the hair ball theorem (seams exist)
-        # ==========================================================================
+    # ==========================================================================
+    # Comb the vector field -- remember the hair ball theorem (seams exist)
+    # ==========================================================================
 
         if comb_vectors:
             vectors = comb_vector_field(vectors, mesh)
 
-        # ==========================================================================
-        # Apply smoothing to the vector field
-        # ==========================================================================
+    # ==========================================================================
+    # Apply smoothing to the vector field
+    # ==========================================================================
 
-        if smooth_iters:
-            smoothen_vector_field(vectors, mesh.face_adjacency(), smooth_iters, damping)
+        if smooth_iter:
+            print("Smoothing vector field for {} iterations".format(smooth_iter))
+            smoothen_vector_field(vectors, mesh.face_adjacency(), smooth_iter, damping)
 
-        # ==========================================================================
-        # Do K-means Clustering
-        # ==========================================================================
+    # ==========================================================================
+    # Do K-means Clustering
+    # ==========================================================================
 
         errors = []
-        marker = []
-        markersize = [0.01] * n_clusters_max
         reached = False
 
         for i in range(1, n_clusters_max + 1):
             print()
             print("Clustering started...")
             print("Generating {} clusters".format(i))
-            # Create an instance of a clustering algorithm from ClusteringFactory
-            clustering_algo = ClusteringFactory.create(algo_name)
-            clusterer = clustering_algo(mesh, vectors, i, iters, tol)
-            clusterer.cluster()
+
+
+            # perform n different initializations because of random seeding
+            error_best = np.inf
+            clusterer_best = None
+
+            for _ in range(n_init):
+
+                # Create an instance of a clustering algorithm from ClusteringFactory
+                clustering_algo = ClusteringFactory.create(algo_name)
+                clusterer = clustering_algo(mesh, vectors, i, iters, tol)
+                clusterer.cluster()
+                clustered_field = clusterer.clustered_field
+
+    # ==========================================================================
+    # Compute "loss" of clustering
+    # ==========================================================================
+
+                field_errors = np.zeros(mesh.number_of_faces())
+                for fkey in mesh.faces():
+                    error = distance_cosine(clustered_field.vector(fkey), vectors_raw.vector(fkey))
+                    field_errors[fkey] = error
+                error = np.mean(field_errors)
+
+                # pick best contender
+                if error < error_best:
+                    error_best = error
+                    clusterer_best = clusterer
+
             print("Clustering ended!")
+            print("Clustered Field Mean Error (Cosine Distances) after {} init: {}".format(n_init, error_best))
+
+    # ==========================================================================
+    # Store data
+    # ==========================================================================
+
+            # record best error after n initializations
+            errors.append(error_best)
 
             # store results in clustered_field and labels
-            clustered_field = clusterer.clustered_field
-            labels = clusterer.labels
+            clustered_field = clusterer_best.clustered_field
+            labels = clusterer_best.labels
 
-            # ==========================================================================
-            # Compute "loss" of clustering
-            # ==========================================================================
-
-            field_errors = np.zeros(mesh.number_of_faces())
-            for fkey in mesh.faces():
-                error = distance_cosine(clustered_field.vector(fkey), vectors_raw.vector(fkey))
-                field_errors[fkey] = error
-
-            error = np.mean(field_errors)
-            print("Clustered Field Mean Error (Cosine Distances): {}".format(error))
-
-            errors.append(error)
+    # ==========================================================================
+    # Store data
+    # ==========================================================================
 
             # plot image
             if save_img:
@@ -286,34 +324,111 @@ def directional_clustering(filenames,
             if i < 2:
                 continue
 
-            delta_error = (errors[-2] - errors[-1]) / errors[-1]
-            print("Delta error: {}".format(delta_error))
+            # delta_error = (errors[-2] - errors[-1]) / errors[-1]
+            # print("Delta error: {}".format(delta_error))
 
-            if fabs(delta_error) <= eps:
+            if fabs(error_best) <= eps:
                 print("Convergence threshold of {} reached".format(eps))
 
                 if not reached:
                     k_best = i
-                    k_best_error = error
+                    k_best_error = error_best
+                    clustered_field_best = clustered_field
+                    labels_best = labels
                     reached = True
 
                 if stop_early:
                     print("Stopping early...")
                     break
 
-        # ==========================================================================
-        # Plot errors
-        # ==========================================================================
+    # ==========================================================================
+    # Plot errors
+    # ==========================================================================
 
-        plot = ax.plot(errors, label=filename, zorder=1)
-
+        plot_label = r"\_".join(filename.split("_"))
+        plot = ax.plot(errors, label=plot_label, zorder=1)
         c = plot[0].get_color()
-        ax.scatter(k_best - 1, k_best_error, marker='D', color=c, zorder=2)
+        ax.scatter(k_best - 1, k_best_error, marker='D', s=100, color=c, zorder=2)
+
+    # ==========================================================================
+    # Variable reassignment for convencience
+    # ==========================================================================
+
+        labels = labels_best
+        clustered_field = clustered_field_best
+
+    # ==========================================================================
+    # Assign cluster labels to mesh
+    # ==========================================================================
+
+        mesh.cluster_labels("cluster", labels)
+
+    # ==========================================================================
+    # Generate field orthogonal to the clustered field
+    # ==========================================================================
+
+        # add perpendicular field tha preserves magnitude
+        # assumes that vector field name has format foo_bar_1 or baz_2
+        vf_name_parts = vf_name.split("_")
+        for idx, entry in enumerate(vf_name_parts):
+            # exits at the first entry
+            if entry.isnumeric():
+                dir_idx = idx
+                direction = entry
+
+        n_90 = 2
+        if direction == n_90:
+            n_90 = 1
+
+        vf_name_parts[dir_idx] = str(n_90)
+        vf_name_90 = "_".join(vf_name_parts)
+
+        vectors_90 = mesh.vector_field(vf_name_90)
+        clustered_field_90 = VectorField()
+
+        for fkey, _ in clustered_field.items():
+            cvec_90 = cross_vectors(clustered_field[fkey], [0, 0, 1])
+
+            scale = length_vector(vectors_90[fkey])
+
+            if dot_vectors(cvec_90, vectors_90[fkey]):
+                scale *= -1.0
+
+            cvec_90 = scale_vector(cvec_90, scale)
+            clustered_field_90.add_vector(fkey, cvec_90)
+
+    # ==========================================================================
+    # Scale fields based on stress transformations
+    # ==========================================================================
+
+        args = [mesh, (clustered_field, clustered_field_90), "bending", [1.0, 0.0, 0.0]]
+        clustered_field, clustered_field_90 = transformed_stress_vector_fields(*args)
+
+    # ==========================================================================
+    # Assign clustered fields to mesh
+    # ==========================================================================
+
+        clustered_field_name = vf_name + "_k"
+        mesh.vector_field(clustered_field_name, clustered_field)
+
+        clustered_field_name_90 = vf_name_90 + "_k"
+        mesh.vector_field(clustered_field_name_90, clustered_field_90)
+
+    # ==========================================================================
+    # Export new JSON file for further processing
+    # ==========================================================================
+
+        if save_json:
+            name_out = "{}_k{}_{}_eps_{}_smooth_{}.json".format(filename, k_best, vf_name, eps, smooth_iter)
+            json_out = os.path.abspath(os.path.join(JSON, "clustered", algo_name, name_out))
+            mesh.to_json(json_out)
+            print("Exported clustered vector field with mesh to: {}".format(json_out))
 
     # ==========================================================================
     # Customize plot
     # ==========================================================================
 
+    plt.title(r"Best number of clusters $\hat{k}$", size=30)
     ax.grid(b=None, which='major', axis='both', linestyle='--')
 
     max_clusters = n_clusters_max
@@ -321,10 +436,21 @@ def directional_clustering(filenames,
     ax.set_xticks(ticks=list(range(0, max_clusters)))
     ax.set_xticklabels(labels=list(range(1, max_clusters + 1)))
 
-    ax.set_xlabel("Number of Clusters")
-    ax.set_ylabel(r"Loss - $\mathcal{L}$")
+    ax.set_xlabel(r"Number of Clusters $k$", size=25)
+    ax.set_ylabel(r"Loss $\mathcal{L}$", size=25)
 
     ax.legend()
+
+    # ==========================================================================
+    # Save the plot
+    # ==========================================================================
+
+    dt = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    img_name = "k_best" + "_" + dt + ".png"
+    img_path = os.path.abspath(os.path.join(DATA, "images", img_name))
+    plt.tight_layout()
+    plt.savefig(img_path, bbox_inches='tight', pad_inches=0.1, dpi=600)
+    print("Saved image to : {}".format(img_path))
 
     # ==========================================================================
     # Show the plot
