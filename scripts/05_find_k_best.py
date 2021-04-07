@@ -51,10 +51,6 @@ from directional_clustering.plotters import rgb_colors
 # Matplotlib beautification
 # ==============================================================================
 
-# plt.rcParams.update({
-#     "font.family": "sans-serif",
-#     "font.sans-serif": ["Helvetica"]})
-
 plt.rcParams['figure.facecolor'] = 'white'
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif', size=20)
@@ -64,7 +60,7 @@ plt.rc('xtick', labelsize=20, direction="in")
 plt.rc('ytick', labelsize=20, direction="in")
 plt.rc('legend', fontsize=15)
 
-# setting xtick parameters:
+# setting xtick parameters
 plt.rc('xtick.major', size=10, pad=4)
 plt.rc('xtick.minor', size=5, pad=4)
 plt.rc('ytick.major', size=10)
@@ -74,7 +70,7 @@ plt.rc('ytick.minor', size=5)
 # Additional Functions
 # ==============================================================================
 
-def plot_mesh_clusters(mesh, labels, draw_faces, filename, save_img):
+def plot_mesh_clusters(mesh, labels, draw_faces, draw_colorbar, filename, save_img):
     """
     Plot the cluster labels of a mesh.
     """
@@ -108,22 +104,24 @@ def plot_mesh_clusters(mesh, labels, draw_faces, filename, save_img):
             point["edgewidth"] = 0.10
             points.append(point)
 
-            collection = plotter.draw_points(points)
+        collection = plotter.draw_points(points)
 
     collection.set(array=data, cmap=cmap)
     collection.set_linewidth(lw=0.0)
-    colorbar = plt.colorbar(collection,
-                            shrink=0.9,
-                            pad=0.01,
-                            extend=extend,
-                            extendfrac=0.05,
-                            ax=plotter.axes,
-                            aspect=30,
-                            orientation="vertical")
 
-    colorbar.set_ticks(ticks)
-    colorbar.ax.set_yticklabels(ticks_labels)
-    colorbar.set_label("Directional Clusters", fontsize="large")
+    if draw_colorbar:
+        colorbar = plt.colorbar(collection,
+                                shrink=0.9,
+                                pad=0.01,
+                                extend=extend,
+                                extendfrac=0.05,
+                                ax=plotter.axes,
+                                aspect=30,
+                                orientation="vertical")
+
+        colorbar.set_ticks(ticks)
+        colorbar.ax.set_yticklabels(ticks_labels)
+        colorbar.set_label("Directional Clusters", fontsize="large")
 
     if save_img:
         dt = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
@@ -144,7 +142,7 @@ def directional_clustering(filenames,
                            algo_name="cosine_kmeans",
                            n_init=5,
                            n_clusters_max=10,
-                           eps=1,
+                           eps=0.02,  # loss value threshold
                            iters=100,
                            tol=1e-6,
                            stop_early=False,
@@ -153,9 +151,11 @@ def directional_clustering(filenames,
                            alignment_ref=[1.0, 0.0, 0.0],
                            smooth_iters=0,
                            damping=0.5,
-                           save_json=True,
+                           plot_loss=True,
+                           draw_colorbar=False,
+                           save_json=False,
                            save_img=False,
-                           draw_faces=True):
+                           draw_faces=False):
     """
     Clusters a vector field that has been defined on a mesh. Exports a JSON file.
 
@@ -164,38 +164,6 @@ def directional_clustering(filenames,
     filename : `str`
         The name of the JSON file that encodes a mesh.
         All JSON files must reside in this repo's data/json folder.
-
-    algo_name : `str`
-        The name of the algorithm to cluster the vector field.
-        \nSupported options are `cosine_kmeans` and `variational_kmeans`.
-
-    n_clusters : `int`
-        The number of clusters to generate.
-
-    iters : `int`
-        The number of iterations to run the clustering algorithm for.
-
-    tol : `float`
-        A small threshold value that marks clustering convergence.
-        \nDefaults to 1e-6.
-
-    align_vectors : `bool`
-        Flag to align vectors relative to a reference vector.
-        \nDefaults to False.
-
-    alignment_ref : `list` of `float`
-        The reference vector for alignment.
-        \nDefaults to [1.0, 0.0, 0.0].
-
-    smooth_iters : `int`
-        The number iterations of Laplacian smoothing on the vector field.
-        \nIf set to 0, no smoothing will take place.
-        Defaults to 0.
-
-    damping : `float`
-        A value between 0.0 and 1.0 to control the intensity of the smoothing.
-        \nZero technically means no smoothing. One means maximum smoothing.
-        Defaults to 0.5.
     """
 
     # ==========================================================================
@@ -319,7 +287,7 @@ def directional_clustering(filenames,
 
             # plot image
             if save_img:
-                plot_mesh_clusters(mesh, labels, draw_faces, filename, save_img)
+                plot_mesh_clusters(mesh, labels, draw_faces, draw_colorbar, filename, save_img)
 
             if i < 2:
                 continue
@@ -345,10 +313,12 @@ def directional_clustering(filenames,
     # Plot errors
     # ==========================================================================
 
-        plot_label = r"\_".join(filename.split("_"))
-        plot = ax.plot(errors, label=plot_label, zorder=1)
-        c = plot[0].get_color()
-        ax.scatter(k_best - 1, k_best_error, marker='D', s=100, color=c, zorder=2)
+        if plot_loss:
+
+            plot_label = r"\_".join(filename.split("_"))
+            plot = ax.plot(errors, label=plot_label, zorder=1)
+            c = plot[0].get_color()
+            ax.scatter(k_best - 1, k_best_error, marker='D', s=100, color=c, zorder=2)
 
     # ==========================================================================
     # Variable reassignment for convencience
@@ -428,35 +398,37 @@ def directional_clustering(filenames,
     # Customize plot
     # ==========================================================================
 
-    plt.title(r"Best number of clusters $\hat{k}$", size=30)
-    ax.grid(b=None, which='major', axis='both', linestyle='--')
+    if plot_loss:
 
-    max_clusters = n_clusters_max
+        plt.title(r"Best number of clusters $\hat{k}$", size=30)
+        ax.grid(b=None, which='major', axis='both', linestyle='--')
 
-    ax.set_xticks(ticks=list(range(0, max_clusters)))
-    ax.set_xticklabels(labels=list(range(1, max_clusters + 1)))
+        max_clusters = n_clusters_max
 
-    ax.set_xlabel(r"Number of Clusters $k$", size=25)
-    ax.set_ylabel(r"Loss $\mathcal{L}$", size=25)
+        ax.set_xticks(ticks=list(range(0, max_clusters)))
+        ax.set_xticklabels(labels=list(range(1, max_clusters + 1)))
 
-    ax.legend()
+        ax.set_xlabel(r"Number of Clusters $k$", size=25)
+        ax.set_ylabel(r"Loss $\mathcal{L}$", size=25)
+
+        ax.legend()
 
     # ==========================================================================
     # Save the plot
     # ==========================================================================
 
-    dt = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-    img_name = "k_best" + "_" + dt + ".png"
-    img_path = os.path.abspath(os.path.join(DATA, "images", img_name))
-    plt.tight_layout()
-    plt.savefig(img_path, bbox_inches='tight', pad_inches=0.1, dpi=600)
-    print("Saved image to : {}".format(img_path))
+        dt = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+        img_name = "k_best" + "_" + dt + ".png"
+        img_path = os.path.abspath(os.path.join(DATA, "images", img_name))
+        plt.tight_layout()
+        plt.savefig(img_path, bbox_inches='tight', pad_inches=0.1, dpi=600)
+        print("Saved image to : {}".format(img_path))
 
     # ==========================================================================
     # Show the plot
     # ==========================================================================
 
-    plt.show()
+        plt.show()
 
 
 if __name__ == '__main__':

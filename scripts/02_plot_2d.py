@@ -70,7 +70,7 @@ def plot_2d(filename,
             draw_boundary_edges=True,
             draw_faces=True,
             draw_faces_centroids=False,
-            color_faces="clusters",
+            color_faces=None,
             draw_colorbar=True,
             draw_edges=False,
             comb_fields=False,
@@ -157,12 +157,12 @@ def plot_2d(filename,
             vf_b = mesh.vector_field(vf_name_b)
 
             clm = color_label_map[color_faces]
-            f = clm["func"]
+            func = clm["func"]
             cmap = clm["cmap"]
             cbar_label = clm["cbar_label"]
 
             for fkey in mesh.faces():
-                data[fkey] = f(vf_a[fkey], vf_b[fkey])
+                data[fkey] = func(vf_a[fkey], vf_b[fkey])
 
             ticks = np.linspace(data.min(), data.max(), 7)
             ticks_labels = [np.round(x, 2) for x in ticks]
@@ -184,22 +184,23 @@ def plot_2d(filename,
 
             collection = plotter.draw_points(points)
 
-        collection.set(array=data, cmap=cmap)
-        collection.set_linewidth(lw=0.0)
+        if cmap:
+            collection.set(array=data, cmap=cmap)
+            collection.set_linewidth(lw=0.0)
 
-        if draw_colorbar:
-            colorbar = plt.colorbar(collection,
-                                    shrink=0.9,
-                                    pad=0.01,
-                                    extend=extend,
-                                    extendfrac=0.05,
-                                    ax=plotter.axes,
-                                    aspect=30,
-                                    orientation="vertical")
+            if draw_colorbar:
+                colorbar = plt.colorbar(collection,
+                                        shrink=0.9,
+                                        pad=0.01,
+                                        extend=extend,
+                                        extendfrac=0.05,
+                                        ax=plotter.axes,
+                                        aspect=30,
+                                        orientation="vertical")
 
-            colorbar.set_ticks(ticks)
-            colorbar.ax.set_yticklabels(ticks_labels)
-            colorbar.set_label(cbar_label, fontsize="large")
+                colorbar.set_ticks(ticks)
+                colorbar.ax.set_yticklabels(ticks_labels)
+                colorbar.set_label(cbar_label, fontsize="large")
 
     # plot vector fields on mesh as lines
     if draw_vector_fields or draw_streamlines:
