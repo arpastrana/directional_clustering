@@ -122,16 +122,16 @@ def centroids_associate(X, W, d_func):
     """
 
     # compute the norms of the rows
-    xn = rows_norm(X)
-    wn = rows_norm(W)
+    # xn = rows_norm(X)
+    # wn = rows_norm(W)
 
-    # check for nan's
-    if np.isnan(wn).any():
-        raise Exception("There's a NaN in wn: {}".format(wn))
+    # # check for nan's
+    # if np.isnan(wn).any():
+    #     raise Exception("There's a NaN in wn: {}".format(wn))
 
     # normalize rows
-    X = X / xn
-    W = W / wn
+    # X = X / xn
+    # W = W / wn
 
     # set nan's to zero for numerical stability
     W[np.nonzero(np.isnan(W))] = 0.0

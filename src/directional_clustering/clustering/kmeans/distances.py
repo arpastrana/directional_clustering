@@ -4,6 +4,22 @@ import numpy as np
 __all__ = ["distance_cosine", "distance_cosine_abs", "distance_euclidean"]
 
 
+def cosine_similarity(A, B):
+    """
+    Computes the cosine distance between two arrays.
+    """
+    def rows_norm(M):
+        return np.linalg.norm(M, ord=2, axis=1, keepdims=True)
+
+    A = np.atleast_2d(A)
+    B = np.atleast_2d(B)
+
+    A = A / rows_norm(A)
+    B = B / rows_norm(B)
+
+    return np.dot(A, np.transpose(B))
+
+
 def distance_cosine(A, B):
     """
     Computes the cosine distance between two arrays.
@@ -26,9 +42,7 @@ def distance_cosine(A, B):
     The cosine distance can be expressed 1 - cosine similarity.
     The cosine similarity is given by AB / (||A||||B||)
     """
-    cos_sim = np.dot(A, np.transpose(B)) / (np.linalg.norm(A) * np.linalg.norm(B))
-
-    return 1.0 - cos_sim
+    return 1.0 - cosine_similarity(A, B)
 
 
 def distance_cosine_abs(A, B):
@@ -54,9 +68,7 @@ def distance_cosine_abs(A, B):
     The absolute cosine distance can be expressed 1 - abs(cosine similarity).
     The cosine similarity is given by AB / (||A||||B||)
     """
-    cos_sim = np.dot(A, np.transpose(B)) / (np.linalg.norm(A) * np.linalg.norm(B))
-
-    return 1.0 - np.abs(cos_sim)
+    return 1.0 - np.abs(cosine_similarity(A, B))
 
 
 def distance_euclidean(A, B):
