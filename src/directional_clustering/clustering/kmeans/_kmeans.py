@@ -129,7 +129,7 @@ class KMeans(ClusteringAlgorithm):
 
         W = kmeans_initialize(X, 1, replace)
 
-        for _ in range(k-1):
+        for _ in range(k - 1):
             labels, W, _ = self._cluster(X, W, self.distance_func, self.iters, self.tol, False)
 
             values = W[labels]

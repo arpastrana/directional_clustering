@@ -2,6 +2,7 @@ from directional_clustering.clustering import ClusteringAlgorithm
 from directional_clustering.clustering import CosineKMeans
 from directional_clustering.clustering import CosineAbsoluteKMeans
 from directional_clustering.clustering import VariationalKMeans
+from directional_clustering.clustering import EuclideanKMeans
 
 
 __all__ = ["ClusteringFactory"]
@@ -55,6 +56,7 @@ class ClusteringFactory(object):
 ClusteringFactory.register("cosine_kmeans", CosineKMeans)
 ClusteringFactory.register("cosine_abs_kmeans", CosineAbsoluteKMeans)
 ClusteringFactory.register("variational_kmeans", VariationalKMeans)
+ClusteringFactory.register("euclidean_kmeans", EuclideanKMeans)
 
 
 if __name__ == "__main__":
