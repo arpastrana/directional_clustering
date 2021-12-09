@@ -88,9 +88,9 @@ class MeshPlus(Mesh):
         return attr_vectorfield
 
 
-    def clustering_label(self, name, labels=None):
+    def cluster_labels(self, name, labels=None):
         """
-        Gets or sets cluster labels on a mesh.
+        Gets or sets cluster labels on the faces of a mesh.
 
         Parameters
         -----------

@@ -109,7 +109,8 @@ class KMeans(ClusteringAlgorithm):
 
     def _create_seeds(self, metric):
         """
-        Find the initial seeds using random picking without replacement.
+        Find the initial seeds using an interative farthest-point strategy.
+        The first seed is picked at random, without replacement.
 
         Parameters
         ----------
@@ -129,11 +130,12 @@ class KMeans(ClusteringAlgorithm):
 
         W = kmeans_initialize(X, 1, replace)
 
-        for _ in range(k-1):
+        for _ in range(k - 1):
             labels, W, _ = self._cluster(X, W, self.distance_func, self.iters, self.tol, False)
 
             values = W[labels]
 
+            # TODO: Replace pairwise_distances with custom method
             distances = pairwise_distances(X, values, metric=metric)
             distances = np.diagonal(distances).reshape(-1, 1)
 
@@ -152,10 +154,14 @@ class KMeans(ClusteringAlgorithm):
         It sets `self._clustered_field`, `self_labels`, `self.centers`, and `self.loss`.
         Returns `None`.
         """
+        # convert list of vectors to an array
         X = np.array(self.vector_field.to_sequence())
-        r = self._cluster(X, self.seeds, self.distance_func, self.iters, self.tol, False)
 
+        # perform the clustering
+        r = self._cluster(X, self.seeds, self.distance_func, self.iters, self.tol, False)
         labels, centers, losses = r
+
+        # fetch assigned centroid to each entry in the vector field
         clusters = centers[labels]
 
         # create a new vector field

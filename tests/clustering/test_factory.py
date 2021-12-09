@@ -21,7 +21,7 @@ def supported_algorithms():
     A list with the names of all the supported clustering algorithms.
     TODO: This should be automatically queried, not hand-written!
     """
-    supported = ["variational kmeans", "cosine kmeans"]
+    supported = ["variational_kmeans", "cosine_kmeans"]
     return supported
 
 
