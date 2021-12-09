@@ -17,6 +17,5 @@ sphinx ==2.4
 twine
 scikit-learn ==0.23.2
 
-
 # install this package
 -e .

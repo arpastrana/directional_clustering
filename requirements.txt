@@ -1,6 +1,4 @@
-COMPAS>=0.16.1
+COMPAS==1.8.1
+plotly==4.13.0
 variational_clustering @ git+https://github.com/arpastrana/variational_clustering.git@9fbd30efeba6ab3d3255ac2ef13f9ed6574002b0
-
-plotly == 4.13.0
-
 fire
