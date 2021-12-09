@@ -31,8 +31,8 @@ plt.rc('text', usetex=True)
 plt.rc('font', family='serif', size=20)
 plt.rc('axes', linewidth=1.5)
 plt.rc('axes', labelsize=15)
-plt.rc('xtick', labelsize=20, direction="in")
-plt.rc('ytick', labelsize=20, direction="in")
+plt.rc('xtick', labelsize=10, direction="in")
+plt.rc('ytick', labelsize=10, direction="in")
 plt.rc('legend', fontsize=15)
 
 # setting xtick parameters:
@@ -52,11 +52,15 @@ def plot_kmeans_vectors(data, labels, normalize=False, scale_to_max=True, draw_c
     data : np.array
         The vector field converted into a numpy array.
     """
+    seeds = [[11.890863876751077, 0.3545110676123977, 0.0], [2.053814486492628, -2.3074225319656225, 0.0], [1.7771751346256537, 1.9988816547970614, 0.0], [6.669670813796596, -2.87886820459424, 0.0]]
+    seeds = np.array(seeds)
+
     if scale_to_max or normalize:
         norm_data = np.linalg.norm(data, axis=1, keepdims=True)
 
     if scale_to_max:
         data = data / np.amax(norm_data)
+        seeds = seeds / np.amax(norm_data)
 
     if normalize:
         data = data / np.linalg.norm(data, axis=1, keepdims=True)
@@ -64,6 +68,7 @@ def plot_kmeans_vectors(data, labels, normalize=False, scale_to_max=True, draw_c
     n_clusters = np.amax(labels) + 1  # assumes labels are in ascending order and start at zero
     cmap = plt.cm.get_cmap('rainbow', n_clusters)  # to match that in 02_plot_2d.py
 
+    centroids = []
     for i in range(n_clusters):
 
         X = data[np.nonzero(labels == i)]
@@ -71,10 +76,11 @@ def plot_kmeans_vectors(data, labels, normalize=False, scale_to_max=True, draw_c
 
         pos = [X[:, 0], X[:, 1]]
         centroid = [centroid[0], centroid[1]]
+        centroids.append(centroid)
         axislabels = ["X direction [kN]", "Y direction [kN]"]
 
         if scale_to_max:
-            axislabels = ["X direction", "Y direction"]
+            axislabels = ["X", "Y"]
 
         if flip_xy:
             for mlist in (pos, centroid, axislabels):
@@ -85,25 +91,32 @@ def plot_kmeans_vectors(data, labels, normalize=False, scale_to_max=True, draw_c
         plt.scatter(pos[0], pos[1], s=15, alpha=0.2, color=sc_color, label=sclabel)
 
         if draw_centroids:
-            # plt.scatter(centroid[0], centroid[1], marker="x", color="black", s=200)
 
-            # a = np.array([0.0, centroid[0]])  # start line at the origin
-            # b = np.array([0.0, centroid[1]])  # start line at the origin
+            # lines from origin
+            plt.scatter(centroid[0], centroid[1], marker="x", color="black", s=200)
+            a = np.array([0.0, centroid[0]])  # start line at the origin
+            b = np.array([0.0, centroid[1]])  # start line at the origin
+            plt.plot(a, b, color="black", linewidth=0.75)  # plot line
 
-            # plt.plot(a, b, color=sc_color, linewidth=0.75)
-            width = 0.001
-            plt.arrow(0, 0, centroid[0], centroid[1],
-                      color="dimgray",
-                      ls="-",
-                      width=width,
-                      head_width=20*width,
-                      head_length=20*width)
+            # plt.scatter(seeds[:, 0], seeds[:, 1], marker="s", color="black", s=100)
+            # plt.plot([seeds, centroid, color='black', lw="--")
 
-    # plt.axes()
-    plt.grid(b=None, which='major', axis='both', linestyle='--', linewidth=0.5)
+            # width = 0.001
+            # plt.arrow(0, 0, centroid[0], centroid[1],
+            #           color="dimgray",
+            #           ls="-",
+            #           width=width,
+            #           head_width=20*width,
+            #           head_length=20*width)
 
-    plt.xlabel(axislabels[0], size=15)
-    plt.ylabel(axislabels[1], size=15)
+    # plt.scatter(seeds[:, 0], seeds[:, 1], marker="x", color="black", s=100)
+    # for seed, centroid in zip(seeds, centroids):
+    #     plt.plot(np.array([seed[0], centroid[0]]), np.array([seed[1], centroid[1]]), color='black', ls="--")
+
+    # plt.grid(b=None, which='major', axis='both', linestyle='--', linewidth=0.5)
+    # plt.xlabel(axislabels[0], size=15)
+    # plt.ylabel(axislabels[1], size=15)
+
     plt.legend(loc="best", fontsize="xx-small", markerscale=3)
 
 
@@ -118,8 +131,8 @@ def plot_vectors_2d(filename,
                     normalize=False,
                     scale_to_max=False,
                     flip_xy=False,
-                    show_plot=True,
-                    save_img=True,
+                    show_img=True,
+                    save_img=False,
                     figsize=(6, 8)):
     """
     Make a plot of a vector field and its clusters. No mesh.
@@ -138,7 +151,6 @@ def plot_vectors_2d(filename,
         labels_array[fkey] = int(label)
 
     # get vector field
-    available_vf = mesh.vector_fields()
     vf = mesh.vector_field(vf_name)
 
     # smooth vector field
@@ -151,7 +163,7 @@ def plot_vectors_2d(filename,
         vectors_array[fkey, :] = vector
 
     # plot?
-    fig = plt.figure(figsize=figsize)
+    plt.figure(figsize=figsize)
     plot_kmeans_vectors(vectors_array,
                         labels_array,
                         normalize=normalize,
@@ -160,7 +172,7 @@ def plot_vectors_2d(filename,
                         flip_xy=flip_xy)
 
     # customize plot
-    plt.title("{Cluster Assignments on Vector Field}")
+    # plt.title("{Cluster Assignments on Vector Field}")
 
     # save
     if save_img:
@@ -172,12 +184,13 @@ def plot_vectors_2d(filename,
         print("Saved image to : {}".format(img_path))
 
     # show plot
-    if show_plot:
+    if show_img:
         plt.show()
 
 # ==============================================================================
 # Executable
 # ==============================================================================
+
 
 if __name__ == '__main__':
     fire.Fire(plot_vectors_2d)

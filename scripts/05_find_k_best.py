@@ -32,6 +32,7 @@ from directional_clustering.mesh import MeshPlus
 # clustering algorithms factory
 from directional_clustering.clustering import ClusteringFactory
 from directional_clustering.clustering import distance_cosine
+from directional_clustering.clustering import distance_cosine_abs
 
 # vector field
 from directional_clustering.fields import VectorField
@@ -52,6 +53,7 @@ from directional_clustering.plotters import rgb_colors
 # ==============================================================================
 
 plt.rcParams['figure.facecolor'] = 'white'
+
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif', size=20)
 plt.rc('axes', linewidth=1.5)
@@ -60,7 +62,6 @@ plt.rc('xtick', labelsize=20, direction="in")
 plt.rc('ytick', labelsize=20, direction="in")
 plt.rc('legend', fontsize=15)
 
-# setting xtick parameters
 plt.rc('xtick.major', size=10, pad=4)
 plt.rc('xtick.minor', size=5, pad=4)
 plt.rc('ytick.major', size=10)
@@ -152,10 +153,10 @@ def directional_clustering(filenames,
                            smooth_iters=0,
                            damping=0.5,
                            plot_loss=True,
-                           draw_colorbar=False,
+                           draw_colorbar=True,
                            save_json=False,
                            save_img=False,
-                           draw_faces=False):
+                           draw_faces=False):  # if false, it will draw dots
     """
     Clusters a vector field that has been defined on a mesh. Exports a JSON file.
 

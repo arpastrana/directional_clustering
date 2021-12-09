@@ -54,15 +54,31 @@ plt.rc('xtick', labelsize=20, direction="in")
 plt.rc('ytick', labelsize=20, direction="in")
 plt.rc('legend', fontsize=15)
 
-# setting xtick parameters:
+# setting xtick parameters
 plt.rc('xtick.major', size=10, pad=4)
 plt.rc('xtick.minor', size=5, pad=4)
 plt.rc('ytick.major', size=10)
 plt.rc('ytick.minor', size=5)
 
 # ==============================================================================
+# Set the colors to use to color mesh faces/centroids
+# ==============================================================================
+
+COLOR_LABEL_MAP = {"angles": {"cmap": "RdPu",
+                              "cbar_label": "Angular Difference [Deg]",
+                              "func": partial(angle_vectors, deg=True)},
+                   "cosine_distance": {"cmap": "RdPu",
+                                       "cbar_label": "Cosine Distance",
+                                       "func": distance_cosine},
+                   "abs_cosine_distance": {"cmap": "RdPu",
+                                           "cbar_label": "Cosine Distance",
+                                           "func": distance_cosine_abs}
+                   }
+
+# ==============================================================================
 # Plot a lot of information in 2d
 # ==============================================================================
+
 
 def plot_2d(filename,
             draw_vector_fields=False,
@@ -76,7 +92,7 @@ def plot_2d(filename,
             comb_fields=False,
             align_field_1_to=None,
             align_field_2_to=None,
-            streamlines_density=0.75,
+            streamlines_density=0.75,  # 0.55 for 4ps
             streamlines_lw=None,
             vector_fields_scale=0.03,
             vector_fields_same_scale=True,
@@ -131,14 +147,7 @@ def plot_2d(filename,
             ticks_labels = list(range(1, n_clusters + 1))
             extend = "neither"
 
-        elif color_faces == "angles" or color_faces == "cosine_distance":
-
-            color_label_map = {"angles": {"cmap": "Blues",
-                                          "cbar_label": "Angular Difference [Deg]",
-                                          "func": partial(angle_vectors, deg=True)},
-                               "cosine_distance":  {"cmap": "RdPu",
-                                                    "cbar_label": "Cosine Distance",
-                                                    "func": distance_cosine}}
+        elif color_faces == "angles" or color_faces == "cosine_distance" or color_faces == "abs_cosine_distance":
 
             available_vf = mesh.vector_fields()
             print("Avaliable vector fields on the mesh are:\n", available_vf)
@@ -156,7 +165,7 @@ def plot_2d(filename,
             vf_a = mesh.vector_field(vf_name_a)
             vf_b = mesh.vector_field(vf_name_b)
 
-            clm = color_label_map[color_faces]
+            clm = COLOR_LABEL_MAP[color_faces]
             func = clm["func"]
             cmap = clm["cmap"]
             cbar_label = clm["cbar_label"]
@@ -221,9 +230,9 @@ def plot_2d(filename,
                 print("This vector field is not available. Please try again.")
 
         if draw_vector_fields:
+            # colors for all vector related matters
             colors = cycle([(0, 0, 255), (255, 0, 0), (0, 255, 0), (0, 0, 0)])
             # colors = cycle([(235, 45, 125), (0, 165, 0), (0, 0, 255), (0, 0, 0)])
-            # colors for all vector related matters
 
             # vector field drawing parameters -- better of being exposed?
             width = 0.5

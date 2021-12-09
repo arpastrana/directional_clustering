@@ -1,3 +1,6 @@
+# math
+from math import fabs
+
 # os
 import os
 
@@ -53,19 +56,20 @@ plt.rc('ytick.minor', size=5)
 # Plot a lot of information in 2d
 # ==============================================================================
 
+
 def plot_2d(filename,
             draw_boundary_edges=True,
             draw_faces=False,
             draw_faces_centroids=False,
             color_faces=None,
-            draw_colorbar=False,
+            draw_colorbar=True,
             draw_edges=False,
-            save_img=False,
+            save_img=True,
             pad_inches=0.0,
-            show_img=True
+            show_img=False
             ):
     """
-    Makes a 3d plot of a mesh with a vector field.
+    Makes a 2d plot of a mesh with a vector field.
 
     Parameters
     ----------
@@ -167,6 +171,7 @@ def plot_2d(filename,
             for fkey in sorted_fkeys:
                 # get bending information
                 mx, my, mxy = mesh.face_attributes(fkey, names=moment_names)
+
                 # generate principal bending moments
                 m1a, m2a = principal_stresses_and_angles(mx, my, mxy)
                 m1, angle1 = m1a
@@ -180,7 +185,9 @@ def plot_2d(filename,
                 theta = delta + angle_vectors(vec, REF_VECTOR)
 
                 # transform bending moments with theta
-                btrans = transformed_stresses(mx, my, mxy, theta)
+                tmx, tmy, tmxy = transformed_stresses(mx, my, mxy, theta)
+                # taking absolute of torsional bending for visualization reasons
+                btrans = tmx, tmy, fabs(tmxy)
 
                 # convert bending moments into stress
                 if z_factor:
@@ -204,7 +211,7 @@ def plot_2d(filename,
                     else:
                         cbar_label = "{}: {}: Stress [kN/cm2]".format(bname_out, l_name)
 
-            cmap = "Spectral"  # Spectral, BrBG, viridis, PiYG
+            cmap = "Spectral_r"  # Other options: Spectral, BrBG, viridis, PiYG
             ticks = np.linspace(data.min(), data.max(), 7)
             ticks_labels = [np.round(x, 2) for x in ticks]
             extend = "both"
@@ -254,7 +261,6 @@ def plot_2d(filename,
     # show to screen
     if show_img:
         plotter.show()
-
 
 
 if __name__ == '__main__':
