@@ -60,6 +60,7 @@ class CosineAbsoluteKMeans(KMeans):
         self.distance_func = distance_cosine_abs
 
         # create seeds
+        # TODO: metric must be a custom abs "cosine", not cosine, to be fair
         self._create_seeds("cosine")
 
 
