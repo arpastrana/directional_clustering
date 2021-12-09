@@ -17,11 +17,12 @@ install:
 - hash -r
 - conda config --set always_yes yes --set changeps1 no
 - conda update -q conda
+- conda config --add channels conda-forge
 # Useful for debugging any issues with conda
 - conda info -a
 
 # Replace dep1 dep2 ... with your dependencies
-- conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION COMPAS=1.8.1 scikit-learn igl
+- conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION COMPAS=1.8.1 igl scikit-learn
 - conda activate test-environment
 - python -m pip install .
 - pip install --no-cache-dir -r requirements-dev.txt
