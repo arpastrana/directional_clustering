@@ -45,7 +45,7 @@ things, of installing scientific computing packages like `numpy` and
 The only required dependencies are `compas` and`sklearn`.
 
 ```bash
-conda create -n clusters python=3.7 COMPAS=0.16.9 scikit-learn
+conda create -n clusters python=3.7 COMPAS=1.8.1 scikit-learn
 conda activate clusters
 ```
 
