@@ -42,4 +42,4 @@ class MeshPlusPlotter(MeshPlotter):
 
         lines.extend(_lines)
 
-        self.draw_lines(lines)
+        return self.draw_lines(lines)
