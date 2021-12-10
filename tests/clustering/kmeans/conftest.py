@@ -9,6 +9,7 @@ from directional_clustering.fields import VectorField
 from directional_clustering.clustering import KMeans
 from directional_clustering.clustering import CosineKMeans
 from directional_clustering.clustering import VariationalKMeans
+from directional_clustering.clustering import DifferentiableCosineKMeans
 
 
 # ==============================================================================
@@ -154,3 +155,12 @@ def variational_kmeans(mesh, vector_field, n_clusters, iters, tol):
     An instance of VariationalKMeans.
     """
     return VariationalKMeans(mesh, vector_field, n_clusters, iters, tol)
+
+
+@pytest.fixture
+def diff_cosine_kmeans(mesh, vector_field, n_clusters, iters, tol):
+    """
+    An instance of DifferentiableCosineKMeans.
+    """
+    t = 1.0  # attention temperature
+    return DifferentiableCosineKMeans(mesh, vector_field, n_clusters, iters, tol, t)

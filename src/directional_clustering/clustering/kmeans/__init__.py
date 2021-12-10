@@ -34,5 +34,6 @@ from ._kmeans import *
 from .cosine import *
 from .variational import *
 from .euclidean import *
+from .differentiable import *
 
 __all__ = [name for name in dir() if not name.startswith('_')]
