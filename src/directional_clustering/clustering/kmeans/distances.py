@@ -64,7 +64,8 @@ def distance_cosine_abs(A, B):
 
     Notes
     -----
-    The absolute cosine distance is bounded between 0 and 1. 1 means the most distant.
+    The absolute cosine distance is bounded between 0 and 1.
+    1 means the most distant.
     The absolute cosine distance can be expressed 1 - abs(cosine similarity).
     The cosine similarity is given by AB / (||A||||B||)
     """

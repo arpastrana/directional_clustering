@@ -107,9 +107,21 @@ class KMeans(ClusteringAlgorithm):
         """
         return self._labels
 
+    @property
+    def centers(self):
+        """
+        A mapping that maps cluster indices to cluster centroid vectors.
+
+        Returns
+        -------
+        centers : `dict`
+            A dictionary of the form `{cluster_index: centroid_vector}`.
+        """
+        return self._centers
+
     def _create_seeds(self, metric):
         """
-        Find the initial seeds using an interative farthest-point strategy.
+        Find the initial seeds using an iterative farthest-point search.
         The first seed is picked at random, without replacement.
 
         Parameters
@@ -126,12 +138,11 @@ class KMeans(ClusteringAlgorithm):
         """
         X = np.array(self.vector_field.to_sequence())
         k = self.n_clusters
-        replace = False
 
-        W = kmeans_initialize(X, 1, replace)
+        W = kmeans_initialize(X, 1, replace=False)
 
         for _ in range(k - 1):
-            labels, W, _ = self._cluster(X, W, self.distance_func, self.iters, self.tol, False)
+            labels, W, = self._cluster_seeds(X, W, self.distance_func, self.iters, self.tol, False)
 
             values = W[labels]
 
@@ -158,6 +169,7 @@ class KMeans(ClusteringAlgorithm):
         X = np.array(self.vector_field.to_sequence())
 
         # perform the clustering
+        # TODO: Expose early stopping as attribute
         r = self._cluster(X, self.seeds, self.distance_func, self.iters, self.tol, False)
         labels, centers, losses = r
 
@@ -176,7 +188,7 @@ class KMeans(ClusteringAlgorithm):
         # store data into attributes
         self._clustered_field = clustered_field  # clustered vector field
         self._labels = clustered_labels  # face labels
-        self._centers = {idx: center for idx, center in enumerate(centers)}
+        self._centers = {idx: center.tolist() for idx, center in enumerate(centers)}
         self._loss = losses[-1]
 
     @staticmethod
@@ -238,6 +250,31 @@ class KMeans(ClusteringAlgorithm):
                 break
 
         return labels, W, losses
+
+    def _cluster_seeds(self, *args, **kwargs):
+        """
+        The clustering approach to create initial seeds.
+
+        Parameters
+        ----------
+        args : `list`
+            A list of input parameters.
+        kwargs : `dict`
+            Named attributes
+
+        Returns
+        -------
+        labels : `np.array` (n, )
+            The index of the center closest to every vector in the vector field.
+        seeds : `np.array` (k, 3)
+            The cluster seeds centers.
+
+        Notes
+        -----
+        This is a private method.
+        """
+        labels, seeds, _ = self._cluster(*args, **kwargs)
+        return labels, seeds
 
 
 if __name__ == "__main__":
