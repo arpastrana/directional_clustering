@@ -42,7 +42,7 @@ def rows_norm(M):
 
 def kmeans_initialize(X, k, replace=False):
     """
-    Picks k values at random from a 2d matrix.
+    Picks k values at random from a 2d matrix with or without replacement.
 
     Parameters
     ----------
@@ -120,30 +120,18 @@ def centroids_associate(X, W, d_func):
     closest_k : `np.array`, (n,)
         The closest k-centroid for every example in X.
     """
-
-    # compute the norms of the rows
-    # xn = rows_norm(X)
-    # wn = rows_norm(W)
-
-    # # check for nan's
-    # if np.isnan(wn).any():
-    #     raise Exception("There's a NaN in wn: {}".format(wn))
-
-    # normalize rows
-    # X = X / xn
-    # W = W / wn
-
     # set nan's to zero for numerical stability
     W[np.nonzero(np.isnan(W))] = 0.0
 
     # compute distance
-    distance = d_func(X, W)
+    distances = d_func(X, W)
 
     # find closest indices
-    closest_k = np.argmin(distance, axis=1)
+    closest_k = np.argmin(distances, axis=1)
 
-    # calculate mean squared error
-    loss = np.mean(np.min(np.square(distance), axis=1))
+    # calculate mean absolute distance (error)
+    closest = np.amin(np.abs(distances), axis=1, keepdims=True)
+    loss = np.mean(closest)
 
     return loss, closest_k
 
