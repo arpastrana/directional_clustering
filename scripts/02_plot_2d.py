@@ -61,9 +61,13 @@ plt.rc('ytick.major', size=10)
 plt.rc('ytick.minor', size=5)
 
 # ==============================================================================
-# Set the colors to use to color mesh faces/centroids
+# Set global variables
 # ==============================================================================
 
+IMG_EXTENSION = "pdf"
+ZORDER_LEGEND = 5000  # manually set to be drawn in front of other objects
+
+# Set the colors to use to color mesh faces/centroids
 COLOR_LABEL_MAP = {"angles": {"cmap": "RdPu",
                               "cbar_label": "Angular Difference [Deg]",
                               "func": partial(angle_vectors, deg=True)},
@@ -71,7 +75,7 @@ COLOR_LABEL_MAP = {"angles": {"cmap": "RdPu",
                                        "cbar_label": "Cosine Distance",
                                        "func": distance_cosine},
                    "abs_cosine_distance": {"cmap": "RdPu",
-                                           "cbar_label": "Cosine Distance",
+                                           "cbar_label": "Absolute Cosine Distance",
                                            "func": distance_cosine_abs}
                    }
 
@@ -81,14 +85,14 @@ COLOR_LABEL_MAP = {"angles": {"cmap": "RdPu",
 
 
 def plot_2d(filename,
-            draw_vector_fields=False,
-            draw_streamlines=False,
-            draw_boundary_edges=True,
             draw_faces=True,
             draw_faces_centroids=False,
-            color_faces=None,
-            draw_colorbar=True,
+            draw_vector_fields=False,
+            draw_streamlines=False,
             draw_edges=False,
+            draw_colorbar=True,
+            draw_boundary_edges=True,
+            color_faces=None,
             comb_fields=False,
             align_field_1_to=None,
             align_field_2_to=None,
@@ -109,15 +113,26 @@ def plot_2d(filename,
         The name of the JSON file that stores the clustering resultes w.r.t certain
         \n mesh, attribute, alglrithm and number of clusters.
     """
+    # ==========================================================================
+    # Load up a mesh from a JSON file
+    # ==========================================================================
 
-    # load a mesh from a JSON file
     name_in = filename + ".json"
-    json_in = os.path.abspath(os.path.join(JSON, name_in))
+    json_in = os.path.abspath(os.path.join(JSON, "clustered", name_in))
 
     mesh = MeshPlus.from_json(json_in)
 
+    # ==========================================================================
+    # Instantiate a plotter
+    # ==========================================================================
+
     # ClusterPlotter is a custom wrapper around a COMPAS MeshPlotter
     plotter = MeshPlusPlotter(mesh, figsize=(16, 9), dpi=600)
+
+    # ==========================================================================
+    # Draw mesh edges
+    # ==========================================================================
+
     if draw_boundary_edges:
         plotter.draw_edges(keys=list(mesh.edges_on_boundary()))
 
@@ -125,29 +140,35 @@ def plot_2d(filename,
     if draw_edges:
         plotter.draw_edges()
 
-    # color up the faces of the mesh according to their cluster
+    # ==========================================================================
+    # Draw mesh faces
+    # ==========================================================================
+
+    # get number of clusters from filename
+    mesh_name = filename.split("/")[-1]
+    n_clusters = int(mesh_name.split("_")[1][-1]) # second position is number of cluster
+    print(f"The number of clusters on the mesh is: {n_clusters}")
+
     if draw_faces or draw_faces_centroids:
         cmap = None
         data = np.zeros(mesh.number_of_faces())
         sorted_fkeys = sorted(list(mesh.faces()))
 
-        if color_faces == "clusters":
-            # cmap = "Paired"
+        if color_faces == "labels":
+            # parse cluster labels
             labels = mesh.cluster_labels("cluster")
             for fkey, label in labels.items():
                 data[fkey] = label
 
-            # plot stuff
+            # matplotlib setup
             cbar_label = "Directional Clusters"
-            n_clusters = int(input("Please input the number of clusters here: "))
             cmap = plt.cm.get_cmap('rainbow', n_clusters)  # plasma or rainbow
-
             ticks = np.linspace(0, n_clusters - 1, n_clusters + 1) + 0.5 * (n_clusters - 1)/n_clusters
             ticks = ticks[:-1]
-            ticks_labels = list(range(1, n_clusters + 1))
+            ticks_labels = list(range(n_clusters))
             extend = "neither"
 
-        elif color_faces == "angles" or color_faces == "cosine_distance" or color_faces == "abs_cosine_distance":
+        elif color_faces in {"angles", "cosine_distance", "abs_cosine_distance"}:
 
             available_vf = mesh.vector_fields()
             print("Avaliable vector fields on the mesh are:\n", available_vf)
@@ -173,9 +194,60 @@ def plot_2d(filename,
             for fkey in mesh.faces():
                 data[fkey] = func(vf_a[fkey], vf_b[fkey])
 
-            ticks = np.linspace(data.min(), data.max(), 7)
+            ticks = np.linspace(data.min(), data.max(), num=7)
             ticks_labels = [np.round(x, 2) for x in ticks]
             extend = "both"
+
+        elif color_faces == "attention":
+
+            attention = mesh.attributes["attention"]
+
+            while True:
+                att_k = input(f"Please select the cluster attention coefficient to plot (0 to {n_clusters-1}): ")
+                try:
+                    att_k = int(att_k)
+                    if att_k >= 0 and att_k < (n_clusters):
+                        break
+                except:
+                    print("That cluster index doesn't exist. Try again.")
+
+            cmap = plt.cm.get_cmap('rainbow', n_clusters)  # plasma or rainbow
+            cluster_colors = np.array([cmap(i) for i in range(n_clusters)])
+
+            # parse cluster labels
+            for fkey, attention_coefficients in attention.items():
+                # TODO: data serialization convert int-type fkeys into strings!
+                data[int(fkey)] = attention_coefficients[att_k]
+
+            # rename color_faces for export image name
+            color_faces = color_faces + str(att_k)
+
+            # matplotlib setup
+            cbar_label = f"Attention Coefficient for Cluster {att_k}"
+            cmap = "RdPu"
+            ticks = np.linspace(data.min(), data.max(), num=7)
+            ticks_labels = [np.round(x, 2) for x in ticks]
+            extend = "both"
+
+        elif color_faces == "attention_labels":
+
+            attention = mesh.attributes["attention"]
+
+            cluster_indices = np.array(list(range(n_clusters)))
+            A = np.array(list([attention[str(fkey)] for fkey in mesh.faces()]))
+            cluster_attention = A @ cluster_indices
+
+            for fkey in mesh.faces():
+                data[fkey] = cluster_attention[fkey]
+
+            cbar_label = "Attention per Cluster"
+            cmap = "rainbow"
+            # ticks = np.linspace(0, n_clusters - 1, n_clusters + 1) + 0.5 * (n_clusters - 1)/n_clusters
+            # ticks = ticks[:-1]
+            # ticks_labels = list(range(n_clusters))
+            ticks = np.linspace(data.min(), data.max(), num=7)
+            ticks_labels = [np.round(x, 2) for x in ticks]
+            extend = "neither"
 
         if draw_faces:
 
@@ -211,14 +283,19 @@ def plot_2d(filename,
                 colorbar.ax.set_yticklabels(ticks_labels)
                 colorbar.set_label(cbar_label, fontsize="large")
 
-    # plot vector fields on mesh as lines
+    # ==========================================================================
+    # Draw vector field information (as lines or as streamlines)
+    # ==========================================================================
+
     if draw_vector_fields or draw_streamlines:
+
         # supported vector field attributes
         available_vf = mesh.vector_fields()
         print("Avaliable vector fields on the mesh are:\n", available_vf)
 
         # the name of the vector field to cluster.
         vf_names = []
+
         while True:
             vf_name = input("Please select the vector fields to draw. Type 'ok' to stop adding vector fields: ")
             if vf_name in available_vf:
@@ -232,7 +309,6 @@ def plot_2d(filename,
         if draw_vector_fields:
             # colors for all vector related matters
             colors = cycle([(0, 0, 255), (255, 0, 0), (0, 255, 0), (0, 0, 0)])
-            # colors = cycle([(235, 45, 125), (0, 165, 0), (0, 0, 255), (0, 0, 0)])
 
             # vector field drawing parameters -- better of being exposed?
             width = 0.5
@@ -246,7 +322,9 @@ def plot_2d(filename,
                     vf = comb_vector_field(vf, mesh)
 
                 color = next(colors)
-                plotter.draw_vector_field(vf, color, same_scale, scale, width)
+                lines = plotter.draw_vector_field(vf, color, same_scale, scale, width)
+                _vf_name = "".join(vf_name.split("_"))
+                lines.set_label(_vf_name)
 
         if draw_streamlines:
             colors = cycle([(0, 0, 255), (255, 0, 0), (0, 255, 0), (0, 0, 0)])
@@ -353,26 +431,48 @@ def plot_2d(filename,
                     LW = None
 
                 # plot streamlines
-                plt.streamplot(XX, YY, U, V,
-                               color=[i / 255.0 for i in next(colors)],
-                               arrowsize=0.2,
-                               maxlength=20.0,
-                               minlength=0.1,
-                               density=streamlines_density,
-                               linewidth=LW)
+                stream_set = plt.streamplot(XX, YY, U, V,
+                                            color=[i / 255.0 for i in next(colors)],
+                                            arrowsize=0.0,
+                                            maxlength=20.0,
+                                            minlength=0.1,
+                                            density=streamlines_density,
+                                            integration_direction="both",
+                                            linewidth=LW)
 
-    # save image
+                _vf_name = "".join(vf_name.split("_"))
+                stream_set.lines.set_label(_vf_name)
+
+        legend = plt.legend(facecolor="white")
+        legend.set_zorder(ZORDER_LEGEND)
+
+    # ==========================================================================
+    # Save plotter scene as an image
+    # ==========================================================================
+
     if save_img:
-        dt = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-        img_name = filename.split("/")[-1] + "_" + dt + ".png"
-        img_path = os.path.abspath(os.path.join(DATA, "images", img_name))
+
+        exp_name = filename.split('/')[-1]
+
+        cf = "".join(color_faces.split("_")) if color_faces else 0
+        data_shown = f"clr{cf}_vf{int(draw_vector_fields)}_strm{int(draw_streamlines)}"
+        img_name = f"{exp_name}_{data_shown}.{IMG_EXTENSION}"
+        clusterer_name = mesh.attributes["clusterer_name"]
+        img_path = os.path.abspath(os.path.join(DATA, "images", clusterer_name, img_name))
         plt.tight_layout()
         plotter.save(img_path, bbox_inches='tight', pad_inches=pad_inches)
-        print("Saved image to : {}".format(img_path))
+        print(f"Saved image to : {img_path}")
 
-    # show to screen
+    # ==========================================================================
+    # Plot image and show to screen
+    # ==========================================================================
+
     if show_img:
         plotter.show()
+
+# ==============================================================================
+# Main
+# ==============================================================================
 
 
 if __name__ == '__main__':

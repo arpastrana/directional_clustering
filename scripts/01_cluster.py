@@ -209,6 +209,7 @@ def directional_clustering(filename,
     # vector which is the "most distant" at a given iteration using kmeans itself
     # These seeds will be used later on as input to start the final kmeans run.
 
+    print("-----")
     print("Clustering started...")
 
     # Create an instance of a clustering algorithm from ClusteringFactory
@@ -225,18 +226,21 @@ def directional_clustering(filename,
 
     clusterer.cluster()
 
-    print("Loss Clustering: {}".format(clusterer.loss))
+    print(f"Loss Clustering: {clusterer.loss}")
     print("Clustering ended!")
 
     # store results in clustered_field and labels
     clustered_field = clusterer.clustered_field
     labels = clusterer.labels
 
+    for index, center in clusterer.centers.items():
+        print(f"{index}: {center}")
+
     # ==========================================================================
     # Compute mean squared error "loss" of clustering
     # ==========================================================================
 
-    # probably would be better to encapsulate this in a function or in a Loss object
+    # TODO: probably would be better to encapsulate this in a function or in an object
     # clustering_error = MeanSquaredError(vector_field, clustered_field)
     # clustering_error = MeanAbsoluteError(vector_field, clustered_field)
 
@@ -247,17 +251,33 @@ def directional_clustering(filename,
         # raw vector
         # difference_vector = subtract_vectors(clustered_field.vector(fkey), vectors.vector(fkey))
         # errors[fkey] = length_vector_sqrd(difference_vector)
-        error = distance_cosine(clustered_field.vector(fkey), vectors.vector(fkey))
-        errors[fkey] = error
+        error = clusterer.distance_func(clustered_field.vector(fkey), vectors.vector(fkey))
+        errors[fkey] = np.abs(error)
 
     mse = np.mean(errors)
-    print("Clustered Field Mean Error (Cosine Distances): {}".format(mse))
+    print("-----")
+    print(f"Clustered Field Mean Abs Error: {mse}")
 
     # ==========================================================================
     # Assign cluster labels to mesh
     # ==========================================================================
 
     mesh.cluster_labels("cluster", labels)
+
+    # ==========================================================================
+    # Store clusterer algorithm name as mesh attribute
+    # ==========================================================================
+
+    mesh.attributes["clusterer_name"] = algo_name
+
+    # ==========================================================================
+    # Assign attention coefficients to mesh - poor man's version
+    # ==========================================================================
+
+    # TODO: refactor into a MeshPlus method
+    is_diff = algo_name.split("_")[-1] == "diff"  # last word indicates diff
+    if is_diff:
+        mesh.attributes["attention"] = clusterer.attention
 
     # ==========================================================================
     # Generate field orthogonal to the clustered field
@@ -294,9 +314,11 @@ def directional_clustering(filename,
         clustered_field_90.add_vector(fkey, cvec_90)
 
     # ==========================================================================
-    # Scale fields based on stress transformations
+    # Scale fields based on plane stress transformations
     # ==========================================================================
 
+    print("-----")
+    print("Rescaling vector field based on plane stress transformation")
     while True:
         stress_type = input("What stress type are we looking at, bending or axial? ")
 
@@ -322,10 +344,24 @@ def directional_clustering(filename,
     # Export new JSON file for further processing
     # ==========================================================================
 
-    name_out = "{}_k{}_{}_smooth{}.json".format(filename, n_clusters, vf_name, smooth_iters)
+    def string_collapser(string, character="_"):
+        split_string = string.split(character)
+        return "".join(split_string)
+
+    name_clustering = (filename, f"k_{n_clusters}", vf_name, algo_name)
+    name_clustering = "_".join([string_collapser(s) for s in name_clustering])
+    name_transforms = f"align{int(align_vectors)}_comb{int(comb_vectors)}_smooth{smooth_iters}"
+    name_out = "_".join([name_clustering, name_transforms]) + ".json"
+
     json_out = os.path.abspath(os.path.join(JSON, "clustered", algo_name, name_out))
     mesh.to_json(json_out)
-    print("Exported clustered vector field with mesh to: {}".format(json_out))
+
+    print("-----")
+    print(f"Exported clustered vector field with mesh to:\n{json_out}")
+
+# ==============================================================================
+# Main
+# ==============================================================================
 
 
 if __name__ == '__main__':
