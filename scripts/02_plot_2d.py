@@ -64,8 +64,9 @@ plt.rc('ytick.minor', size=5)
 # Set global variables
 # ==============================================================================
 
-IMG_EXTENSION = "pdf"
 ZORDER_LEGEND = 5000  # manually set to be drawn in front of other objects
+IMG_EXTENSION = "pdf"
+CMAP_LABELS = "rainbow"
 
 # Set the colors to use to color mesh faces/centroids
 COLOR_LABEL_MAP = {"angles": {"cmap": "RdPu",
@@ -162,7 +163,7 @@ def plot_2d(filename,
 
             # matplotlib setup
             cbar_label = "Directional Clusters"
-            cmap = plt.cm.get_cmap('rainbow', n_clusters)  # plasma or rainbow
+            cmap = plt.cm.get_cmap(CMAP_LABELS, n_clusters)  # plasma or rainbow
             ticks = np.linspace(0, n_clusters - 1, n_clusters + 1) + 0.5 * (n_clusters - 1)/n_clusters
             ticks = ticks[:-1]
             ticks_labels = list(range(n_clusters))
@@ -211,9 +212,6 @@ def plot_2d(filename,
                 except:
                     print("That cluster index doesn't exist. Try again.")
 
-            cmap = plt.cm.get_cmap('rainbow', n_clusters)  # plasma or rainbow
-            cluster_colors = np.array([cmap(i) for i in range(n_clusters)])
-
             # parse cluster labels
             for fkey, attention_coefficients in attention.items():
                 # TODO: data serialization convert int-type fkeys into strings!
@@ -229,24 +227,24 @@ def plot_2d(filename,
             ticks_labels = [np.round(x, 2) for x in ticks]
             extend = "both"
 
-        elif color_faces == "attention_labels":
+        elif color_faces == "labels_attention":
 
             attention = mesh.attributes["attention"]
 
-            cluster_indices = np.array(list(range(n_clusters)))
-            A = np.array(list([attention[str(fkey)] for fkey in mesh.faces()]))
+            cluster_indices = np.array(list(range(0, n_clusters)))
+            A = np.array(list([coeff for _, coeff in attention.items()]))
             cluster_attention = A @ cluster_indices
 
-            for fkey in mesh.faces():
-                data[fkey] = cluster_attention[fkey]
+            for idx, bundle in enumerate(attention.items()):
+                # TODO: data serialization convert int-type fkeys into strings!
+                fkey, _ = bundle
+                data[int(fkey)] = cluster_attention[idx]
 
-            cbar_label = "Attention per Cluster"
-            cmap = "rainbow"
-            # ticks = np.linspace(0, n_clusters - 1, n_clusters + 1) + 0.5 * (n_clusters - 1)/n_clusters
-            # ticks = ticks[:-1]
-            # ticks_labels = list(range(n_clusters))
-            ticks = np.linspace(data.min(), data.max(), num=7)
-            ticks_labels = [np.round(x, 2) for x in ticks]
+            tao = mesh.attributes["tau"]
+            cbar_label = r"Attention per Cluster, $\tau={}$".format(tao)
+            cmap = CMAP_LABELS
+            ticks = np.linspace(0, n_clusters-1, n_clusters)
+            ticks_labels = list(range(n_clusters))
             extend = "neither"
 
         if draw_faces:
@@ -272,14 +270,16 @@ def plot_2d(filename,
             if draw_colorbar:
                 colorbar = plt.colorbar(collection,
                                         shrink=0.9,
-                                        pad=0.01,
+                                        pad=0.005,
                                         extend=extend,
                                         extendfrac=0.05,
                                         ax=plotter.axes,
+                                        ticks=ticks,
                                         aspect=30,
                                         orientation="vertical")
 
-                colorbar.set_ticks(ticks)
+                # colorbar.set_ticks(ticks)
+                assert len(ticks) == len(ticks_labels)
                 colorbar.ax.set_yticklabels(ticks_labels)
                 colorbar.set_label(cbar_label, fontsize="large")
 

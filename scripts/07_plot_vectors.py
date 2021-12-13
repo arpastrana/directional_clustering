@@ -52,15 +52,15 @@ def plot_kmeans_vectors(data, labels, normalize=False, scale_to_max=True, draw_c
     data : np.array
         The vector field converted into a numpy array.
     """
-    seeds = [[11.890863876751077, 0.3545110676123977, 0.0], [2.053814486492628, -2.3074225319656225, 0.0], [1.7771751346256537, 1.9988816547970614, 0.0], [6.669670813796596, -2.87886820459424, 0.0]]
-    seeds = np.array(seeds)
+    # seeds = [[11.890863876751077, 0.3545110676123977, 0.0], [2.053814486492628, -2.3074225319656225, 0.0], [1.7771751346256537, 1.9988816547970614, 0.0], [6.669670813796596, -2.87886820459424, 0.0]]
+    # seeds = np.array(seeds)
 
     if scale_to_max or normalize:
         norm_data = np.linalg.norm(data, axis=1, keepdims=True)
 
     if scale_to_max:
         data = data / np.amax(norm_data)
-        seeds = seeds / np.amax(norm_data)
+        # seeds = seeds / np.amax(norm_data)
 
     if normalize:
         data = data / np.linalg.norm(data, axis=1, keepdims=True)
@@ -92,11 +92,13 @@ def plot_kmeans_vectors(data, labels, normalize=False, scale_to_max=True, draw_c
 
         if draw_centroids:
 
-            # lines from origin
+            # draw centroid as point
             plt.scatter(centroid[0], centroid[1], marker="x", color="black", s=200)
-            a = np.array([0.0, centroid[0]])  # start line at the origin
-            b = np.array([0.0, centroid[1]])  # start line at the origin
-            plt.plot(a, b, color="black", linewidth=0.75)  # plot line
+
+            # draw lines from origin to centroid
+            # a = np.array([0.0, centroid[0]])  # start line at the origin
+            # b = np.array([0.0, centroid[1]])  # start line at the origin
+            # plt.plot(a, b, color="black", linewidth=0.75)  # plot line
 
             # plt.scatter(seeds[:, 0], seeds[:, 1], marker="s", color="black", s=100)
             # plt.plot([seeds, centroid, color='black', lw="--")
@@ -140,7 +142,7 @@ def plot_vectors_2d(filename,
 
     # load a mesh from a JSON file
     name_in = filename + ".json"
-    json_in = os.path.abspath(os.path.join(JSON, name_in))
+    json_in = os.path.abspath(os.path.join(JSON, "clustered", name_in))
 
     mesh = MeshPlus.from_json(json_in)
 
@@ -172,7 +174,7 @@ def plot_vectors_2d(filename,
                         flip_xy=flip_xy)
 
     # customize plot
-    # plt.title("{Cluster Assignments on Vector Field}")
+    plt.title("{Cluster Assignments on Vector Field}")
 
     # save
     if save_img:

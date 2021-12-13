@@ -44,12 +44,15 @@ def directional_clustering(filename,
                            n_clusters=4,
                            iters=100,
                            tol=1e-6,
+                           early_stopping=False,
                            comb_vectors=False,
                            align_vectors=False,
                            alignment_ref=[1.0, 0.0, 0.0],
                            smooth_iters=0,
                            damping=0.5,
-                           stress_transf_ref=[1.0, 0.0, 0.0]):
+                           stress_transf_ref=[1.0, 0.0, 0.0],
+                           kwargs_seeds={},
+                           kwargs={}):
     """
     Clusters a vector field that has been defined on a mesh. Exports a JSON file.
 
@@ -210,11 +213,13 @@ def directional_clustering(filename,
     # These seeds will be used later on as input to start the final kmeans run.
 
     print("-----")
-    print("Clustering started...")
 
     # Create an instance of a clustering algorithm from ClusteringFactory
     clustering_algo = ClusteringFactory.create(algo_name)
-    clusterer = clustering_algo(mesh, vectors, n_clusters, iters, tol)
+    clusterer = clustering_algo(mesh, vectors)
+
+    # initialize seeds
+    clusterer.seed(n_clusters, **kwargs_seeds)
 
     # do kmeans clustering
     # labels contains the cluster index assigned to every vector in the vector field
@@ -224,8 +229,8 @@ def directional_clustering(filename,
     # every vector and the centroid of the cluster it is assigned to
     # the goal of kmeans is to minimize this loss function
 
-    clusterer.cluster()
-
+    print("Clustering started...")
+    clusterer.cluster(n_clusters, iters, tol, early_stopping, **kwargs)
     print(f"Loss Clustering: {clusterer.loss}")
     print("Clustering ended!")
 
@@ -252,11 +257,11 @@ def directional_clustering(filename,
         # difference_vector = subtract_vectors(clustered_field.vector(fkey), vectors.vector(fkey))
         # errors[fkey] = length_vector_sqrd(difference_vector)
         error = clusterer.distance_func(clustered_field.vector(fkey), vectors.vector(fkey))
-        errors[fkey] = np.abs(error)
+        errors[fkey] = np.square(error)
 
-    mse = np.mean(errors)
+    rmse = np.sqrt(np.mean(errors))
     print("-----")
-    print(f"Clustered Field Mean Abs Error: {mse}")
+    print(f"Clustered Field RMSE: {rmse}")
 
     # ==========================================================================
     # Assign cluster labels to mesh
@@ -274,10 +279,13 @@ def directional_clustering(filename,
     # Assign attention coefficients to mesh - poor man's version
     # ==========================================================================
 
-    # TODO: refactor into a MeshPlus method
+    # TO DO: refactor into a MeshPlus method
     is_diff = algo_name.split("_")[-1] == "diff"  # last word indicates diff
     if is_diff:
         mesh.attributes["attention"] = clusterer.attention
+        tao = kwargs.get("tau")
+        if tao:
+            mesh.attributes["tau"] = tao
 
     # ==========================================================================
     # Generate field orthogonal to the clustered field
