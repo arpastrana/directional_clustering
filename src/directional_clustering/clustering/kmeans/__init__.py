@@ -31,9 +31,9 @@ from __future__ import print_function
 from .operations import *
 from .distances import *
 from ._kmeans import *
+from .differentiable import *
 from .cosine import *
 from .variational import *
 from .euclidean import *
-from .differentiable import *
 
 __all__ = [name for name in dir() if not name.startswith('_')]

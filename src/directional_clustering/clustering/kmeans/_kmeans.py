@@ -36,6 +36,7 @@ class KMeans(ClusteringAlgorithm):
         assert mesh.number_of_faces() >= vector_field.size()
 
         # data structures
+        # TODO: Make n_clusters an __init__ argument to unify seed()/cluster()?
         self.mesh = mesh
         self.vector_field = vector_field
 

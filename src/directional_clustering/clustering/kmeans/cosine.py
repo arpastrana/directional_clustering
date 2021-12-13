@@ -1,10 +1,14 @@
 from directional_clustering.clustering.kmeans import KMeans
+from directional_clustering.clustering.kmeans import DifferentiableKMeans
 
 from directional_clustering.clustering.kmeans import distance_cosine
 from directional_clustering.clustering.kmeans import distance_cosine_abs
 
 
-__all__ = ["CosineKMeans", "CosineAbsoluteKMeans"]
+__all__ = ["CosineKMeans",
+           "CosineAbsoluteKMeans",
+           "DifferentiableCosineKMeans",
+           "DifferentiableCosineAbsoluteKMeans"]
 
 
 class CosineKMeans(KMeans):
@@ -45,7 +49,39 @@ class CosineAbsoluteKMeans(KMeans):
         # set appropiate distance function
         self.distance_func = distance_cosine_abs
         # TODO: metric must be a custom abs "cosine", not cosine, to be fair
-        self._metric = "cosine"
+        self.distance_name = "cosine"
+
+
+class DifferentiableCosineKMeans(DifferentiableKMeans, CosineKMeans):
+    """
+    Differentiable k-means clustering using cosine distance as the kernel function.
+
+    Parameters
+    ----------
+    mesh : `directional_clustering.mesh.MeshPlus`
+        A reference mesh. Reserved.
+    vector_field : `directional_clustering.fields.VectorField`
+        The vector field to cluster.
+    """
+    def __init__(self, mesh, vector_field):
+        # initialize parent class constructor
+        super(DifferentiableCosineKMeans, self).__init__(mesh, vector_field)
+
+
+class DifferentiableCosineAbsoluteKMeans(DifferentiableKMeans, CosineAbsoluteKMeans):
+    """
+    Differentiable k-means clustering using cosine absolute distance as the kernel function.
+
+    Parameters
+    ----------
+    mesh : `directional_clustering.mesh.MeshPlus`
+        A reference mesh. Reserved.
+    vector_field : `directional_clustering.fields.VectorField`
+        The vector field to cluster.
+    """
+    def __init__(self, mesh, vector_field):
+        # initialize parent class constructor
+        super(DifferentiableCosineAbsoluteKMeans, self).__init__(mesh, vector_field)
 
 
 if __name__ == "__main__":

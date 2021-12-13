@@ -2,14 +2,13 @@ from math import fabs
 
 import numpy as np
 
-from directional_clustering.clustering.kmeans import CosineKMeans
 
-__all__ = ["DifferentiableCosineKMeans"]
+__all__ = ["DifferentiableKMeans"]
 
 
-class DifferentiableCosineKMeans(CosineKMeans):
+class DifferentiableKMeans():
     """
-    Differentiable k-means clustering using cosine distance as the kernel function.
+    Differentiable k-means clustering using a custom kernel function.
 
     Parameters
     ----------
@@ -20,9 +19,8 @@ class DifferentiableCosineKMeans(CosineKMeans):
     """
     def __init__(self, mesh, vector_field):
         # initialize parent class constructor
-        # parent classes sets distance function and creates initial seeds
         # TODO: Make n_clusters an __init__ argument to unify seed()/cluster()?
-        super(DifferentiableCosineKMeans, self).__init__(mesh, vector_field)
+        super(DifferentiableKMeans, self).__init__(mesh, vector_field)
 
         # set attention parameters
         self.attention = None
@@ -165,7 +163,7 @@ class DifferentiableCosineKMeans(CosineKMeans):
         This is a private method.
         """
         # Parent class cluster method to dettach it from attention mechanism
-        labels, seeds, _ = super(DifferentiableCosineKMeans, self)._cluster(*args, **kwargs)
+        labels, seeds, _ = super(DifferentiableKMeans, self)._cluster(*args, **kwargs)
         return labels, seeds
 
 
