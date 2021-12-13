@@ -21,32 +21,16 @@ class DifferentiableCosineKMeans(CosineKMeans):
         A reference mesh. Reserved.
     vector_field : `directional_clustering.fields.VectorField`
         The vector field to cluster.
-    n_clusters : `int`
-        The number of clusters to generate.
-    iters : `int`
-        The iterations to run the algorithm for.
-    tol : `float`
-        The tolerance to declare convergence.
-    temperature : `float`
-        A scalar coefficient to control the hardness of the cluster assignments.
-        Optional. Defaults to `100.0`.
-    stabilize : `bool`
-        A flag to numerically stabilize the attention softmax operation.
-        Optional. Defaults to `True`.
-
     """
-    def __init__(self, mesh, vector_field, n_clusters, iters, tol, temperature=10.0, stabilize=True):
+    def __init__(self, mesh, vector_field):
         # initialize parent class constructor
         # parent classes sets distance function and creates initial seeds
-        args = mesh, vector_field, n_clusters, iters, tol
-        super(DifferentiableCosineKMeans, self).__init__(*args)
+        super(DifferentiableCosineKMeans, self).__init__(mesh, vector_field)
 
         # set attention parameters
         self.attention = None
-        self.temperature = temperature
-        self.stabilize = stabilize
 
-    def _cluster(self, X, W, dist_func, iters, tol, early_stopping=False):
+    def _cluster(self, X, W, dist_func, n_clusters, iters, tol, early_stopping, tau, stabilize=True, *args, **kwargs):
         """
         Perform differentiable k-means clustering on a vector field.
 
@@ -58,14 +42,24 @@ class DifferentiableCosineKMeans(CosineKMeans):
             An array with the initial cluster centers.
         dist_func : `function`
             A distance function to calculate the association metric.
+        n_clusters : `int`
+            The number of clusters to generate.
         iters : `float`
             The number of iterations to run the k-means for.
         tol : `tol`
             The loss relative difference between iterations to declare early convergence.
-        early_stopping : `bool`, optional.
+        early_stopping : `bool`
             Flag to stop when tolerance threshold is met.
             Otherwise, the algorithm will exhaust all iterations.
-            Defaults to `False`.
+        tau : `float`
+            An coefficient that controls the softness of the attention mechanism
+        stabilize : `bool`, optional
+            A flag to numerically stabilize the attention softmax operation.
+            Defaults to `True`.
+        args : `list`, optional
+            Additional arguments.
+        kwargs : `dict`, optional
+            Additional keyword arguments.
 
         Returns
         -------
@@ -100,15 +94,15 @@ class DifferentiableCosineKMeans(CosineKMeans):
             assert distances.shape == (n, k)
 
             # calculate attention matrix (n, k)
-            z = distances * self.temperature  # apply attention temperature
-            if self.stabilize:
+            z = distances * tau  # apply attention temperature
+            if stabilize:
                 z = z - np.amax(z)  # softmax stabilization
             z = np.exp(z)
             y = np.sum(z, axis=1, keepdims=True)
             assert y.shape == (n, 1)
             attention = z / y
             assert attention.shape == (n, k)
-            assert np.isclose(np.sum(attention), n)
+            assert np.isclose(np.sum(attention), n), print(np.sum(attention))
 
             # compute centroid matrix (k, d)
             centroids = np.transpose(attention) @ X
@@ -116,19 +110,21 @@ class DifferentiableCosineKMeans(CosineKMeans):
             assert centroids.shape == (k, d)
 
             # TODO: is MSE the right metric to calculate loss?
-            # calculate mean squared distance (error)
-            closest = np.amin(np.abs(distances), axis=1, keepdims=True)
-            loss = np.mean(closest)
+            # calculate root mean squared distance (error)
+            closest = np.amin(np.square(distances), axis=1, keepdims=True)
+            loss = np.sqrt(np.mean(closest))
             losses.append(loss)
 
             # check for exit
-            # if i < 2 or not early_stopping:
-            #     continue
+            if i < 2 or not early_stopping:
+                continue
 
             # check if relative loss difference between two iterations is small
-            # if fabs((losses[-2] - losses[-1]) / losses[-1]) < tol:
-            #     print("Early stopping at {}/{} iteration".format(i, iters))
-            #     break
+            eps = (losses[-2] - losses[-1]) / losses[-1]
+            if fabs(eps) < tol:
+                print(f"Convergence threshold met: {eps} < {tol}")
+                print(f"Early stopping at {i}/{iters} iteration")
+                break
 
         # create new temporary vector field to check clusters
         X_hat = attention @ centroids
@@ -193,32 +189,36 @@ if __name__ == "__main__":
     for i in range(vector_field.size()):
         mesh.add_face([0, 1, 2])
 
-    k = 2  # number of clusters, TODO: sensitive if k=vector_field.size()?
-    t = 10  # attention temperature - small values (like 1) make centroids to equalize
-    tmax = 100 # max iterations
+    n_clusters = 2  # number of clusters, TODO: sensitive if k=vector_field.size()?
+    iters = 100  # max iterations
     tol = 1e-6  # convergence threshold
-
-    dclusterer = DifferentiableCosineKMeans(mesh, vector_field, k, tmax, tol, t)
-    dclusterer.cluster()
-    dclustered = dclusterer.clustered_field
+    early_stopping = False
+    tao = 100  # attention temperature - small values (like 1) make centroids to equalize
 
     print("----")
+    print("Clustering with Differentiable Cosine KMeans")
+
+    dclusterer = DifferentiableCosineKMeans(mesh, vector_field)
+    dclusterer.cluster(n_clusters, iters, tol, early_stopping, tao)
+    dclustered = dclusterer.clustered_field
+
 
     print(f"Loss: {dclusterer.loss}, Labels: {dclusterer.labels}")
     print(f"Cluster centers {dclusterer.centers}")
     print(f"Clustered vector field {list(dclustered.vectors())}")
 
     print("----")
+    print("Clustering with Cosine KMeans")
 
-    clusterer = CosineKMeans(mesh, vector_field, k, tmax, tol)
-    clusterer.cluster()
+    clusterer = CosineKMeans(mesh, vector_field)
+    clusterer.cluster(n_clusters, iters, tol, early_stopping)
     clustered = clusterer.clustered_field
 
     print(f"Loss: {clusterer.loss}, Labels: {clusterer.labels}")
     print(f"Cluster centers {clusterer.centers}")
     print(f"Clustered vector field {list(clustered.vectors())}")
 
-    assert dclusterer.labels == clusterer.labels
+    # assert dclusterer.labels == clusterer.labels
 
     assert clustered.vector(0) == [0.0, 0.0, 1.5]
     assert clustered.vector(1) == [0.0, 0.0, 1.5]

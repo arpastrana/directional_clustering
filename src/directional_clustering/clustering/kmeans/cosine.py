@@ -17,22 +17,14 @@ class CosineKMeans(KMeans):
         A reference mesh. Reserved.
     vector_field : `directional_clustering.fields.VectorField`
         The vector field to cluster.
-    n_clusters : `int`
-        The number of clusters to generate.
-    iters : `int`
-        The iterations to run the algorithm for.
-    tol : `float`
-        The tolerance to declare convergence.
     """
-    def __init__(self, mesh, vector_field, n_clusters, iters, tol):
+    def __init__(self, mesh, vector_field):
         # initialize parent class constructor
-        super(CosineKMeans, self).__init__(mesh, vector_field, n_clusters, iters, tol)
+        super(CosineKMeans, self).__init__(mesh, vector_field)
 
         # set appropiate distance function
         self.distance_func = distance_cosine
-
-        # create seeds
-        self._create_seeds("cosine")
+        self.distance_name = "cosine"
 
 
 class CosineAbsoluteKMeans(KMeans):
@@ -45,23 +37,15 @@ class CosineAbsoluteKMeans(KMeans):
         A reference mesh. Reserved.
     vector_field : `directional_clustering.fields.VectorField`
         The vector field to cluster.
-    n_clusters : `int`
-        The number of clusters to generate.
-    iters : `int`
-        The iterations to run the algorithm for.
-    tol : `float`
-        The tolerance to declare convergence.
     """
-    def __init__(self, mesh, vector_field, n_clusters, iters, tol):
+    def __init__(self, mesh, vector_field):
         # initialize parent class constructor
-        super(CosineAbsoluteKMeans, self).__init__(mesh, vector_field, n_clusters, iters, tol)
+        super(CosineAbsoluteKMeans, self).__init__(mesh, vector_field)
 
         # set appropiate distance function
         self.distance_func = distance_cosine_abs
-
-        # create seeds
         # TODO: metric must be a custom abs "cosine", not cosine, to be fair
-        self._create_seeds("cosine")
+        self._metric = "cosine"
 
 
 if __name__ == "__main__":

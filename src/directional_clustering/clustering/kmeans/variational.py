@@ -48,22 +48,33 @@ class VariationalKMeans(KMeans):
         self._initial_clusters = None
         self._faces = None
 
-        # create seeds
-        self._create_seeds()
-
-    def cluster(self):
+    def cluster(self, n_clusters, iters, tol, early_stopping, *args, **kwargs):
         """
         Cluster a vector field.
+
+        Parameters
+        ----------
+        n_clusters : `int`
+            The number of clusters to generate.
+        iters : `int`
+            The number of iterations to run the k-means for.
+        args : `list`, optional
+            Additional arguments.
+        kwargs : `dict`, optional
+            Additional keyword arguments.
 
         Notes
         -----
         It sets `self._clustered_field`, `self_labels`, `self.centers`, and `self.loss`.
         Returns `None`.
         """
+        # create seeds
+        self._create_seeds(n_clusters)
+
         # do clustering
         cluster_log = k_means(self._initial_clusters,
                               self._faces,
-                              self.iters,
+                              iters,
                               self.merge_split)
 
         # last chunk in the cluster log
@@ -93,9 +104,18 @@ class VariationalKMeans(KMeans):
         self._centers = centers
         self._loss = loss
 
-    def _create_seeds(self):
+    def _create_seeds(self, n_clusters, *args, **kwargs):
         """
         Find the initial seeds for clustering using a farthest-point strategy.
+
+        Parameters
+        ----------
+        n_clusters : `int`
+            The number of clusters to generate.
+        args : `list`, optional
+            Additional arguments.
+        kwargs : `dict`, optional
+            Additional keyword arguments.
 
         Notes
         -----
@@ -105,4 +125,4 @@ class VariationalKMeans(KMeans):
         """
         vectors = {key: vector for key, vector in self.vector_field.items()}
         self._faces = make_faces(self.mesh, vectors)
-        self._initial_clusters = furthest_init(self.n_clusters, self._faces).pop()
+        self._initial_clusters = furthest_init(n_clusters, self._faces).pop()

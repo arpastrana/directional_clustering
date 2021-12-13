@@ -121,7 +121,7 @@ def centroids_associate(X, W, d_func):
         The closest k-centroid for every example in X.
     """
     # set nan's to zero for numerical stability
-    W[np.nonzero(np.isnan(W))] = 0.0
+    # W[np.nonzero(np.isnan(W))] = 0.0
 
     # compute distance
     distances = d_func(X, W)
@@ -129,8 +129,8 @@ def centroids_associate(X, W, d_func):
     # find closest indices
     closest_k = np.argmin(distances, axis=1)
 
-    # calculate mean absolute distance (error)
-    closest = np.amin(np.abs(distances), axis=1, keepdims=True)
+    # calculate root mean square distance (error)
+    closest = np.amin(np.square(distances), axis=1, keepdims=True)
     loss = np.mean(closest)
 
     return loss, closest_k

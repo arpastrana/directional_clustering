@@ -26,28 +26,18 @@ class KMeans(ClusteringAlgorithm):
         A reference mesh.
     vector_field : `directional_clustering.fields.VectorField`
         The vector field to cluster.
-    n_clusters : `int`
-        The number of clusters to generate.
     iters : `int`
         The iterations to run the algorithm for.
     tol : `float`
         The tolerance to declare convergence.
     """
-    def __init__(self, mesh, vector_field, n_clusters, iters, tol):
-        # check sanity
-        assert mesh.number_of_faces() >= n_clusters
-        assert len(list(vector_field)) >= n_clusters
+    def __init__(self, mesh, vector_field):
+        # sanity check
+        assert mesh.number_of_faces() >= vector_field.size()
 
         # data structures
         self.mesh = mesh
         self.vector_field = vector_field
-
-        # tresholds
-        self.iters = iters
-        self.tol = tol
-
-        # number of clusters to make
-        self.n_clusters = n_clusters
 
         # distance function
         self.distance_func = None
@@ -119,59 +109,60 @@ class KMeans(ClusteringAlgorithm):
         """
         return self._centers
 
-    def _create_seeds(self, metric):
+    def cluster(self, n_clusters, iters, tol, early_stopping, *args, **kwargs):
         """
-        Find the initial seeds using an iterative farthest-point search.
-        The first seed is picked at random, without replacement.
+        Cluster a vector field.
 
         Parameters
         ----------
-        metric : `str`
-            The name of the distance metric to use.
-            Available options are `"cosine"` and `"euclidean"`.
-            Check `sklearn.metrics.pairwise.pairwise_distances` for more info.
-
-        Notes
-        -----
-        This is a private method.
-        It sets `self.seeds` and returns `None`.
-        """
-        X = np.array(self.vector_field.to_sequence())
-        k = self.n_clusters
-
-        W = kmeans_initialize(X, 1, replace=False)
-
-        for _ in range(k - 1):
-            labels, W, = self._cluster_seeds(X, W, self.distance_func, self.iters, self.tol, False)
-
-            values = W[labels]
-
-            # TODO: Replace pairwise_distances with custom method
-            distances = pairwise_distances(X, values, metric=metric)
-            distances = np.diagonal(distances).reshape(-1, 1)
-
-            index = np.argmax(distances, axis=0)
-            farthest = X[index, :]
-            W = np.vstack([W, farthest])
-
-        self.seeds = W
-
-    def cluster(self):
-        """
-        Cluster a vector field.
+        n_clusters : `int`
+            The number of clusters to generate.
+        iters : `int`
+            The number of iterations to run the k-means for.
+        tol : `tol`
+            The loss relative difference between iterations to declare early convergence.
+        early_stopping : `bool`
+            Flag to stop when tolerance threshold is met.
+            Otherwise, the algorithm will exhaust all iterations.
+        args : `list`, optional
+            Additional arguments.
+        kwargs : `dict`, optional
+            Additional keyword arguments.
 
         Notes
         -----
         It sets `self._clustered_field`, `self_labels`, `self.centers`, and `self.loss`.
         Returns `None`.
         """
+        # check sanity
+        assert self.mesh.number_of_faces() >= n_clusters
+        assert len(list(self.vector_field)) >= n_clusters
+
         # convert list of vectors to an array
         X = np.array(self.vector_field.to_sequence())
 
+        # generate seeds and store them as self.seeds
+        # TODO: early stopping is hard-coded as false for seed making
+        seeds = self._seeds(X,
+                            n_clusters,
+                            iters,
+                            tol,
+                            early_stopping=False,
+                            *args,
+                            **kwargs)
+
+        self.seeds = seeds
+
         # perform the clustering
-        # TODO: Expose early stopping as attribute
-        r = self._cluster(X, self.seeds, self.distance_func, self.iters, self.tol, False)
-        labels, centers, losses = r
+        labels, centers, losses = self._cluster(X,
+                                                seeds,
+                                                self.distance_func,
+                                                n_clusters,
+                                                iters,
+                                                tol,
+                                                early_stopping,
+                                                *args,
+                                                **kwargs)
 
         # fetch assigned centroid to each entry in the vector field
         clusters = centers[labels]
@@ -180,19 +171,20 @@ class KMeans(ClusteringAlgorithm):
         clustered_field = VectorField()
         clustered_labels = {}
 
+        # fill in vector field with clustering results
         for index, fkey in enumerate(self.vector_field.keys()):
             vector = clusters[index, :].tolist()
             clustered_field.add_vector(fkey, vector)
             clustered_labels[fkey] = labels[index]
 
-        # store data into attributes
+        # store data as clustering object attributes
         self._clustered_field = clustered_field  # clustered vector field
         self._labels = clustered_labels  # face labels
         self._centers = {idx: center.tolist() for idx, center in enumerate(centers)}
         self._loss = losses[-1]
 
     @staticmethod
-    def _cluster(X, W, dist_func, iters, tol, early_stopping=False):
+    def _cluster(X, W, dist_func, n_clusters, iters, tol, early_stopping, *args, **kwargs):
         """
         Perform k-means clustering on a vector field.
 
@@ -204,14 +196,19 @@ class KMeans(ClusteringAlgorithm):
             An array with the clusters' centers.
         dist_func : `function`
             A distance function to calculate the association metric.
+        n_clusters : `int`
+            The number of clusters to generate.
         iters : `float`
             The number of iterations to run the k-means for.
         tol : `tol`
             The loss relative difference between iterations to declare early convergence.
-        early_stopping : `bool`, optional.
+        early_stopping : `bool`
             Flag to stop when tolerance threshold is met.
             Otherwise, the algorithm will exhaust all iterations.
-            Defaults to `False`.
+        args : `list`, optional
+            Additional arguments.
+        kwargs : `dict`, optional
+            Additional keyword arguments.
 
         Returns
         -------
@@ -227,10 +224,7 @@ class KMeans(ClusteringAlgorithm):
         The nuts and bolts of kmeans clustering.
         This is a private method.
         """
-        k, d = W.shape
-
         losses = []
-
         for i in range(iters):
 
             # assign labels
@@ -238,18 +232,78 @@ class KMeans(ClusteringAlgorithm):
             losses.append(loss)
 
             # recalculate centroids
-            W = centroids_estimate(X, k, labels)
+            W = centroids_estimate(X, n_clusters, labels)
 
             # check for exit
             if i < 2 or not early_stopping:
                 continue
 
             # check if relative loss difference between two iterations is small
-            if fabs((losses[-2] - losses[-1]) / losses[-1]) < tol:
-                print("Early stopping at {}/{} iteration".format(i, iters))
+            eps = (losses[-2] - losses[-1]) / losses[-1]
+            if fabs(eps) < tol:
+                print(f"Convergence threshold met: {eps} < {tol}")
+                print(f"Early stopping at {i}/{iters} iteration")
                 break
 
         return labels, W, losses
+
+    def _seeds(self, X, n_clusters, iters, tol, early_stopping, *args, **kwargs):
+        """
+        Find the initial seeds using an iterative farthest-point search.
+        The first seed is picked at random, without replacement.
+
+        Parameters
+        ----------
+        X : `np.array`, (n, 3)
+            An array with the vectors of a vector field.
+        n_clusters : `int`
+            The number of clusters to generate.
+        iters : `float`
+            The number of iterations to run the k-means for.
+        tol : `tol`
+            The loss relative difference between iterations to declare early convergence.
+        early_stopping : `bool`
+            Flag to stop when tolerance threshold is met.
+            Otherwise, the algorithm will exhaust all iterations.
+        args : `list`, optional
+            Additional arguments.
+        kwargs : `dict`, optional
+            Additional keyword arguments.
+
+        Returns
+        -------
+        seeds : `np.array`, (k, 3)
+            An array with the initial cluster seeds.
+
+        Notes
+        -----
+        This is a private method.
+        """
+        W = kmeans_initialize(X, 1, replace=False)
+
+        for k in range(n_clusters - 1):
+            labels, W = self._cluster_seeds(X,
+                                            W,
+                                            self.distance_func,
+                                            k + 1,
+                                            iters,
+                                            tol,
+                                            early_stopping,
+                                            *args,
+                                            **kwargs)
+
+            values = W[labels]
+
+            # TODO: Replace pairwise_distances with custom method
+            # Check `sklearn.metrics.pairwise.pairwise_distances` for more info
+            distances = pairwise_distances(X, values, metric=self.distance_name)
+            distances = np.diagonal(distances).reshape(-1, 1)
+
+            index = np.argmax(distances, axis=0)
+            farthest = X[index, :]
+            W = np.vstack([W, farthest])
+
+        return W
 
     def _cluster_seeds(self, *args, **kwargs):
         """
@@ -257,10 +311,10 @@ class KMeans(ClusteringAlgorithm):
 
         Parameters
         ----------
-        args : `list`
-            A list of input parameters.
-        kwargs : `dict`
-            Named attributes
+        args : `list`, optional
+            Additional arguments.
+        kwargs : `dict`, optional
+            Keyword arguments.
 
         Returns
         -------

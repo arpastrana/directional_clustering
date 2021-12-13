@@ -16,22 +16,14 @@ class EuclideanKMeans(KMeans):
         A reference mesh. Reserved.
     vector_field : `directional_clustering.fields.VectorField`
         The vector field to cluster.
-    n_clusters : `int`
-        The number of clusters to generate.
-    iters : `int`
-        The iterations to run the algorithm for.
-    tol : `float`
-        The tolerance to declare convergence.
     """
-    def __init__(self, mesh, vector_field, n_clusters, iters, tol):
+    def __init__(self, mesh, vector_field):
         # initialize parent class constructor
-        super(EuclideanKMeans, self).__init__(mesh, vector_field, n_clusters, iters, tol)
+        super(EuclideanKMeans, self).__init__(mesh, vector_field)
 
         # set appropiate distance function
         self.distance_func = distance_euclidean
-
-        # create seeds
-        self._create_seeds("euclidean")
+        self.distance_name = "euclidean"
 
 
 if __name__ == "__main__":
