@@ -4,6 +4,9 @@ import os
 # argument parsing helper
 import fire
 
+# pyplot, 'cause why not
+import matplotlib.pyplot as plt
+
 # good ol' numpy
 import numpy as np
 
@@ -121,7 +124,7 @@ def directional_clustering(filename,
 
     # the name of the vector field to cluster.
     while True:
-        vf_name = input("Please choose one vector field to cluster:")
+        vf_name = input("Please choose one vector field to cluster: ")
         if vf_name in available_vf:
             break
         else:
@@ -212,13 +215,12 @@ def directional_clustering(filename,
     # vector which is the "most distant" at a given iteration using kmeans itself
     # These seeds will be used later on as input to start the final kmeans run.
 
-    print("-----")
-
     # Create an instance of a clustering algorithm from ClusteringFactory
     clustering_algo = ClusteringFactory.create(algo_name)
     clusterer = clustering_algo(mesh, vectors)
 
     # initialize seeds
+    print("-----")
     clusterer.seed(n_clusters, **kwargs_seeds)
 
     # do kmeans clustering
@@ -229,9 +231,10 @@ def directional_clustering(filename,
     # every vector and the centroid of the cluster it is assigned to
     # the goal of kmeans is to minimize this loss function
 
+    print("-----")
     print("Clustering started...")
     clusterer.cluster(n_clusters, iters, tol, early_stopping, **kwargs)
-    print(f"Loss Clustering: {clusterer.loss}")
+    print(f"Loss Clustering (original field to {n_clusters} centroids): {clusterer.loss}")
     print("Clustering ended!")
 
     # store results in clustered_field and labels
@@ -261,7 +264,23 @@ def directional_clustering(filename,
 
     rmse = np.sqrt(np.mean(errors))
     print("-----")
-    print(f"Clustered Field RMSE: {rmse}")
+    print(f"Clustered Field RMSE (clustered field to original field): {rmse}")
+
+    # ==========================================================================
+    # Plot clusterer loss history
+    # ==========================================================================
+
+    print("-----")
+    while True:
+        plot_history = input("Plot clusterer loss history? [Y/n] ")
+        if plot_history in ["", "y", "Y"]:
+            plt.plot(clusterer.loss_history)
+            plt.show()
+            break
+        elif plot_history == "n":
+            break
+        else:
+            print("Hmm...That's neither a yes nor a no. Try again.")
 
     # ==========================================================================
     # Assign cluster labels to mesh
@@ -327,13 +346,17 @@ def directional_clustering(filename,
 
     print("-----")
     print("Rescaling vector field based on plane stress transformation")
+    stress_types = {"m": "bending", "n": "axial"}
     while True:
-        stress_type = input("What stress type are we looking at, bending or axial? ")
-
-        if stress_type in ["bending", "axial"]:
+        stress_id = input("What stress type are we looking at, bending (m) or axial (n)? [M/n]")
+        if stress_id in ["m", "n", ""]:
+            if stress_id == "":
+                stress_id = "m"
+            stress_type = stress_types[stress_id]
+            print(f"Selected stress type is: {stress_type}")
             break
         else:
-            print("Hmm...That's neither axial nor bending. Please try again.")
+            print("Hmm...That's neither axial (n) nor bending (m). Please try again.")
 
     args = [mesh, (clustered_field, clustered_field_90), stress_type, stress_transf_ref]
     clustered_field, clustered_field_90 = transformed_stress_vector_fields(*args)

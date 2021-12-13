@@ -288,6 +288,7 @@ class KMeans(ClusteringAlgorithm):
         Returns `None`.
         This is a private method.
         """
+        print("Creating seeds...")
         assert self.mesh.number_of_faces() >= n_clusters
         assert len(list(self.vector_field)) >= n_clusters
 
@@ -304,6 +305,7 @@ class KMeans(ClusteringAlgorithm):
                                      *args,
                                      **kwargs)
         self.seeds = seeds
+        print("Seeds were generated!")
 
     def _seeds_generate(self, X, n_clusters, iters, tol, early_stopping, *args, **kwargs):
         """
