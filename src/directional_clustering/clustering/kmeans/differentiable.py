@@ -4,10 +4,6 @@ import numpy as np
 
 from directional_clustering.clustering.kmeans import CosineKMeans
 
-from directional_clustering.clustering.kmeans import centroids_associate
-from directional_clustering.clustering.kmeans import centroids_estimate
-
-
 __all__ = ["DifferentiableCosineKMeans"]
 
 
@@ -25,6 +21,7 @@ class DifferentiableCosineKMeans(CosineKMeans):
     def __init__(self, mesh, vector_field):
         # initialize parent class constructor
         # parent classes sets distance function and creates initial seeds
+        # TODO: Make n_clusters an __init__ argument to unify seed()/cluster()?
         super(DifferentiableCosineKMeans, self).__init__(mesh, vector_field)
 
         # set attention parameters
@@ -144,7 +141,7 @@ class DifferentiableCosineKMeans(CosineKMeans):
         print("Differentiable clustering ended!")
         return labels, centroids, losses
 
-    def _cluster_seeds(self, *args, **kwargs):
+    def _seeds_cluster(self, *args, **kwargs):
         """
         The clustering approach to create initial seeds.
 
@@ -201,7 +198,6 @@ if __name__ == "__main__":
     dclusterer = DifferentiableCosineKMeans(mesh, vector_field)
     dclusterer.cluster(n_clusters, iters, tol, early_stopping, tao)
     dclustered = dclusterer.clustered_field
-
 
     print(f"Loss: {dclusterer.loss}, Labels: {dclusterer.labels}")
     print(f"Cluster centers {dclusterer.centers}")

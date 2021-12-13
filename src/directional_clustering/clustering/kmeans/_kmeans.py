@@ -51,6 +51,7 @@ class KMeans(ClusteringAlgorithm):
         self._labels = None
 
         self._loss = None
+        self._loss_history = None
 
     @property
     def loss(self):
@@ -67,6 +68,22 @@ class KMeans(ClusteringAlgorithm):
         This is computed as the mean squared distance of to the k-centers.
         """
         return self._loss
+
+    @property
+    def loss_history(self):
+        """
+        The log of losses recorded while clustering a vector field.
+
+        Returns
+        -------
+        loss : `list` of `float`
+            The loss history.
+
+        Notes
+        -----
+        The length of the list is the number of elapsed clustering iterations.
+        """
+        return self._loss_history
 
     @property
     def clustered_field(self):
@@ -141,21 +158,14 @@ class KMeans(ClusteringAlgorithm):
         # convert list of vectors to an array
         X = np.array(self.vector_field.to_sequence())
 
-        # generate seeds and store them as self.seeds
-        # TODO: early stopping is hard-coded as false for seed making
-        seeds = self._seeds(X,
-                            n_clusters,
-                            iters,
-                            tol,
-                            early_stopping=False,
-                            *args,
-                            **kwargs)
-
-        self.seeds = seeds
+        # fetch initial seeds
+        seeds = self.seeds
+        if seeds is None:
+            raise ValueError("No initial seeds! Have you created them?")
 
         # perform the clustering
         labels, centers, losses = self._cluster(X,
-                                                seeds,
+                                                self.seeds,
                                                 self.distance_func,
                                                 n_clusters,
                                                 iters,
@@ -182,6 +192,7 @@ class KMeans(ClusteringAlgorithm):
         self._labels = clustered_labels  # face labels
         self._centers = {idx: center.tolist() for idx, center in enumerate(centers)}
         self._loss = losses[-1]
+        self._loss_history = losses
 
     @staticmethod
     def _cluster(X, W, dist_func, n_clusters, iters, tol, early_stopping, *args, **kwargs):
@@ -247,7 +258,53 @@ class KMeans(ClusteringAlgorithm):
 
         return labels, W, losses
 
-    def _seeds(self, X, n_clusters, iters, tol, early_stopping, *args, **kwargs):
+    def seed(self, n_clusters, iters=100, tol=1e-6, early_stopping=False, *args, **kwargs):
+        """
+        Generate the initial cluster seeds using a farthest-point search.
+        The first seed is picked at random, without replacement.
+
+        Parameters
+        ----------
+        n_clusters : `int`
+            The number of clusters to generate.
+        iters : `float`, optional
+            The number of iterations to run the k-means for.
+            Defaults to `100`.
+        tol : `tol`, optional
+            The loss relative difference between iterations to declare early convergence.
+            Defaults to `1e-6`.
+        early_stopping : `bool`, optional
+            Flag to stop when tolerance threshold is met.
+            Otherwise, the algorithm will exhaust all iterations.
+            Defaults to `False`.
+        args : `list`, optional
+            Additional arguments.
+        kwargs : `dict`, optional
+            Additional keyword arguments.
+
+        Notes
+        -----
+        Returns `None`.
+        This is a private method.
+        """
+        assert self.mesh.number_of_faces() >= n_clusters
+        assert len(list(self.vector_field)) >= n_clusters
+
+        # convert list of vectors to an array
+        X = np.array(self.vector_field.to_sequence())
+
+        # generate seeds and store them as self.seeds
+        # TODO: early stopping is hard-coded as false for seed making
+        seeds = self._seeds_generate(X,
+                                     n_clusters,
+                                     iters,
+                                     tol,
+                                     early_stopping,
+                                     *args,
+                                     **kwargs)
+        self.seeds = seeds
+
+    def _seeds_generate(self, X, n_clusters, iters, tol, early_stopping, *args, **kwargs):
         """
         Find the initial seeds using an iterative farthest-point search.
         The first seed is picked at random, without replacement.
@@ -282,7 +339,7 @@ class KMeans(ClusteringAlgorithm):
         W = kmeans_initialize(X, 1, replace=False)
 
         for k in range(n_clusters - 1):
-            labels, W = self._cluster_seeds(X,
+            labels, W = self._seeds_cluster(X,
                                             W,
                                             self.distance_func,
                                             k + 1,
@@ -305,7 +362,7 @@ class KMeans(ClusteringAlgorithm):
 
         return W
 
-    def _cluster_seeds(self, *args, **kwargs):
+    def _seeds_cluster(self, *args, **kwargs):
         """
         The clustering approach to create initial seeds.
 
