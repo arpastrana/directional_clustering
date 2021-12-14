@@ -174,7 +174,7 @@ def directional_clustering(filename,
     # vector field will be very noisy, especially around "singularities".
     # this means there can be drastic orientation jumps/flips between two vectors
     # which will affect the quality of the clustering.
-    # to mitigate this, we apply laplacian smoothing which helps to soften and 
+    # to mitigate this, we apply laplacian smoothing which helps to soften and
     # preserve continuity between adjacent vectors
     # what this basically does is going through every face in the mesh,
     # querying what are their neighbor faces, and then averaging the vectors stored

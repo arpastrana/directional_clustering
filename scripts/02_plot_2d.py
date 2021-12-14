@@ -9,6 +9,7 @@ import numpy as np
 
 # plots and beyond
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 # python standard libraries
 from itertools import cycle
@@ -97,8 +98,11 @@ def plot_2d(filename,
             comb_fields=False,
             align_field_1_to=None,
             align_field_2_to=None,
+            streamlines_max_length=20.0,
             streamlines_density=0.75,  # 0.55 for 4ps
+            streamlines_grid_scale=1.0,  # 0.1 for hecker circle
             streamlines_lw=None,
+            streamlines_clip_circle=False,
             vector_fields_scale=0.03,
             vector_fields_same_scale=True,
             save_img=True,
@@ -257,7 +261,7 @@ def plot_2d(filename,
             for fkey in sorted_fkeys:
                 point = {}
                 point["pos"] = mesh.face_centroid(fkey)
-                point["radius"] = 0.03
+                point["radius"] = 0.15  # 0.03 for slabs
                 point["edgewidth"] = 0.10
                 points.append(point)
 
@@ -347,8 +351,8 @@ def plot_2d(filename,
             vxdiff = vxmax - vxmin
             vydiff = vymax - vymin
 
-            X = np.linspace(vxmin + pe * vxdiff, vxmax - pe * vxdiff, len(set(vx)))
-            Y = np.linspace(vymin + pe * vydiff, vymax - pe * vydiff, len(set(vy)))
+            X = np.linspace(vxmin + pe * vxdiff, vxmax - pe * vxdiff, int(len(set(vx)) * streamlines_grid_scale))
+            Y = np.linspace(vymin + pe * vydiff, vymax - pe * vydiff, int(len(set(vy)) * streamlines_grid_scale))
             XX, YY = np.meshgrid(X, Y)
 
             # gather gkey maps
@@ -434,7 +438,7 @@ def plot_2d(filename,
                 stream_set = plt.streamplot(XX, YY, U, V,
                                             color=[i / 255.0 for i in next(colors)],
                                             arrowsize=0.0,
-                                            maxlength=20.0,
+                                            maxlength=streamlines_max_length,
                                             minlength=0.1,
                                             density=streamlines_density,
                                             integration_direction="both",
@@ -442,6 +446,13 @@ def plot_2d(filename,
 
                 _vf_name = "".join(vf_name.split("_"))
                 stream_set.lines.set_label(_vf_name)
+
+                # TODO: find more elegant way to find max radius
+                if streamlines_clip_circle:
+                    patch = patches.Circle((0, 0),
+                                           radius=vxmax,
+                                           transform=plotter.axes.transData)
+                    stream_set.lines.set_clip_path(patch)
 
         legend = plt.legend(facecolor="white")
         legend.set_zorder(ZORDER_LEGEND)
@@ -453,12 +464,13 @@ def plot_2d(filename,
     if save_img:
 
         exp_name = filename.split('/')[-1]
-
         cf = "".join(color_faces.split("_")) if color_faces else 0
         data_shown = f"clr{cf}_vf{int(draw_vector_fields)}_strm{int(draw_streamlines)}"
         img_name = f"{exp_name}_{data_shown}.{IMG_EXTENSION}"
         clusterer_name = mesh.attributes["clusterer_name"]
+
         img_path = os.path.abspath(os.path.join(DATA, "images", clusterer_name, img_name))
+
         plt.tight_layout()
         plotter.save(img_path, bbox_inches='tight', pad_inches=pad_inches)
         print(f"Saved image to : {img_path}")
