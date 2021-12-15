@@ -120,8 +120,14 @@ temp/**
 docs/
 docsource/api/generated/
 
-# JSON files of clustered fields
-data/json_files/clustered
+# generated JSON files of clustered fields
+data/json/clustered
 
 # generated images
 data/images
+
+# generated off meshes
+data/off
+
+# generated n-rosy fields
+data/rawfield
