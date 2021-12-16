@@ -7,6 +7,7 @@ __all__ = ["VectorField"]
 class VectorField(Field):
     """
     A field with a fixed dimensionality of 3.
+    # TODO: Any field should be a VectorField and this should be renamed to 3DVectorField?
     """
     def __init__(self):
         """
@@ -20,7 +21,7 @@ class VectorField(Field):
 
     def add_vector(self, key, vector):
         """
-        Adds a vector entry to a vector field.
+        Adds a vector entry to the field.
 
         Parameters
         ----------
@@ -33,7 +34,7 @@ class VectorField(Field):
 
     def remove_vector(self, key):
         """
-        Deletes a vector from the vector field.
+        Deletes a vector from the field.
 
         Parameters
         ----------
@@ -44,7 +45,7 @@ class VectorField(Field):
 
     def vector(self, key):
         """
-        Queries a vector from a vector field.
+        Queries a vector from a field.
 
         Parameters
         ----------
@@ -60,24 +61,24 @@ class VectorField(Field):
 
     def keys(self):
         """
-        Iterates over they access keys of the vector field.
+        Iterates over they access keys of the field.
 
         Yields
         ------
         key : `int`
-            The next access key in the vector field.
+            The next access key in the field.
         """
         for key, _ in self:
             yield key
 
     def vectors(self):
         """
-        Iterates over the vectors of the vector field.
+        Iterates over the vectors of the field.
 
         Yields
         ------
         vector : `list` of `float`
-            The next vector in the vector field.
+            The next vector in the field.
         """
         for _, vector in self:
             yield vector
@@ -89,9 +90,9 @@ class VectorField(Field):
         Yields
         ------
         key : `int`
-            The next access key in the vector field.
+            The next access key in the field.
         vector : `list` of `float`
-            The next vector in the vector field.
+            The next vector in the field.
         """
         for key, vector in self:
             yield key, vector
@@ -100,81 +101,81 @@ class VectorField(Field):
     # IO
     # --------------------------------------------------------------------------
 
-    def to_sequence(self):
-        """
-        Converts a vector field into a sequence.
+    # def to_sequence(self):
+    #     """
+    #     Converts the field into a sequence.
 
-        Returns
-        -------
-        sequence : `list` of `list`
-            A list of vectors.
+    #     Returns
+    #     -------
+    #     sequence : `list` of `list`
+    #         A list of vectors.
 
-        Notes
-        -----
-        The output vectors are not sorted by their access keys.
-        """
-        return [vector for vector in self.vectors()]
+    #     Notes
+    #     -----
+    #     The output vectors are not sorted by their access keys.
+    #     """
+    #     return [vector for vector in self.vectors()]
 
-    @classmethod
-    def from_sequence(cls, sequence):
-        """
-        Creates a vector field from a sequence.
+    # @classmethod
+    # def from_sequence(cls, sequence):
+    #     """
+    #     Creates a field from a sequence.
 
-        Parameters
-        ----------
-        sequence : `list` of `list`
-            A list of vectors.
+    #     Parameters
+    #     ----------
+    #     sequence : `list` of `list`
+    #         A list of vectors.
 
-        Returns
-        -------
-        vector_field : `directional_clustering.fields.VectorField`
-            A vector field.
+    #     Returns
+    #     -------
+    #     field : `directional_clustering.fields.Field`
+    #         A field.
 
-        Notes
-        -----
-        The vectors are stored in the order they are supplied.
-        Access keys are generated in the range from 0 to the sequence length.
-        """
-        vf = cls()
+    #     Notes
+    #     -----
+    #     The vectors are stored in the order they are supplied.
+    #     Access keys are generated in the range from 0 to the sequence length.
+    #     """
+    #     vf = cls()
 
-        for index, vector in enumerate(sequence):
-            vf.add_vector(index, vector)
+    #     for index, vector in enumerate(sequence):
+    #         vf.add_vector(index, vector)
 
-        return vf
+    #     return vf
 
-    @classmethod
-    def from_mesh_faces(cls, mesh, name):
-        """
-        Extracts a vector field from the faces of a mesh.
+    # @classmethod
+    # def from_mesh_faces(cls, mesh, name):
+    #     """
+    #     Extracts a field from the faces of a mesh.
 
-        Parameters
-        ----------
-        mesh : `directional_clustering.mesh.MeshPlus`
-            A mesh.
-        name : `str`
-            The name of the face attribute to query.
+    #     Parameters
+    #     ----------
+    #     mesh : `directional_clustering.mesh.MeshPlus`
+    #         A mesh.
+    #     name : `str`
+    #         The name of the face attribute to query.
 
-        Returns
-        -------
-        vector_field : `VectorField`
-            A vector field.
+    #     Returns
+    #     -------
+    #     field : `Field`
+    #         A field.
 
-        Notes
-        -----
-        Deprecated.
-        Every vector is stored with the mesh face keys as access keys.
-        """
-        vector_field = cls()
+    #     Notes
+    #     -----
+    #     Deprecated.
+    #     Every vector is stored with the mesh face keys as access keys.
+    #     """
+    #     vector_field = cls()
 
-        for fkey in mesh.faces():
-            vector = mesh.face_attribute(fkey, name)
+    #     for fkey in mesh.faces():
+    #         vector = mesh.face_attribute(fkey, name)
 
-            msg = "Attribute {} is not defined on face {}!".format(name, fkey)
-            assert vector is not None, msg
+    #         msg = "Attribute {} is not defined on face {}!".format(name, fkey)
+    #         assert vector is not None, msg
 
-            vector_field.add_vector(fkey, vector)
+    #         vector_field.add_vector(fkey, vector)
 
-        return vector_field
+    #     return vector_field
 
 
 if __name__ == "__main__":

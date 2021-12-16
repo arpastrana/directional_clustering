@@ -35,5 +35,6 @@ from __future__ import print_function
 from .abstract_field import *
 from .field import *
 from .vector_field import *
+from .nrosy_field import *
 
 __all__ = [name for name in dir() if not name.startswith('_')]
