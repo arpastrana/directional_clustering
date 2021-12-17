@@ -131,7 +131,7 @@ def centroids_associate(X, W, d_func):
 
     # calculate root mean square distance (error)
     closest = np.amin(np.square(distances), axis=1, keepdims=True)
-    loss = np.mean(closest)
+    loss = np.sqrt(np.mean(closest))
 
     return loss, closest_k
 
