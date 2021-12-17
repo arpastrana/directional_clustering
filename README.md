@@ -42,10 +42,10 @@ things, of installing scientific computing packages like `numpy` and
 
 2. Next, let's create a new `conda` environment from your command line interface
 (your terminal on macOS or from the anaconda prompt on windows).
-The only required dependencies are `compas` and`sklearn`.
+The only required dependencies are `compas` and `igl`.
 
 ```bash
-conda create -n clusters python=3.7 COMPAS=1.8.1 scikit-learn
+conda create -n clusters python=3.7 COMPAS=1.8.1 igl
 conda activate clusters
 ```
 

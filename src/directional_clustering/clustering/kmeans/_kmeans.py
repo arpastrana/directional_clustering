@@ -354,9 +354,9 @@ class KMeans(ClusteringAlgorithm):
 
             values = W[labels]
 
-            # TODO: Replace pairwise_distances with custom method
-            # Check `sklearn.metrics.pairwise.pairwise_distances` for more info
-            distances = pairwise_distances(X, values, metric=self.distance_name)
+            # distance of every vector to every other clustered vector (incl. itself)
+            distances = self.distance_func(X, values)
+            # distance of every vector to itself
             distances = np.diagonal(distances).reshape(-1, 1)
 
             index = np.argmax(distances, axis=0)
