@@ -5,7 +5,6 @@ from math import pi
 from compas.geometry import Vector
 from compas.geometry import Rotation
 
-from directional_clustering.fields import VectorField
 from directional_clustering.fields import Field
 
 
@@ -32,6 +31,16 @@ class NRoSyField(Field):
         """
         assert degree > 1
         super(NRoSyField, self).__init__(dimensionality=degree * 3)
+        self._degree = degree
+
+    def degree(self):
+        """
+        Returns
+        --------
+        degree : `int`
+            The number of equidistant vectors in the N-RoSy field
+        """
+        return self._degree
 
     # --------------------------------------------------------------------------
     # Factory methods
@@ -90,7 +99,7 @@ class NRoSyField(Field):
     # IO
     # --------------------------------------------------------------------------
 
-    def to_rawfield(filepath):
+    def to_rawfield(self, filepath, precision=6):
         """
         Exports a vector field to a .rawfield file.
 
@@ -98,6 +107,11 @@ class NRoSyField(Field):
         ----------
         filepath : `str`
             The filepath where to store the exported (N-Rosy) vector field.
+        mesh : `directional_clustering.mesh.MeshPlus`.
+            A mesh whose key indices are used as the basis for output ordering.
+            The mesh face keys must match the vector field keys.
+        precision : `int`
+            The rounding floating-point precision.
 
         Notes
         -----
@@ -106,24 +120,45 @@ class NRoSyField(Field):
         the input field is rotated a fixed angle for `n` times around its
         corresponding face normal. The angle of rotation is 2 * pi / `n`.
         """
-        return
+        with open(filepath, "w") as f:
+            # write degree-sizeheader
+            f.write(f"{self.degree()} {self.size()}\n")
+
+            # iterate over nrosy field keys
+            for key, item in self:
+
+                vector = self[key]
+                vector_clean = []
+
+                for entry in vector:
+                    # write nrosy vector
+                    entry = round(entry, precision)
+                    vector_clean.append(f"{entry + 0.0}")
+
+                vector_clean = " ".join(vector_clean)
+                f.write(f"{vector_clean}\n")
 
 
 if __name__ == "__main__":
 
     import os
     from directional_clustering import JSON
+    from directional_clustering import RAWFIELD
     from directional_clustering.mesh import MeshPlus
 
     filename = "four_point_slab"
-    vf_name = "m_1"
-    degree = 4
+    vf_name = "custom_1"
+    degree = 2
 
     name_in = filename + ".json"
     json_in = os.path.abspath(os.path.join(JSON, name_in))
     mesh = MeshPlus.from_json(json_in)
     vector_field = mesh.vector_field(vf_name)
 
-    nrosy_field = NRoSyField.from_vector_field(vector_field, mesh, degree, True)
+    nrosy = NRoSyField.from_vector_field(vector_field, mesh, degree, True)
 
-    print("Sucess!")
+    rawfield_out = f"{filename}_{vf_name}.rawfield"
+    rawfield_out = os.path.abspath(os.path.join(RAWFIELD, rawfield_out))
+    nrosy.to_rawfield(rawfield_out)
+
+    print("Success!")

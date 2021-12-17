@@ -21,6 +21,7 @@ from directional_clustering import JSON
 from directional_clustering.mesh import MeshPlus
 
 # transformations
+from directional_clustering.transformations import comb_vector_field
 from directional_clustering.transformations import smoothen_vector_field
 
 # ==============================================================================
@@ -92,13 +93,15 @@ def plot_kmeans_vectors(data, labels, normalize=False, scale_to_max=True, draw_c
 
         if draw_centroids:
 
-            # draw centroid as point
-            plt.scatter(centroid[0], centroid[1], marker="x", color="black", s=200)
-
             # draw lines from origin to centroid
-            # a = np.array([0.0, centroid[0]])  # start line at the origin
-            # b = np.array([0.0, centroid[1]])  # start line at the origin
-            # plt.plot(a, b, color="black", linewidth=0.75)  # plot line
+            a = np.array([0.0, centroid[0]])  # start line at the origin
+            b = np.array([0.0, centroid[1]])  # start line at the origin
+            plt.plot(a, b, color="black", linewidth=0.5, ls="--")  # plot line
+
+            # draw origin as point
+            plt.scatter(0.0, 0.0, marker="o", color="black", alpha=1.0, s=25)
+            # draw centroid as point
+            plt.scatter(centroid[0], centroid[1], marker="o", color=sc_color, edgecolors="black", alpha=1.0, s=100)
 
             # plt.scatter(seeds[:, 0], seeds[:, 1], marker="s", color="black", s=100)
             # plt.plot([seeds, centroid, color='black', lw="--")
@@ -128,6 +131,7 @@ def plot_kmeans_vectors(data, labels, normalize=False, scale_to_max=True, draw_c
 
 def plot_vectors_2d(filename,
                     vf_name,
+                    comb=False,
                     smooth_iters=0,
                     draw_centroids=True,
                     normalize=False,
@@ -154,6 +158,10 @@ def plot_vectors_2d(filename,
 
     # get vector field
     vf = mesh.vector_field(vf_name)
+
+    # Comb the vector field -- remember the hair ball theorem (seams exist)
+    if comb:
+        vf = comb_vector_field(vf, mesh)
 
     # smooth vector field
     if smooth_iters:

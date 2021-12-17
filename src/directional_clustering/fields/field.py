@@ -107,6 +107,52 @@ class Field(AbstractField):
         """
         return len(self._field)
 
+    # --------------------------------------------------------------------------
+    # IO
+    # --------------------------------------------------------------------------
+
+    def to_sequence(self):
+        """
+        Converts the field into a sequence.
+
+        Returns
+        -------
+        sequence : `list` of `list`
+            A list of vectors.
+
+        Notes
+        -----
+        The output vectors are not sorted by their access keys.
+        """
+        return [value for _, value in self]
+
+    @classmethod
+    def from_sequence(cls, sequence):
+        """
+        Creates a field from a sequence.
+
+        Parameters
+        ----------
+        sequence : `list` of `list`
+            A list of vectors.
+
+        Returns
+        -------
+        field : `directional_clustering.fields.Field`
+            A field.
+
+        Notes
+        -----
+        The input vectors are stored in the order they are supplied.
+        Access keys are generated in the range from 0 to the sequence length.
+        """
+        vf = cls()
+
+        for index, vector in enumerate(sequence):
+            vf[index] = vector
+
+        return vf
+
 
 if __name__ == "__main__":
     pass
