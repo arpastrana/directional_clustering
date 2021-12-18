@@ -52,6 +52,7 @@ def directional_clustering(filename,
                            align_vectors=False,
                            alignment_ref=[1.0, 0.0, 0.0],
                            smooth_iters=0,
+                           smooth_align=True,
                            damping=0.5,
                            stress_transf_ref=[1.0, 0.0, 0.0],
                            kwargs_seeds={},
@@ -157,6 +158,8 @@ def directional_clustering(filename,
     # x and global y vectors as references, which have worked ok for my purposes.
 
     if align_vectors:
+        print("-----")
+        print(f"Aligning vector field to {alignment_ref}")
         align_vector_field(vectors, alignment_ref)
 
     # ==========================================================================
@@ -164,6 +167,8 @@ def directional_clustering(filename,
     # ==========================================================================
 
     if comb_vectors:
+        print("-----")
+        print("Combing vector field")
         vectors = comb_vector_field(vectors, mesh)
 
     # ==========================================================================
@@ -186,7 +191,9 @@ def directional_clustering(filename,
     # so smoothing is something to use with care
 
     if smooth_iters:
-        smoothen_vector_field(vectors, mesh.face_adjacency(), smooth_iters, damping)
+        print("-----")
+        print(f"Smoothing vector field for {smooth_iters} iters. Align neighbors: {smooth_align}")
+        smoothen_vector_field(vectors, mesh.face_adjacency(), smooth_iters, damping, smooth_align)
 
     # ==========================================================================
     # Do K-means Clustering

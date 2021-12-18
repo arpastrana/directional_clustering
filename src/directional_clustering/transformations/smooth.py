@@ -2,6 +2,8 @@ from compas.geometry import add_vectors
 from compas.geometry import subtract_vectors
 from compas.geometry import scale_vector
 
+from directional_clustering.transformations import align_vectors
+
 
 __all__ = ["smoothen_vector_field",
            "adjacent_vectors",
@@ -9,7 +11,7 @@ __all__ = ["smoothen_vector_field",
            "smoothed_vector"]
 
 
-def smoothen_vector_field(vector_field, adjacency, iters, damping=0.5):
+def smoothen_vector_field(vector_field, adjacency, iters, damping=0.5, align=True):
     """
     Apply Laplacian smoothing to a vector field.
 
@@ -24,11 +26,15 @@ def smoothen_vector_field(vector_field, adjacency, iters, damping=0.5):
     damping : `float`, optional.
         A coefficient between 0.0 and 1.0 that controls the smoothing strength.
         1.0 is maximum smoothing.
-        Defaults to 0.5
+        Defaults to 0.5.
+    align : `bool`, optional.
+        A flag to align adjacent vectors to any given vector before aggregation.
+        The alignment check is carried via the dot product.
+        Defaults to `True`.
 
     Notes
     -----
-    Modifies vector field in place.
+    Modifies the vector field in place.
     """
     assert vector_field.size() == len(adjacency)
 
@@ -46,9 +52,14 @@ def smoothen_vector_field(vector_field, adjacency, iters, damping=0.5):
                 smoothed_vectors[key] = vector
                 continue
 
-            adj_vector = mean_vector(adjacent_vectors(vector_field, neighbors))
+            adj_vectors = adjacent_vectors(vector_field, neighbors)
 
-            smoothed_vectors[key] = smoothed_vector(vector, adj_vector, damping)
+            if align:
+                adj_vectors = [align_vectors(v, vector) for v in adj_vectors]
+
+            avg_vector = mean_vector(adj_vectors)
+
+            smoothed_vectors[key] = smoothed_vector(vector, avg_vector, damping)
 
         # update vector field
         for key in vector_field.keys():

@@ -98,6 +98,7 @@ def plot_2d(filename,
             comb_fields=False,
             align_field_1_to=None,
             align_field_2_to=None,
+            face_centroids_radius=0.08,
             streamlines_max_length=20.0,
             streamlines_density=0.75,  # 0.55 for 4ps
             streamlines_grid_scale=1.0,  # 0.1 for hecker circle
@@ -261,7 +262,7 @@ def plot_2d(filename,
             for fkey in sorted_fkeys:
                 point = {}
                 point["pos"] = mesh.face_centroid(fkey)
-                point["radius"] = 0.15  # 0.03 for slabs
+                point["radius"] = face_centroids_radius # 0.03 for slabs
                 point["edgewidth"] = 0.10
                 points.append(point)
 
