@@ -23,7 +23,6 @@ class EuclideanKMeans(KMeans):
 
         # set appropiate distance function
         self.distance_func = distance_euclidean
-        self.distance_name = "euclidean"
 
 
 if __name__ == "__main__":

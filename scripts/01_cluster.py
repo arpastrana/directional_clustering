@@ -259,17 +259,17 @@ def directional_clustering(filename,
     # clustering_error = MeanSquaredError(vector_field, clustered_field)
     # clustering_error = MeanAbsoluteError(vector_field, clustered_field)
 
-    errors = np.zeros(mesh.number_of_faces())
+    distances = np.zeros(mesh.number_of_faces())
     for fkey in mesh.faces():
         # for every face compute difference between clustering output and
         # aligned+smoothed vector, might be better to compare against the
         # raw vector
         # difference_vector = subtract_vectors(clustered_field.vector(fkey), vectors.vector(fkey))
         # errors[fkey] = length_vector_sqrd(difference_vector)
-        error = clusterer.distance_func(clustered_field.vector(fkey), vectors.vector(fkey))
-        errors[fkey] = np.square(error)
+        distance = clusterer.distance_func(clustered_field.vector(fkey), vectors.vector(fkey))
+        distances[fkey] = distance
 
-    rmse = np.sqrt(np.mean(errors))
+    rmse = clusterer.loss_func(distances)
     print("-----")
     print(f"Clustered Field RMSE (clustered field to original field): {rmse}")
 
@@ -279,9 +279,11 @@ def directional_clustering(filename,
 
     print("-----")
     while True:
-        plot_history = input("Plot clusterer loss history? [Y/n] ")
+        plot_history = input("Plot clusterer loss histories? [Y/n] ")
         if plot_history in ["", "y", "Y"]:
-            plt.plot(clusterer.loss_history)
+            plt.plot(clusterer.loss_history, label="loss_centroids")
+            plt.plot(clusterer.loss_history_field, label="loss_field")
+            plt.legend()
             plt.show()
             break
         elif plot_history == "n":

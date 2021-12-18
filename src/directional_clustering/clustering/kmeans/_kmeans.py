@@ -45,12 +45,12 @@ class KMeans(ClusteringAlgorithm):
 
         # initialization
         self.seeds = None
+        self._is_seeding = False
 
         # to be set after running cluster()
         self._clustered_field = None
         self._centers = None
         self._labels = None
-
         self._loss = None
         self._loss_history = None
 
@@ -73,7 +73,7 @@ class KMeans(ClusteringAlgorithm):
     @property
     def loss_history(self):
         """
-        The log of losses recorded while clustering a vector field.
+        The log of centroid losses recorded while clustering a vector field.
 
         Returns
         -------
@@ -85,6 +85,22 @@ class KMeans(ClusteringAlgorithm):
         The length of the list is the number of elapsed clustering iterations.
         """
         return self._loss_history
+
+    @property
+    def loss_history_field(self):
+        """
+        The log of field losses recorded while clustering a vector field.
+
+        Returns
+        -------
+        loss : `list` of `float`
+            The loss history.
+
+        Notes
+        -----
+        The length of the list is the number of elapsed clustering iterations.
+        """
+        return self._loss_history_field
 
     @property
     def clustered_field(self):
@@ -165,15 +181,18 @@ class KMeans(ClusteringAlgorithm):
             raise ValueError("No initial seeds! Have you created them?")
 
         # perform the clustering
-        labels, centers, losses = self._cluster(X,
-                                                self.seeds,
-                                                self.distance_func,
-                                                n_clusters,
-                                                iters,
-                                                tol,
-                                                early_stopping,
-                                                *args,
-                                                **kwargs)
+        self._is_seeding = False
+        labels, centers, losses, losses_field = self._cluster(X,
+                                                              self.seeds,
+                                                              self.distance_func,
+                                                              self.loss_func,
+                                                              n_clusters,
+                                                              iters,
+                                                              tol,
+                                                              early_stopping,
+                                                              is_seeding=self._is_seeding,
+                                                              *args,
+                                                              **kwargs)
 
         # fetch assigned centroid to each entry in the vector field
         clusters = centers[labels]
@@ -194,9 +213,10 @@ class KMeans(ClusteringAlgorithm):
         self._centers = {idx: center.tolist() for idx, center in enumerate(centers)}
         self._loss = losses[-1]
         self._loss_history = losses
+        self._loss_history_field = losses_field
 
     @staticmethod
-    def _cluster(X, W, dist_func, n_clusters, iters, tol, early_stopping, *args, **kwargs):
+    def _cluster(X, W, dist_func, loss_func, n_clusters, iters, tol, early_stopping, is_seeding, *args, **kwargs):
         """
         Perform k-means clustering on a vector field.
 
@@ -208,6 +228,8 @@ class KMeans(ClusteringAlgorithm):
             An array with the clusters' centers.
         dist_func : `function`
             A distance function to calculate the association metric.
+        loss_func : `function`
+            A distance function to compute the value of the loss function.
         n_clusters : `int`
             The number of clusters to generate.
         iters : `float`
@@ -217,6 +239,8 @@ class KMeans(ClusteringAlgorithm):
         early_stopping : `bool`
             Flag to stop when tolerance threshold is met.
             Otherwise, the algorithm will exhaust all iterations.
+        early_stopping : `bool`
+            Flag to indicate if this method is using for seeding or not.
         args : `list`, optional
             Additional arguments.
         kwargs : `dict`, optional
@@ -237,11 +261,21 @@ class KMeans(ClusteringAlgorithm):
         This is a private method.
         """
         losses = []
+        losses_field = []
         for i in range(iters):
 
             # assign labels
-            loss, labels = centroids_associate(X, W, dist_func)
+            loss, labels = centroids_associate(X, W, dist_func, loss_func)
+
+            # store centroid association loss
             losses.append(loss)
+
+            # calculate loss from unclustered to clustered field
+            if not is_seeding:
+                X_hat = W[labels]
+                dist = np.diagonal(dist_func(X, X_hat))  # distance to themselves
+                loss_field = loss_func(dist)
+                losses_field.append(loss_field)
 
             # recalculate centroids
             W = centroids_estimate(X, n_clusters, labels)
@@ -257,7 +291,7 @@ class KMeans(ClusteringAlgorithm):
                 print(f"Early stopping at {i}/{iters} iteration")
                 break
 
-        return labels, W, losses
+        return labels, W, losses, losses_field
 
     def seed(self, n_clusters, iters=100, tol=1e-6, early_stopping=False, *args, **kwargs):
         """
@@ -295,6 +329,9 @@ class KMeans(ClusteringAlgorithm):
         # convert list of vectors to an array
         X = np.array(self.vector_field.to_sequence())
 
+        # activate seeding more
+        self._is_seeding = True
+
         # generate seeds and store them as self.seeds
         # TODO: early stopping is hard-coded as false for seed making
         seeds = self._seeds_generate(X,
@@ -305,6 +342,7 @@ class KMeans(ClusteringAlgorithm):
                                      *args,
                                      **kwargs)
         self.seeds = seeds
+        self._is_seeding = False
         print("Seeds were generated!")
 
     def _seeds_generate(self, X, n_clusters, iters, tol, early_stopping, *args, **kwargs):
@@ -345,10 +383,12 @@ class KMeans(ClusteringAlgorithm):
             labels, W = self._seeds_cluster(X,
                                             W,
                                             self.distance_func,
+                                            self.loss_func,
                                             k + 1,
                                             iters,
                                             tol,
                                             early_stopping,
+                                            self._is_seeding,
                                             *args,
                                             **kwargs)
 
@@ -387,8 +427,26 @@ class KMeans(ClusteringAlgorithm):
         -----
         This is a private method.
         """
-        labels, seeds, _ = self._cluster(*args, **kwargs)
+        labels, seeds, _, _ = self._cluster(*args, **kwargs)
         return labels, seeds
+
+    @staticmethod
+    def loss_func(distance):
+        """
+        Compute the value of the loss (objective) function.
+
+        Parameters
+        ----------
+        distance : `np.array`, (n, )
+            The distances between initial and clustered vectors.
+            Distances are calculated by `self.distance_func`.
+
+        Returns
+        -------
+        loss : `float`
+            The value of the loss.
+        """
+        return np.sqrt(np.mean(np.square(distance)))
 
 
 if __name__ == "__main__":

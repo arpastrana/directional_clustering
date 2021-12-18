@@ -28,7 +28,6 @@ class CosineKMeans(KMeans):
 
         # set appropiate distance function
         self.distance_func = distance_cosine
-        self.distance_name = "cosine"
 
 
 class CosineAbsoluteKMeans(KMeans):
@@ -48,8 +47,6 @@ class CosineAbsoluteKMeans(KMeans):
 
         # set appropiate distance function
         self.distance_func = distance_cosine_abs
-        # TODO: metric must be a custom abs "cosine", not cosine, to be fair
-        self.distance_name = "cosine"
 
 
 class DifferentiableCosineKMeans(DifferentiableKMeans, CosineKMeans):

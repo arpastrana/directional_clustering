@@ -25,7 +25,7 @@ class DifferentiableKMeans():
         # set attention parameters
         self.attention = None
 
-    def _cluster(self, X, W, dist_func, n_clusters, iters, tol, early_stopping, tau, stabilize=True, *args, **kwargs):
+    def _cluster(self, X, W, dist_func, loss_func, n_clusters, iters, tol, early_stopping, tau, stabilize=True, *args, **kwargs):
         """
         Perform differentiable k-means clustering on a vector field.
 
@@ -37,6 +37,8 @@ class DifferentiableKMeans():
             An array with the initial cluster centers.
         dist_func : `function`
             A distance function to calculate the association metric.
+        loss_func : `function`
+            A distance function to compute the value of the loss function.
         n_clusters : `int`
             The number of clusters to generate.
         iters : `float`
@@ -77,16 +79,29 @@ class DifferentiableKMeans():
         centroids = W
 
         losses = []
+        losses_field = []
 
         for i in range(iters):
 
             # assign labels (centroids associate)
             # set nan's to zero for numerical stability
-            centroids[np.nonzero(np.isnan(W))] = 0.0
+            # centroids[np.nonzero(np.isnan(W))] = 0.0
 
             # compute distance matrix (n, k)
+            # TODO: in the paper, why are distances multiplied times -1?
             distances = self.distance_func(X, centroids) * -1.0
             assert distances.shape == (n, k)
+
+            # find vectors' closest centroid
+            # TODO: We use argmax and not argmin because distances are negative
+            closest_k = np.argmax(distances, axis=1)  # shape (n, )
+
+            # get distance of vector to its closest centroid
+            closest_dist = distances[np.arange(len(closest_k)), closest_k]
+
+            # compute loss of vector to its closest centroid (like in not-diff KMeans)
+            loss = loss_func(closest_dist)
+            losses.append(loss)
 
             # calculate attention matrix (n, k)
             z = distances * tau  # apply attention temperature
@@ -104,11 +119,14 @@ class DifferentiableKMeans():
             centroids = centroids / np.transpose(np.sum(attention, axis=0, keepdims=True))
             assert centroids.shape == (k, d)
 
-            # TODO: is MSE the right metric to calculate loss?
-            # calculate root mean squared distance (error)
-            closest = np.amin(np.square(distances), axis=1, keepdims=True)
-            loss = np.sqrt(np.mean(closest))
-            losses.append(loss)
+            # create new temporary vector field to check clusters
+            X_hat = attention @ centroids
+            assert X_hat.shape == (n, d)
+
+            # calculate loss from unclustered to clustered field
+            dist = np.diagonal(dist_func(X, X_hat))  # distance to themselves
+            loss_field = loss_func(dist)
+            losses_field.append(loss_field)
 
             # check for exit
             if i < 2 or not early_stopping:
@@ -121,13 +139,11 @@ class DifferentiableKMeans():
                 print(f"Early stopping at {i}/{iters} iteration")
                 break
 
-        # create new temporary vector field to check clusters
-        X_hat = attention @ centroids
-        assert X_hat.shape == (n, d)
-
         # clip cluster assignment to closest centroid
         c_distances = self.distance_func(X_hat, centroids)
         labels = np.argmin(c_distances, axis=1)
+        # TODO: assertion test below fails. Why! Should not.
+        # assert np.allclose(labels, closest_k)
 
         # sets attention matrix as clusterer attribute before exiting
         attention_dict = {}
@@ -137,7 +153,7 @@ class DifferentiableKMeans():
         self.attention = attention_dict
 
         print("Differentiable clustering ended!")
-        return labels, centroids, losses
+        return labels, centroids, losses, losses_field
 
     def _seeds_cluster(self, *args, **kwargs):
         """
@@ -163,7 +179,7 @@ class DifferentiableKMeans():
         This is a private method.
         """
         # Parent class cluster method to dettach it from attention mechanism
-        labels, seeds, _ = super(DifferentiableKMeans, self)._cluster(*args, **kwargs)
+        labels, seeds, _, _ = super(DifferentiableKMeans, self)._cluster(*args, **kwargs)
         return labels, seeds
 
 
