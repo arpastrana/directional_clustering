@@ -1,6 +1,7 @@
 from math import fabs
 
-import numpy as np
+# import numpy as np
+import autograd.numpy as np
 
 from sklearn.metrics.pairwise import pairwise_distances
 
@@ -446,7 +447,10 @@ class KMeans(ClusteringAlgorithm):
         loss : `float`
             The value of the loss.
         """
-        return np.sqrt(np.mean(np.square(distance)))
+        # RSME
+        # return np.sqrt(np.mean(np.square(distance)))
+        # Mean
+        return np.mean(distance)
 
 
 if __name__ == "__main__":
