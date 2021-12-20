@@ -125,8 +125,11 @@ def directional_clustering(filename,
 
     # the name of the vector field to cluster.
     while True:
-        vf_name = input("Please choose one vector field to cluster: ")
+        vf_name = input("Please choose one vector field to cluster [m_1]: ")
         if vf_name in available_vf:
+            break
+        elif vf_name == "":
+            vf_name = "m_1"
             break
         else:
             print("This vector field is not available. Please try again.")
@@ -228,7 +231,20 @@ def directional_clustering(filename,
 
     # initialize seeds
     print("-----")
-    clusterer.seed(n_clusters, **kwargs_seeds)
+    # clusterer.seed(n_clusters, **kwargs_seeds)
+
+    # TODO: manually setting seeds
+    # manual_seeds = np.random.rand(n_clusters, 3)
+    # manual_seeds[:, 2] = 0.0
+
+    manual_seeds = np.array([[0.11417426, 0.28130369, 0.0],
+                             [0.60739818, 0.57142395, 0.0],
+                             [0.35134898, 0.85995537, 0.0],
+                             [0.45353768, 0.21977421, 0.0],
+                             [0.30653699, 0.50145481, 0.0]])
+
+    print("\n", manual_seeds)
+    clusterer.seeds = manual_seeds
 
     # do kmeans clustering
     # labels contains the cluster index assigned to every vector in the vector field
@@ -250,6 +266,36 @@ def directional_clustering(filename,
 
     for index, center in clusterer.centers.items():
         print(f"{index}: {center}")
+
+    # ==========================================================================
+    # Print out gradient
+    # ==========================================================================
+
+    from autograd import grad
+
+    recorder = {"attention": None,
+                "centroids": None,
+                "losses": [],
+                "losses_field": []}
+    tau = 10.0
+    tau = np.array([1.0, 10.0, 20.0, 50.0, 100.0])  # smallest values lead to smaller gradients
+    tau = np.ones(n_clusters) * -1
+    stabilize = False
+    argnum = 5
+
+    grad_func = grad(clusterer._cluster_diff, argnum=argnum)
+
+    is_diff = algo_name.split("_")[-1] == "diff"  # last word indicates diff
+    if is_diff:
+
+        X = np.array(vectors.to_sequence())
+        seeds = clusterer.seeds
+
+        grad_cluster = grad_func(X, seeds, iters, tol, early_stopping, tau, stabilize, recorder)
+
+        # print(np.amax(np.abs(grad_cluster), axis=0)
+        print("-----")
+        print(f"Gradient w.r.t. argnum {argnum}:\n{np.abs(grad_cluster)}")
 
     # ==========================================================================
     # Compute mean squared error "loss" of clustering
