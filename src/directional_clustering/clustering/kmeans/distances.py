@@ -1,15 +1,20 @@
-import numpy as np
+# import numpy as np
+import autograd.numpy as np
 
 
-__all__ = ["distance_cosine", "distance_cosine_abs", "distance_euclidean"]
+__all__ = ["distance_cosine",
+           "distance_cosine_abs",
+           "distance_euclidean"]
 
 
-def cosine_similarity(A, B):
+def cosine_similarity(A, B, row_wise):
     """
     Computes the cosine distance between two arrays.
     """
     def rows_norm(M):
-        return np.linalg.norm(M, ord=2, axis=1, keepdims=True)
+        brn = np.linalg.norm(M, ord=2, axis=1)
+        brn = np.reshape(brn, (M.shape[0], -1))
+        return brn
 
     A = np.atleast_2d(A)
     B = np.atleast_2d(B)
@@ -17,10 +22,17 @@ def cosine_similarity(A, B):
     A = A / rows_norm(A)
     B = B / rows_norm(B)
 
-    return np.dot(A, np.transpose(B))
+    if row_wise:
+        # both matrices must have equal number of rows
+        assert A.shape[0] == B.shape[0]
+        # return row-wise dot product
+        return np.einsum('ij,ij->i', A, B)
+
+    else:
+        return np.dot(A, np.transpose(B))
 
 
-def distance_cosine(A, B):
+def distance_cosine(A, B, row_wise=False):
     """
     Computes the cosine distance between two arrays.
 
@@ -30,6 +42,10 @@ def distance_cosine(A, B):
         The first array.
     B : `np.array` (k, d)
         The second array.
+    row_wise : `bool`, optional.
+        If `True`, it calculates pairwise distances between every row in A and every possible row in B.
+        Otherwise, distances are calculated only between matching rows assuming `n=k`.
+        Defaults to `False`.
 
     Returns
     -------
@@ -42,7 +58,7 @@ def distance_cosine(A, B):
     The cosine distance can be expressed 1 - cosine similarity.
     The cosine similarity is given by AB / (||A||||B||)
     """
-    return 1.0 - cosine_similarity(A, B)
+    return 1.0 - cosine_similarity(A, B, row_wise)
 
 
 def distance_cosine_abs(A, B):
