@@ -61,7 +61,7 @@ def distance_cosine(A, B, row_wise=False):
     return 1.0 - cosine_similarity(A, B, row_wise)
 
 
-def distance_cosine_abs(A, B):
+def distance_cosine_abs(A, B, row_wise=False):
     """
     Computes the absolute cosine distance between two arrays.
     Here the absolute value of the cosine similarity is taken.
@@ -72,6 +72,10 @@ def distance_cosine_abs(A, B):
         The first array.
     B : `np.array` (k, d)
         The second array.
+    row_wise : `bool`, optional.
+        If `True`, it calculates pairwise distances between every row in A and every possible row in B.
+        Otherwise, distances are calculated only between matching rows assuming `n=k`.
+        Defaults to `False`.
 
     Returns
     -------
@@ -85,7 +89,7 @@ def distance_cosine_abs(A, B):
     The absolute cosine distance can be expressed 1 - abs(cosine similarity).
     The cosine similarity is given by AB / (||A||||B||)
     """
-    return 1.0 - np.abs(cosine_similarity(A, B))
+    return 1.0 - np.abs(cosine_similarity(A, B, row_wise))
 
 
 def distance_euclidean(A, B):

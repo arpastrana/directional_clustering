@@ -274,7 +274,7 @@ class KMeans(ClusteringAlgorithm):
             # calculate loss from unclustered to clustered field
             if not is_seeding:
                 X_hat = W[labels]
-                dist = np.diagonal(dist_func(X, X_hat))  # distance to themselves
+                dist = dist_func(X, X_hat, row_wise=True)  # distance to themselves
                 loss_field = loss_func(dist)
                 losses_field.append(loss_field)
 
@@ -447,10 +447,11 @@ class KMeans(ClusteringAlgorithm):
         loss : `float`
             The value of the loss.
         """
+        scale = 100.0
         # RSME
-        # return np.sqrt(np.mean(np.square(distance)))
+        # return np.sqrt(np.mean(np.square(distance * scale)))
         # Mean
-        return np.mean(distance)
+        return np.mean(distance * scale)
 
 
 if __name__ == "__main__":

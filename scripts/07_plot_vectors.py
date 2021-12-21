@@ -21,6 +21,7 @@ from directional_clustering import JSON
 from directional_clustering.mesh import MeshPlus
 
 # transformations
+from directional_clustering.transformations import align_vector_field
 from directional_clustering.transformations import comb_vector_field
 from directional_clustering.transformations import smoothen_vector_field
 
@@ -131,8 +132,12 @@ def plot_kmeans_vectors(data, labels, normalize=False, scale_to_max=True, draw_c
 
 def plot_vectors_2d(filename,
                     vf_name,
-                    comb=False,
+                    comb_vectors=False,
+                    align_vectors=False,
+                    alignment_ref=[1.0, 0.0, 0.0],
                     smooth_iters=0,
+                    smooth_align=True,
+                    smooth_damping=0.5,
                     draw_centroids=True,
                     normalize=False,
                     scale_to_max=False,
@@ -159,13 +164,19 @@ def plot_vectors_2d(filename,
     # get vector field
     vf = mesh.vector_field(vf_name)
 
+    # align vector field to alignment_ref
+    if align_vectors:
+        print("-----")
+        print(f"Aligning vector field to {alignment_ref}")
+        align_vector_field(vf, alignment_ref)
+
     # Comb the vector field -- remember the hair ball theorem (seams exist)
-    if comb:
+    if comb_vectors:
         vf = comb_vector_field(vf, mesh)
 
     # smooth vector field
     if smooth_iters:
-        smoothen_vector_field(vf, mesh.face_adjacency(), smooth_iters, 0.5)
+        smoothen_vector_field(vf, mesh.face_adjacency(), smooth_iters, smooth_damping, smooth_align)
 
     vectors_array = np.zeros((mesh.number_of_faces(), 3))  # assumes vectors live in 3d
     for fkey in mesh.faces():

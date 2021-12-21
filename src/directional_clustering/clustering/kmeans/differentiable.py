@@ -1,7 +1,12 @@
 from math import fabs
 
-# import numpy as np
+# i am too smart to manually compute gradients
+from autograd import grad
+
 import autograd.numpy as np
+
+# optimization is never a bad idea
+from scipy.optimize import minimize
 
 
 __all__ = ["DifferentiableKMeans"]
@@ -22,11 +27,10 @@ class DifferentiableKMeans():
         # initialize parent class constructor
         # TODO: Make n_clusters an __init__ argument to unify seed()/cluster()?
         super(DifferentiableKMeans, self).__init__(mesh, vector_field)
-
         # set attention parameters
         self.attention = None
 
-    def _cluster(self, X, W, dist_func, loss_func, n_clusters, iters, tol, early_stopping, tau, stabilize=True, *args, **kwargs):
+    def _cluster(self, X, W, dist_func, loss_func, n_clusters, iters, tol, early_stopping, tau, stabilize=True, optimize=True, optimizer="BFGS", *args, **kwargs):
         """
         Perform differentiable k-means clustering on a vector field.
 
@@ -76,15 +80,27 @@ class DifferentiableKMeans():
         print("Starting differentiable k-means clustering...")
         k, r = W.shape
         n, d = X.shape
+
+        # soft dimensions-matching test
         assert d == r
 
-        centroids = W
-        recorder = {"attention": None,
-                    "centroids": None,
-                    "losses": [],
-                    "losses_field": []}
+        # create recorder to store values from clustering method
+        recorder = {"attention": None, "centroids": None, "losses": [], "losses_field": []}
 
-        last_loss = self._cluster_diff(X, centroids, iters, tol, early_stopping, tau, stabilize, recorder)
+        # convert tau to array
+        # TODO: does it require type check before reconverting to array?
+        tau = np.array(tau)
+
+        if optimize:
+            # solve clustering problem via optimization
+            res = self._cluster_optimize(X, W, iters, tol, early_stopping, tau, stabilize, optimizer)
+            xopt = res.x
+            tau = xopt
+            print(f"Optimization solution: {res.x}.\nOutput message: {res.message}")
+
+        # run clustering again with optimal parameters to overcome autograd issues with autograd values?
+        loss = self._cluster_diff(X, W, iters, tol, early_stopping, tau, stabilize, recorder)
+        print(f"Loss final run: {loss}.")
 
         # unpack recorder
         attention = recorder["attention"]
@@ -97,18 +113,44 @@ class DifferentiableKMeans():
         attention_dict = {}
         for index, fkey in enumerate(self.vector_field.keys()):
             attention_dict[fkey] = attention[index, :].tolist()
-
         self.attention = attention_dict
 
         print("Differentiable clustering ended!")
-
         return closest_k, centroids, losses, losses_field
 
-    def _cluster_diff(self, X, centroids, iters, tol, early_stopping, tau, stabilize, recorder):
+    def _cluster_optimize(self, X, centroids, iters, tol, early_stopping, tau, stabilize, optimizer):
+        """
+        Let the hunger games begin.
+        """
+        x0 = tau
+
+        def func(x0, X, centroids, iters, tol, early_stopping, stabilize):
+            """
+            Helper function to re-organize ordering of inputs.
+            The first argument is the optimization variable. Must be an array.
+            """
+            tau = x0
+            last_loss = self._cluster_diff(X, centroids, iters, tol, early_stopping, tau, stabilize, recorder=None, verbose=False)
+
+            return last_loss
+
+        # gradient w.r.t. first argument to be compatible with scipy's function signature.
+        grad_func = grad(func, argnum=0)
+
+        # minimize func
+        args = (X, centroids, iters, tol, early_stopping, stabilize)
+        res = minimize(func, x0,
+                       args=args,
+                       jac=grad_func,
+                       method=optimizer,  # BFGS, SLSQP
+                       options={'disp': True, 'maxiter': 100, 'gtol': 1e-4})
+        return res
+
+    def _cluster_diff(self, X, centroids, iters, tol, early_stopping, tau, stabilize, recorder=None, verbose=True):
         """
         """
-        losses = recorder["losses"]
-        losses_field = recorder["losses_field"]
+        losses = []
+        losses_field = []
 
         for i in range(iters):
 
@@ -133,7 +175,7 @@ class DifferentiableKMeans():
 
             # calculate loss from unclustered to clustered field
             X_hat = attention @ centroids
-            loss_field = self.loss_func(self.distance_func(X, X_hat, True))
+            loss_field = self.loss_func(self.distance_func(X, X_hat, row_wise=True))
 
             # store losses
             losses.append(loss)
@@ -146,15 +188,21 @@ class DifferentiableKMeans():
             # check if relative loss difference between two iterations is small
             eps = np.abs((losses[-2] - losses[-1]) / losses[-1])
             if eps < tol:
-                print(f"Convergence threshold met: {eps} < {tol}")
-                print(f"Early stopping at {i}/{iters} iteration")
+                if verbose:
+                    if not isinstance(eps, float):
+                        eps = eps._value
+                    print(f"Convergence threshold met: {eps} < {tol}")
+                    print(f"Early stopping at {i}/{iters} iteration")
                 break
 
-        recorder["centroids"] = centroids
-        recorder["closest_k"] = closest_k
-        recorder["attention"] = attention
+        if recorder:
+            recorder["losses"] = losses
+            recorder["losses_field"] = losses_field
+            recorder["centroids"] = centroids
+            recorder["closest_k"] = closest_k
+            recorder["attention"] = attention
 
-        return loss_field
+        return loss
 
     @staticmethod
     def _cluster_loss(distances, closest_k, loss_func):

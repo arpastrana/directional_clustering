@@ -50,18 +50,20 @@ class MeshPlus(Mesh):
                 try:
                     vector = self.face_attribute(fkey, name)
                     if type(vector) is list:
+                        # TODO: make a vector copy to avoid transformation issues?
                         vector_field.add_vector(fkey, vector)
                     else:
                         raise ValueError
                 except ValueError:
-                    return None        #the attribute doesn't exist or it's not a vectorfield
+                    return None  # the attribute doesn't exist or it's not a vectorfield
             return vector_field
         else:
-            msg = "The vector field to add is incompatible with the mesh"
+            msg = "The vector field to add is incompatible with the mesh!"
             assert vector_field.size() == self.number_of_faces(), msg
             for vkey in vector_field.keys():
-                self.face_attribute(vkey, name, vector_field.vector(vkey))
-
+                # TODO: make a vector copy to avoid transformation issues?
+                vector = vector_field.vector(vkey)
+                self.face_attribute(vkey, name, vector)
 
     def vector_fields(self):
         """
@@ -77,8 +79,8 @@ class MeshPlus(Mesh):
         attr_view = self.face_attributes(fkey)
         attr_default = list(attr_view.keys())
         attr_view.custom_only = True
-        attr_costom = list(attr_view.keys())
-        attr = attr_default + attr_costom
+        attr_custom = list(attr_view.keys())
+        attr = attr_default + attr_custom
 
         attr_vectorfield = []
         for name in attr:
@@ -86,7 +88,6 @@ class MeshPlus(Mesh):
                 attr_vectorfield.append(name)
 
         return attr_vectorfield
-
 
     def cluster_labels(self, name, labels=None):
         """

@@ -48,9 +48,11 @@ def directional_clustering(filename,
                            iters=100,
                            tol=1e-6,
                            early_stopping=False,
+                           manual_seeds=False,
                            comb_vectors=False,
                            align_vectors=False,
                            alignment_ref=[1.0, 0.0, 0.0],
+                           align_output=False,
                            smooth_iters=0,
                            smooth_align=True,
                            damping=0.5,
@@ -139,6 +141,9 @@ def directional_clustering(filename,
     # ==========================================================================
 
     vectors = mesh.vector_field(vf_name)
+
+    # TODO: store a safety copy that won't undergo any transformations
+    vectors_raw = mesh.vector_field(vf_name)
 
     # ==========================================================================
     # Align vector field to a reference vector
@@ -229,22 +234,26 @@ def directional_clustering(filename,
     clustering_algo = ClusteringFactory.create(algo_name)
     clusterer = clustering_algo(mesh, vectors)
 
+    # Check if clustering method is differentiable
+    # last word indicates diff
+    is_clusterer_diff = algo_name.split("_")[-1] == "diff"
+
     # initialize seeds
     print("-----")
-    # clusterer.seed(n_clusters, **kwargs_seeds)
+    if not manual_seeds:
+        clusterer.seed(n_clusters, **kwargs_seeds)
 
     # TODO: manually setting seeds
-    # manual_seeds = np.random.rand(n_clusters, 3)
-    # manual_seeds[:, 2] = 0.0
+    else:
+        # manual_seeds = np.random.rand(n_clusters, 3)
+        manual_seeds = np.array([[0.11417426, 0.28130369, 0.0],
+                                 [0.60739818, 0.57142395, 0.0],
+                                 [0.35134898, 0.85995537, 0.0],
+                                 [0.45353768, 0.21977421, 0.0],
+                                 [0.30653699, 0.50145481, 0.0]])
 
-    manual_seeds = np.array([[0.11417426, 0.28130369, 0.0],
-                             [0.60739818, 0.57142395, 0.0],
-                             [0.35134898, 0.85995537, 0.0],
-                             [0.45353768, 0.21977421, 0.0],
-                             [0.30653699, 0.50145481, 0.0]])
-
-    print("\n", manual_seeds)
-    clusterer.seeds = manual_seeds
+        clusterer.seeds = manual_seeds
+        print("Manual seeds:\n", manual_seeds)
 
     # do kmeans clustering
     # labels contains the cluster index assigned to every vector in the vector field
@@ -264,6 +273,7 @@ def directional_clustering(filename,
     clustered_field = clusterer.clustered_field
     labels = clusterer.labels
 
+    print("Computed centroids:\n")
     for index, center in clusterer.centers.items():
         print(f"{index}: {center}")
 
@@ -271,31 +281,30 @@ def directional_clustering(filename,
     # Print out gradient
     # ==========================================================================
 
-    from autograd import grad
+    # if is_clusterer_diff:
 
-    recorder = {"attention": None,
-                "centroids": None,
-                "losses": [],
-                "losses_field": []}
-    tau = 10.0
-    tau = np.array([1.0, 10.0, 20.0, 50.0, 100.0])  # smallest values lead to smaller gradients
-    tau = np.ones(n_clusters) * -1
-    stabilize = False
-    argnum = 5
+        # from autograd import grad
 
-    grad_func = grad(clusterer._cluster_diff, argnum=argnum)
+        # recorder = {"attention": None,
+        #             "centroids": None,
+        #             "losses": [],
+        #             "losses_field": []}
+        # tau = 10.0
+        # tau = np.array([1.0, 10.0, 20.0, 50.0, 100.0])  # smallest values lead to smaller gradients
+        # tau = np.ones(n_clusters) * -1
+        # stabilize = False
+        # argnum = 5
 
-    is_diff = algo_name.split("_")[-1] == "diff"  # last word indicates diff
-    if is_diff:
+        # grad_func = grad(clusterer._cluster_diff, argnum=argnum)
 
-        X = np.array(vectors.to_sequence())
-        seeds = clusterer.seeds
+        # X = np.array(vectors.to_sequence())
+        # seeds = clusterer.seeds
 
-        grad_cluster = grad_func(X, seeds, iters, tol, early_stopping, tau, stabilize, recorder)
+        # grad_cluster = grad_func(X, seeds, iters, tol, early_stopping, tau, stabilize, recorder)
 
-        # print(np.amax(np.abs(grad_cluster), axis=0)
-        print("-----")
-        print(f"Gradient w.r.t. argnum {argnum}:\n{np.abs(grad_cluster)}")
+        # # print(np.amax(np.abs(grad_cluster), axis=0)
+        # print("-----")
+        # print(f"Gradient w.r.t. argnum {argnum}:\n{np.abs(grad_cluster)}")
 
     # ==========================================================================
     # Compute mean squared error "loss" of clustering
@@ -354,8 +363,7 @@ def directional_clustering(filename,
     # ==========================================================================
 
     # TO DO: refactor into a MeshPlus method
-    is_diff = algo_name.split("_")[-1] == "diff"  # last word indicates diff
-    if is_diff:
+    if is_clusterer_diff:
         mesh.attributes["attention"] = clusterer.attention
         tao = kwargs.get("tau")
         if tao:
@@ -385,6 +393,7 @@ def directional_clustering(filename,
     clustered_field_90 = VectorField()
 
     for fkey, vector in clustered_field.items():
+        # TODO: assumes mesh is planar so that vector to cross with is global Z
         cvec_90 = cross_vectors(clustered_field[fkey], [0, 0, 1])
 
         scale = length_vector(vectors_90[fkey])
@@ -415,6 +424,25 @@ def directional_clustering(filename,
 
     args = [mesh, (clustered_field, clustered_field_90), stress_type, stress_transf_ref]
     clustered_field, clustered_field_90 = transformed_stress_vector_fields(*args)
+
+    # ==========================================================================
+    # Align clustered fields to input fields
+    # ==========================================================================
+
+    if align_output:
+        # assumes vector fields pair (unmodified field, clustered+transformed field)
+        for field, c_field in [(vectors_raw, clustered_field), (vectors_90, clustered_field_90)]:
+            i = 0
+            for fkey in mesh.faces():
+                c_vector = c_field[fkey]
+                vector = field[fkey]
+
+                if dot_vectors(c_vector, vector) < 0.0:
+                    c_vector = scale_vector(c_vector, -1.0)
+                    c_field[fkey] = c_vector
+                    i += 1
+
+            print(f"Reversed {i}/{c_field.size()} vectors in clustered field before export!")
 
     # ==========================================================================
     # Assign clustered fields to mesh
