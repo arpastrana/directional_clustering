@@ -15,31 +15,53 @@ class MeshPlusPlotter(MeshPlotter):
     """
     def __init__(self, *args, **kwargs):
         super(MeshPlusPlotter, self).__init__(*args, **kwargs)
-        self.name = "Mesh Plus Plotter"
+        self.name = "MeshPlus Plotter"
 
-    def draw_vector_field(self, field, color, uniform, scale, width=0.5):
+    def draw_vector_field(self, field, color, uniform, scale, width=0.5, as_arrows=False):
         """
         Draws a vector field on a mesh.
 
         It assumes the field and the mesh faces have the same keys.
         """
-        _lines = []
         lines = []
         mesh = self.mesh
 
+        both_sides = True
+        if as_arrows:
+            both_sides = False
+
         for fkey in range(field.size()):
+            line = {}
             vector = field[fkey]
             length = scale
+
             if not uniform:
                 length = length_vector(vector) * scale
-            _lines.append(line_sdl(mesh.face_centroid(fkey), vector, length))
 
-        _lines = [line for line in map(line_tuple_to_dict, _lines)]
-
-        for line in _lines:
+            start, end = line_sdl(mesh.face_centroid(fkey), vector, length, both_sides)
+            line["start"] = start
+            line["end"] = end
+            line["length"] = length
             line["width"] = width
             line["color"] = color
 
-        lines.extend(_lines)
+            lines.append(line)
+
+        if as_arrows:
+            # draw arrow heads as points
+            points = []
+            for line in lines:
+                point = {}
+                point["pos"] = line["end"]
+                point["radius"] = line["length"] * 0.25
+                point["facecolor"] = color
+                point["edgecolor"] = color
+                point["edgewidth"] = 0.001
+
+                points.append(point)
+
+            self.draw_points(points)
+            # draw arrow body and retturn this as the collection
+            return self.draw_lines(lines)
 
         return self.draw_lines(lines)

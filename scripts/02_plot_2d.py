@@ -94,20 +94,21 @@ def plot_2d(filename,
             draw_edges=False,
             draw_colorbar=True,
             draw_boundary_edges=True,
+            face_centroids_radius=0.08,
             color_faces=None,
             comb_fields=False,
             align_field_1_to=None,
             align_field_2_to=None,
-            face_centroids_radius=0.08,
+            vector_fields_scale=0.03,
+            vector_fields_same_scale=True,
+            vector_fields_as_arrows=False,
             streamlines_max_length=20.0,
             streamlines_density=0.75,  # 0.55 for 4ps
             streamlines_grid_scale=1.0,  # 0.1 for hecker circle
             streamlines_lw=None,
             streamlines_clip_circle=False,
-            vector_fields_scale=0.03,
-            vector_fields_same_scale=True,
-            save_img=True,
             pad_inches=0.0,
+            save_img=True,
             show_img=False
             ):
     """
@@ -327,7 +328,8 @@ def plot_2d(filename,
                     vf = comb_vector_field(vf, mesh)
 
                 color = next(colors)
-                lines = plotter.draw_vector_field(vf, color, same_scale, scale, width)
+                lines = plotter.draw_vector_field(vf, color, same_scale, scale, width, vector_fields_as_arrows)
+
                 _vf_name = "".join(vf_name.split("_"))
                 lines.set_label(_vf_name)
 
