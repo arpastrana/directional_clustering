@@ -49,7 +49,7 @@ class MeshPlus(Mesh):
             for fkey in self.faces():
                 try:
                     vector = self.face_attribute(fkey, name)
-                    if type(vector) is list:
+                    if isinstance(vector, list):
                         # TODO: make a vector copy to avoid transformation issues?
                         vector_field.add_vector(fkey, vector)
                     else:
@@ -57,6 +57,7 @@ class MeshPlus(Mesh):
                 except ValueError:
                     return None  # the attribute doesn't exist or it's not a vectorfield
             return vector_field
+
         else:
             msg = "The vector field to add is incompatible with the mesh!"
             assert vector_field.size() == self.number_of_faces(), msg
