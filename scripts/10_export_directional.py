@@ -54,6 +54,7 @@ def export_directional(filename, vf, degree=4, normalize=True):
 
     rawfield_out = os.path.abspath(os.path.join(RAWFIELD, f"{filename}_{vf}_{degree}rosy.rawfield"))
     nrosy.to_rawfield(rawfield_out)
+    print(f"Exported rawfield to:\n{rawfield_out}")
 
 # ==============================================================================
 # Executable

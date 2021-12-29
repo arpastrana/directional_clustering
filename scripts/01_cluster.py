@@ -52,11 +52,13 @@ def directional_clustering(filename,
                            comb_vectors=False,
                            align_vectors=False,
                            alignment_ref=[1.0, 0.0, 0.0],
-                           align_output=True,
                            smooth_iters=0,
                            smooth_align=True,
                            damping=0.5,
                            stress_transf_ref=[1.0, 0.0, 0.0],
+                           output_align=True,
+                           output_smooth_iters=0,
+                           output_comb=False,
                            kwargs_seeds={},
                            kwargs={}):
     """
@@ -317,10 +319,7 @@ def directional_clustering(filename,
     distances = np.zeros(mesh.number_of_faces())
     for fkey in mesh.faces():
         # for every face compute difference between clustering output and
-        # aligned+smoothed vector, might be better to compare against the
-        # raw vector
-        # difference_vector = subtract_vectors(clustered_field.vector(fkey), vectors.vector(fkey))
-        # errors[fkey] = length_vector_sqrd(difference_vector)
+        # aligned + smoothed vector, or versus raw input?
         distance = clusterer.distance_func(clustered_field.vector(fkey), vectors.vector(fkey))
         distances[fkey] = distance
 
@@ -429,7 +428,7 @@ def directional_clustering(filename,
     # Align clustered fields to input fields
     # ==========================================================================
 
-    if align_output:
+    if output_align:
         # assumes vector fields pair (unmodified field, clustered+transformed field)
         for field, c_field in [(vectors_raw, clustered_field), (vectors_90, clustered_field_90)]:
             i = 0
@@ -443,6 +442,26 @@ def directional_clustering(filename,
                     i += 1
 
             print(f"Reversed {i}/{c_field.size()} vectors in clustered field before export!")
+
+    # ==========================================================================
+    # Comb the clustered vector fields -- remember the hair ball theorem
+    # ==========================================================================
+
+    if output_comb:
+        print("-----")
+        print("Combing both clustered fields 0 and 90")
+        clustered_field = comb_vector_field(clustered_field, mesh)
+        clustered_field_90 = comb_vector_field(clustered_field_90, mesh)
+
+    # ==========================================================================
+    # Apply smoothing to the clustered vector field
+    # ==========================================================================
+
+    if output_smooth_iters:
+        print("-----")
+        print(f"Smoothing output vector fields for {output_smooth_iters} iters. Align neighbors: {smooth_align}")
+        smoothen_vector_field(clustered_field, mesh.face_adjacency(), output_smooth_iters, damping, smooth_align)
+        smoothen_vector_field(clustered_field_90, mesh.face_adjacency(), output_smooth_iters, damping, smooth_align)
 
     # ==========================================================================
     # Assign clustered fields to mesh
