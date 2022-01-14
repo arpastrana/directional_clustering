@@ -39,11 +39,18 @@ class MeshPlusPlotter(MeshPlotter):
                 length = length_vector(vector) * scale
 
             start, end = line_sdl(mesh.face_centroid(fkey), vector, length, both_sides)
+
             line["start"] = start
             line["end"] = end
             line["length"] = length
             line["width"] = width
-            line["color"] = color
+
+            # duck typing with color, assumes dict of color, defaults to single color
+            if isinstance(color, dict):
+                clr = color[fkey]
+            else:
+                clr = color
+            line["color"] = clr
 
             lines.append(line)
 
