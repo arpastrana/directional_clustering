@@ -4,7 +4,7 @@ import os
 # argument parsing helper
 import fire
 
-# hello numpy, my old friend
+# hello scientific computing, my old friend
 import numpy as np
 
 # plots and beyond
@@ -14,9 +14,6 @@ import matplotlib.patches as patches
 # python standard libraries
 from itertools import cycle
 from functools import partial
-
-# time is running out
-from datetime import datetime
 
 # compas & co
 from compas.geometry import angle_vectors
@@ -69,6 +66,23 @@ ZORDER_LEGEND = 5000  # manually set to be drawn in front of other objects
 IMG_EXTENSION = "pdf"
 CMAP_LABELS = "rainbow"
 
+EDGE_WIDTH = 0.01
+# Define colors for vector fields and streamlines
+VF_WIDTH = 0.8
+
+VF_COLORS = [(0, 0, 255), (255, 0, 0), (0, 255, 0), (0, 0, 0)]
+VF_COLORS = [(150, 150, 150), (150, 150, 150), (0, 0, 255), (0, 0, 255)]
+VF_COLORS = [(0, 0, 255), (0, 0, 255), (255, 0, 0), (255, 0, 0)]
+VF_COLORS = [(80, 175, 255)] * 2 + [(39, 217, 128)] * 2
+VF_COLORS = [(80, 175, 255), (39, 217, 128)]
+VF_COLORS = [(39, 14, 217)] * 2 + [(219, 50, 169)] * 2
+VF_COLORS = [(150, 150, 150)] * 2 + [(0, 0, 0)] * 2
+VF_COLORS = [(77, 188, 235)] * 2 + [(0, 0, 0)] * 2
+VF_COLORS = [(77, 188, 235), (39, 14, 217)]
+VF_COLORS = [(250, 80, 210), (0, 150, 10)]  # pink, green, compas cem
+VF_COLORS = [(12, 119, 184), (255, 155, 15)]  # blue, orange, compas cem
+
+
 # Set the colors to use to color mesh faces/centroids
 COLOR_LABEL_MAP = {"angles": {"cmap": "RdPu",
                               "cbar_label": "Angular Difference [Deg]",
@@ -81,7 +95,7 @@ COLOR_LABEL_MAP = {"angles": {"cmap": "RdPu",
                                            "func": distance_cosine_abs}
                    }
 
-# ==============================================================================
+# # ==============================================================================
 # Plot a lot of information in 2d
 # ==============================================================================
 
@@ -102,9 +116,10 @@ def plot_2d(filename,
             vector_fields_scale=0.03,
             vector_fields_same_scale=True,
             vector_fields_as_arrows=False,
+            vector_fields_color_clusters=True,
             streamlines_max_length=20.0,
-            streamlines_density=0.75,  # 0.55 for 4ps
-            streamlines_grid_scale=1.0,  # 0.1 for hecker circle
+            streamlines_density=0.75,  # 0.55 for 4ps, higher is denser
+            streamlines_grid_scale=1.0,  # 0.1 for hecker circle, smaller is faster
             streamlines_lw=None,
             streamlines_clip_circle=False,
             pad_inches=0.0,
@@ -145,7 +160,7 @@ def plot_2d(filename,
 
     # draw mesh edges
     if draw_edges:
-        plotter.draw_edges()
+        plotter.draw_edges(width=EDGE_WIDTH)
 
     # ==========================================================================
     # Draw mesh faces
@@ -313,11 +328,19 @@ def plot_2d(filename,
                 print("This vector field is not available. Please try again.")
 
         if draw_vector_fields:
-            # colors for all vector related matters
-            colors = cycle([(0, 0, 255), (255, 0, 0), (0, 255, 0), (0, 0, 0)])
+            # color labels according to cluster assignment
+            if vector_fields_color_clusters:
+
+                labels = mesh.cluster_labels("cluster")
+                cmap = plt.cm.get_cmap(CMAP_LABELS, n_clusters)
+                color = {key: cmap(label, bytes=True)[:-1] for key, label in labels.items()}
+
+            # colors cycles
+            else:
+                colors = cycle(VF_COLORS)
 
             # vector field drawing parameters -- better of being exposed?
-            width = 0.5
+            width = VF_WIDTH
             scale = vector_fields_scale
             same_scale = vector_fields_same_scale
 
@@ -327,14 +350,17 @@ def plot_2d(filename,
                 if comb_fields:
                     vf = comb_vector_field(vf, mesh)
 
-                color = next(colors)
+                if not vector_fields_color_clusters:
+                    color = next(colors)
+
                 lines = plotter.draw_vector_field(vf, color, same_scale, scale, width, vector_fields_as_arrows)
 
-                _vf_name = "".join(vf_name.split("_"))
-                lines.set_label(_vf_name)
+                if not vector_fields_color_clusters:
+                    _vf_name = "".join(vf_name.split("_"))
+                    lines.set_label(_vf_name)
 
         if draw_streamlines:
-            colors = cycle([(0, 0, 255), (255, 0, 0), (0, 255, 0), (0, 0, 0)])
+            colors = cycle(VF_COLORS)
 
             # get bounding box for all the mesh vertices
             vx = []
