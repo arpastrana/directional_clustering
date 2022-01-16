@@ -48,7 +48,7 @@ def directional_clustering(filename,
                            iters=100,
                            tol=1e-6,
                            early_stopping=False,
-                           manual_seeds=False,
+                           seeds_mode="farthest",
                            comb_vectors=False,
                            align_vectors=False,
                            alignment_ref=[1.0, 0.0, 0.0],
@@ -242,11 +242,16 @@ def directional_clustering(filename,
 
     # initialize seeds
     print("-----")
-    if not manual_seeds:
-        clusterer.seed(n_clusters, **kwargs_seeds)
+    if seeds_mode == "random":
+
+        random_seeds = np.random.random_sample((n_clusters, 2))
+        random_seeds = np.hstack([random_seeds, np.zeros((n_clusters, 1))])
+        assert random_seeds.shape == (n_clusters, 3)
+        clusterer.seeds = random_seeds
+        print("Random seeds:\n", random_seeds)
 
     # TODO: manually setting seeds
-    else:
+    elif seeds_mode == "manual":
         # manual_seeds = np.random.rand(n_clusters, 3)
         manual_seeds = np.array([[0.11417426, 0.28130369, 0.0],
                                  [0.60739818, 0.57142395, 0.0],
@@ -256,6 +261,9 @@ def directional_clustering(filename,
 
         clusterer.seeds = manual_seeds
         print("Manual seeds:\n", manual_seeds)
+
+    elif seeds_mode == "farthest":
+        clusterer.seed(n_clusters, **kwargs_seeds)
 
     # do kmeans clustering
     # labels contains the cluster index assigned to every vector in the vector field
@@ -352,7 +360,25 @@ def directional_clustering(filename,
     mesh.cluster_labels("cluster", labels)
 
     # ==========================================================================
-    # Store clusterer algorithm name as mesh attribute
+    # Store cluster centroids as mesh attributes
+    # ==========================================================================
+
+    mesh.attributes["cluster_centroids"] = clusterer.centers
+
+    # ==========================================================================
+    # Store cluster colors as mesh attributes
+    # TODO: Find more elegant way to maintain color consistency!
+    # ==========================================================================
+
+    cluster_colors = {}
+    cmap = plt.cm.get_cmap("rainbow", n_clusters)
+    for i in range(n_clusters):
+        cluster_colors[i] = cmap(i)
+
+    mesh.attributes["cluster_colors"] = cluster_colors
+
+    # ==========================================================================
+    # Store clusterer algorithm name as mesh attributes
     # ==========================================================================
 
     mesh.attributes["clusterer_name"] = algo_name
@@ -444,6 +470,16 @@ def directional_clustering(filename,
             print(f"Reversed {i}/{c_field.size()} vectors in clustered field before export!")
 
     # ==========================================================================
+    # Assign clustered fields to mesh
+    # ==========================================================================
+
+    clustered_field_name = vf_name + "_k"
+    mesh.vector_field(clustered_field_name, clustered_field)
+
+    clustered_field_name_90 = vf_name_90 + "_k"
+    mesh.vector_field(clustered_field_name_90, clustered_field_90)
+
+    # ==========================================================================
     # Comb the clustered vector fields -- remember the hair ball theorem
     # ==========================================================================
 
@@ -452,6 +488,7 @@ def directional_clustering(filename,
         print("Combing both clustered fields 0 and 90")
         clustered_field = comb_vector_field(clustered_field, mesh)
         clustered_field_90 = comb_vector_field(clustered_field_90, mesh)
+
 
     # ==========================================================================
     # Apply smoothing to the clustered vector field
@@ -467,11 +504,11 @@ def directional_clustering(filename,
     # Assign clustered fields to mesh
     # ==========================================================================
 
-    clustered_field_name = vf_name + "_k"
-    mesh.vector_field(clustered_field_name, clustered_field)
+        clustered_field_name = clustered_field_name + "_s"
+        mesh.vector_field(clustered_field_name, clustered_field)
 
-    clustered_field_name_90 = vf_name_90 + "_k"
-    mesh.vector_field(clustered_field_name_90, clustered_field_90)
+        clustered_field_name_90 = clustered_field_name_90 + "_s"
+        mesh.vector_field(clustered_field_name_90, clustered_field_90)
 
     # ==========================================================================
     # Export new JSON file for further processing
