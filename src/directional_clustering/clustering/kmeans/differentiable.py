@@ -1,8 +1,7 @@
-from math import fabs
-
 # i am too smart to manually compute gradients
 from autograd import grad
 
+# numpy on steroids
 import autograd.numpy as np
 
 # optimization is never a bad idea
