@@ -288,35 +288,6 @@ def directional_clustering(filename,
         print(f"{index}: {center}")
 
     # ==========================================================================
-    # Print out gradient
-    # ==========================================================================
-
-    # if is_clusterer_diff:
-
-        # from autograd import grad
-
-        # recorder = {"attention": None,
-        #             "centroids": None,
-        #             "losses": [],
-        #             "losses_field": []}
-        # tau = 10.0
-        # tau = np.array([1.0, 10.0, 20.0, 50.0, 100.0])  # smallest values lead to smaller gradients
-        # tau = np.ones(n_clusters) * -1
-        # stabilize = False
-        # argnum = 5
-
-        # grad_func = grad(clusterer._cluster_diff, argnum=argnum)
-
-        # X = np.array(vectors.to_sequence())
-        # seeds = clusterer.seeds
-
-        # grad_cluster = grad_func(X, seeds, iters, tol, early_stopping, tau, stabilize, recorder)
-
-        # # print(np.amax(np.abs(grad_cluster), axis=0)
-        # print("-----")
-        # print(f"Gradient w.r.t. argnum {argnum}:\n{np.abs(grad_cluster)}")
-
-    # ==========================================================================
     # Compute mean squared error "loss" of clustering
     # ==========================================================================
 
@@ -488,7 +459,6 @@ def directional_clustering(filename,
         print("Combing both clustered fields 0 and 90")
         clustered_field = comb_vector_field(clustered_field, mesh)
         clustered_field_90 = comb_vector_field(clustered_field_90, mesh)
-
 
     # ==========================================================================
     # Apply smoothing to the clustered vector field
