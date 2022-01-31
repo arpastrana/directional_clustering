@@ -447,7 +447,7 @@ class KMeans(ClusteringAlgorithm):
         loss : `float`
             The value of the loss.
         """
-        scale = 100.0
+        scale = 1.0
         # RSME
         # return np.sqrt(np.mean(np.square(distance * scale)))
         # Mean

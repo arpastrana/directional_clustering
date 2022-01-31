@@ -142,7 +142,7 @@ class DifferentiableKMeans():
                        args=args,
                        jac=grad_func,
                        method=optimizer,  # BFGS, SLSQP
-                       options={'disp': True, 'maxiter': 100, 'gtol': 1e-4})
+                       options={'disp': True, 'maxiter': 100, 'gtol': 1e-6})
         return res
 
     def _cluster_diff(self, X, centroids, iters, tol, early_stopping, tau, stabilize, recorder=None, verbose=True):
