@@ -28,8 +28,25 @@ class DifferentiableKMeans():
         super(DifferentiableKMeans, self).__init__(mesh, vector_field)
         # set attention parameters
         self.attention = None
+        self.tau = None
 
-    def _cluster(self, X, W, dist_func, loss_func, n_clusters, iters, tol, early_stopping, tau, stabilize=True, optimize=True, optimizer="BFGS", *args, **kwargs):
+    def _cluster(self,
+                 X,
+                 W,
+                 dist_func,
+                 loss_func,
+                 n_clusters,
+                 iters,
+                 tol,
+                 early_stopping,
+                 tau,
+                 tau_global=True,
+                 stabilize=True,
+                 optimize=True,
+                 optimizer="BFGS",
+                 alpha=0.0,
+                 *args,
+                 **kwargs):
         """
         Perform differentiable k-means clustering on a vector field.
 
@@ -53,10 +70,23 @@ class DifferentiableKMeans():
             Flag to stop when tolerance threshold is met.
             Otherwise, the algorithm will exhaust all iterations.
         tau : `float`
-            An coefficient that controls the softness of the attention mechanism
+            A coefficient that controls the softness of the attention mechanism.
+        tau_global : `bool`, optional
+            A flag to specify the use of a single value of tau for all clusters.
+            If `False`, then tau becomes a vector of size n_clusters.
+            Defaults to `True`.
         stabilize : `bool`, optional
             A flag to numerically stabilize the attention softmax operation.
             Defaults to `True`.
+        optimize : `bool`, optional
+            A flag to specify whether to optimize the attention temperatures.
+            Defaults to `True`.
+        optimizer : `str`, optional
+            The name of the gradient-based optimization algorithm to use.
+            Defaults to `BFGS`.
+        alpha : `float`, optional
+            The scale factor for the regularization term of the loss function.
+            Defaults to `0.0`.
         args : `list`, optional
             Additional arguments.
         kwargs : `dict`, optional
@@ -88,17 +118,20 @@ class DifferentiableKMeans():
 
         # convert tau to array
         # TODO: does it require type check before reconverting to array?
+        if not tau_global:
+            tau = [tau] * n_clusters
         tau = np.array(tau)
 
         if optimize:
             # solve clustering problem via optimization
-            res = self._cluster_optimize(X, W, iters, tol, early_stopping, tau, stabilize, optimizer)
+            print(f"Loss regularization factor alpha is: {alpha}")
+            res = self._cluster_optimize(X, W, iters, tol, early_stopping, tau, stabilize, optimizer, alpha)
             xopt = res.x
             tau = xopt
             print(f"Optimization solution: {res.x}.\nOutput message: {res.message}")
 
         # run clustering again with optimal parameters to overcome autograd issues with autograd values?
-        loss = self._cluster_diff(X, W, iters, tol, early_stopping, tau, stabilize, recorder)
+        loss = self._cluster_diff(X, W, iters, tol, early_stopping, tau, stabilize, alpha, recorder)
         print(f"Loss final run: {loss}.")
 
         # unpack recorder
@@ -114,22 +147,25 @@ class DifferentiableKMeans():
             attention_dict[fkey] = attention[index, :].tolist()
         self.attention = attention_dict
 
+        # set tau before leaving
+        self.tau = tau
+
         print("Differentiable clustering ended!")
         return closest_k, centroids, losses, losses_field
 
-    def _cluster_optimize(self, X, centroids, iters, tol, early_stopping, tau, stabilize, optimizer):
+    def _cluster_optimize(self, X, centroids, iters, tol, early_stopping, tau, stabilize, optimizer, alpha):
         """
         Let the hunger games begin.
         """
         x0 = tau
 
-        def func(x0, X, centroids, iters, tol, early_stopping, stabilize):
+        def func(x0, X, centroids, iters, tol, early_stopping, stabilize, alpha):
             """
             Helper function to re-organize ordering of inputs.
             The first argument is the optimization variable. Must be an array.
             """
             tau = x0
-            last_loss = self._cluster_diff(X, centroids, iters, tol, early_stopping, tau, stabilize, recorder=None, verbose=False)
+            last_loss = self._cluster_diff(X, centroids, iters, tol, early_stopping, tau, stabilize, alpha, recorder=None, verbose=False)
 
             return last_loss
 
@@ -137,15 +173,15 @@ class DifferentiableKMeans():
         grad_func = grad(func, argnum=0)
 
         # minimize func
-        args = (X, centroids, iters, tol, early_stopping, stabilize)
+        args = (X, centroids, iters, tol, early_stopping, stabilize, alpha)
         res = minimize(func, x0,
                        args=args,
                        jac=grad_func,
                        method=optimizer,  # BFGS, SLSQP
-                       options={'disp': True, 'maxiter': 100, 'gtol': 1e-6})
+                       options={'disp': True, 'maxiter': 200, 'gtol': 1e-6})
         return res
 
-    def _cluster_diff(self, X, centroids, iters, tol, early_stopping, tau, stabilize, recorder=None, verbose=True):
+    def _cluster_diff(self, X, centroids, iters, tol, early_stopping, tau, stabilize, alpha, recorder=None, verbose=True):
         """
         """
         losses = []
@@ -157,14 +193,14 @@ class DifferentiableKMeans():
             distances = self.distance_func(X, centroids)
 
             # find vectors' closest centroid
-            closest_k = np.argmin(distances, axis=1)  # shape (n, )
+            # closest_k = np.argmin(distances, axis=1)  # shape (n, )
 
             # compute loss of vector to its closest centroid (like in not-diff KMeans)
             # get distance of vector to its closest centroid
-            closest_dist = distances[np.arange(len(closest_k)), closest_k]
+            # closest_dist = distances[np.arange(len(closest_k)), closest_k]
             # TODO: Does slicing make gradients become zero? Related to copy/not copy?
             # closest_dist = distances
-            loss = self.loss_func(closest_dist)
+            # loss = self.loss_func(closest_dist)
 
             # calculate attention matrix (n, k)
             attention = self._attention_matrix(distances, tau, stabilize)
@@ -176,6 +212,16 @@ class DifferentiableKMeans():
             X_hat = attention @ centroids
             loss_field = self.loss_func(self.distance_func(X, X_hat, row_wise=True))
 
+            # find the centroid vectors where most confidently associated with
+            closest_k = np.argmax(attention, axis=1)  # shape (n, )
+
+            # compute loss of vector to its closest centroid (like in not-diff KMeans)
+            # get distance of vector to its closest centroid
+            closest_dist = distances[np.arange(len(closest_k)), closest_k]
+            # TODO: Does slicing make gradients become zero? Related to copy/not copy?
+            # closest_dist = distances
+            loss = self.loss_func(closest_dist)
+
             # store losses
             losses.append(loss)
             losses_field.append(loss_field)
@@ -185,7 +231,8 @@ class DifferentiableKMeans():
                 continue
 
             # check if relative loss difference between two iterations is small
-            eps = np.abs((losses[-2] - losses[-1]) / losses[-1])
+            data = losses_field
+            eps = np.abs((data[-2] - data[-1]) / data[-1])
             if eps < tol:
                 if verbose:
                     if not isinstance(eps, float):
@@ -201,7 +248,7 @@ class DifferentiableKMeans():
             recorder["closest_k"] = closest_k
             recorder["attention"] = attention
 
-        return loss
+        return loss_field + np.mean(distances) * alpha
 
     @staticmethod
     def _cluster_loss(distances, closest_k, loss_func):
