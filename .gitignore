@@ -121,7 +121,7 @@ docs/
 docsource/api/generated/
 
 # generated JSON files of clustered fields
-data/json/clustered
+**.json
 
 # generated images
 data/images
