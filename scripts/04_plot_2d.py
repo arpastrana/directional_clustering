@@ -16,6 +16,7 @@ from itertools import cycle
 from functools import partial
 
 # compas & co
+from compas.colors import Color
 from compas.geometry import angle_vectors
 from compas.geometry import length_vector
 from compas.geometry import KDTree
@@ -37,7 +38,9 @@ from directional_clustering.transformations import align_vector_field
 from directional_clustering.transformations import comb_vector_field
 
 # plotters
-from directional_clustering.plotters import MeshPlusPlotter
+# from directional_clustering.plotters import MeshPlusPlotter
+from compas_plotters import Plotter
+from compas_plotters import draw_xpoints_xy
 
 
 # ==============================================================================
@@ -105,7 +108,7 @@ def plot_2d(filename,
             draw_faces_centroids=False,
             draw_vector_fields=False,
             draw_streamlines=False,
-            draw_edges=False,
+            draw_edges=True,
             draw_colorbar=True,
             draw_boundary_edges=True,
             face_centroids_radius=0.08,
@@ -123,11 +126,11 @@ def plot_2d(filename,
             streamlines_lw=None,
             streamlines_clip_circle=False,
             pad_inches=0.0,
-            save_img=True,
-            show_img=False
+            save_img=False,
+            show_img=True
             ):
     """
-    Makes a 3d plot of a mesh with a vector field.
+    Makes a 2d plot of a mesh with a vector field.
 
     Parameters
     ----------
@@ -141,7 +144,6 @@ def plot_2d(filename,
 
     name_in = filename + ".json"
     json_in = os.path.abspath(os.path.join(JSON, "clustered", name_in))
-
     mesh = MeshPlus.from_json(json_in)
 
     # ==========================================================================
@@ -149,18 +151,27 @@ def plot_2d(filename,
     # ==========================================================================
 
     # ClusterPlotter is a custom wrapper around a COMPAS MeshPlotter
-    plotter = MeshPlusPlotter(mesh, figsize=(16, 9), dpi=600)
+    # plotter = MeshPlusPlotter(mesh, figsize=(16, 9), dpi=600)
+    plotter = Plotter(figsize=(12, 8))
+    artist = plotter.add(mesh,
+                         show_vertices=False,
+                         show_edges=False,
+                         show_faces=False)
 
     # ==========================================================================
     # Draw mesh edges
     # ==========================================================================
 
     if draw_boundary_edges:
-        plotter.draw_edges(keys=list(mesh.edges_on_boundary()))
+        # plotter.draw_edges(keys=list(mesh.edges_on_boundary()))
+        _edges = list(mesh.edges_on_boundary())
+        artist.draw_edges(edges=_edges,
+                          color={edge: Color.black() for edge in _edges})
 
     # draw mesh edges
     if draw_edges:
-        plotter.draw_edges(width=EDGE_WIDTH)
+        # plotter.draw_edges(width=EDGE_WIDTH)
+        artist.draw_edges(color={edge: Color.black() for edge in _edges})
 
     # ==========================================================================
     # Draw mesh faces
@@ -169,21 +180,21 @@ def plot_2d(filename,
     # get number of clusters from filename
     mesh_name = filename.split("/")[-1]
     n_clusters = int(mesh_name.split("_")[1][-1]) # second position is number of cluster
-    print(f"The number of clusters on the mesh is: {n_clusters}")
+    print(f"The number of clusters on this mesh is: {n_clusters}")
 
     if draw_faces or draw_faces_centroids:
         cmap = None
         data = np.zeros(mesh.number_of_faces())
         sorted_fkeys = sorted(list(mesh.faces()))
 
-        if color_faces == "labels":
+        if color_faces == "labels" or color_faces == "clusters":
             # parse cluster labels
             labels = mesh.cluster_labels("cluster")
             for fkey, label in labels.items():
                 data[fkey] = label
 
             # matplotlib setup
-            cbar_label = "Directional Clusters"
+            cbar_label = "Clusters"
             cmap = plt.cm.get_cmap(CMAP_LABELS, n_clusters)  # plasma or rainbow
             ticks = np.linspace(0, n_clusters - 1, n_clusters + 1) + 0.5 * (n_clusters - 1)/n_clusters
             ticks = ticks[:-1]
@@ -270,7 +281,9 @@ def plot_2d(filename,
 
         if draw_faces:
 
-            collection = plotter.draw_faces(keys=sorted_fkeys)
+            # collection = plotter.draw_faces(keys=sorted_fkeys)
+            artist.draw_faces(faces=sorted_fkeys)
+            collection = artist._facecollection
 
         elif draw_faces_centroids:
 
@@ -278,11 +291,12 @@ def plot_2d(filename,
             for fkey in sorted_fkeys:
                 point = {}
                 point["pos"] = mesh.face_centroid(fkey)
-                point["radius"] = face_centroids_radius # 0.03 for slabs
+                point["radius"] = face_centroids_radius  # 0.03 for slabs
                 point["edgewidth"] = 0.10
                 points.append(point)
 
-            collection = plotter.draw_points(points)
+            # collection = plotter.draw_points(points)
+            collection = draw_xpoints_xy(points, plotter.axes)
 
         if cmap:
             collection.set(array=data, cmap=cmap)
@@ -353,7 +367,8 @@ def plot_2d(filename,
                 if not vector_fields_color_clusters:
                     color = next(colors)
 
-                lines = plotter.draw_vector_field(vf, color, same_scale, scale, width, vector_fields_as_arrows)
+                # lines = plotter.draw_vector_field(vf, color, same_scale, scale, width, vector_fields_as_arrows)
+                lines = artist.draw_vector_field(vf, color, same_scale, scale, width, vector_fields_as_arrows)
 
                 if not vector_fields_color_clusters:
                     _vf_name = "".join(vf_name.split("_"))
@@ -447,7 +462,6 @@ def plot_2d(filename,
                 U = np.reshape(U, XX.shape)
                 V = np.reshape(V, XX.shape)
 
-
                 LW = []
                 if streamlines_lw:
 
@@ -489,6 +503,8 @@ def plot_2d(filename,
     # ==========================================================================
     # Save plotter scene as an image
     # ==========================================================================
+
+    plotter.zoom_extents()
 
     if save_img:
 
