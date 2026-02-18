@@ -60,4 +60,8 @@ try:
 except Exception:
     pass
 
+# Register artists
+from directional_clustering.plotters import register_artists
+register_artists()
+
 __all__ = ["HOME", "DATA", "DOCS", "TEMP", "TESTS"]

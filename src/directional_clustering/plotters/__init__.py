@@ -19,9 +19,7 @@ from .colors import *
 from .mesh_artist import *
 from .plot_data_struct import *
 from .ply_plotter import *
+from .register import *
 
-# Register artists
-from .register import register_artists
-register_artists()
 
 __all__ = [name for name in dir() if not name.startswith('_')]
