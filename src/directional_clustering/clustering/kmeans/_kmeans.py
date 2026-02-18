@@ -53,7 +53,9 @@ class KMeans(ClusteringAlgorithm):
         self._centers = None
         self._labels = None
         self._loss = None
+        self._loss_field = None
         self._loss_history = None
+        self._loss_history_field = None
 
     @property
     def loss(self):
@@ -70,6 +72,22 @@ class KMeans(ClusteringAlgorithm):
         This is computed as the mean squared distance of to the k-centers.
         """
         return self._loss
+
+    @property
+    def loss_field(self):
+        """
+        The total loss that k-means produced after clustering a vector field.
+
+        Returns
+        -------
+        loss : `float`
+            The loss.
+
+        Notes
+        -----
+        This is computed as the mean squared distance of to the k-centers.
+        """
+        return self._loss_field
 
     @property
     def loss_history(self):
@@ -213,6 +231,7 @@ class KMeans(ClusteringAlgorithm):
         self._labels = clustered_labels  # face labels
         self._centers = {idx: center.tolist() for idx, center in enumerate(centers)}
         self._loss = losses[-1]
+        self._loss_field = losses_field[-1]
         self._loss_history = losses
         self._loss_history_field = losses_field
 
