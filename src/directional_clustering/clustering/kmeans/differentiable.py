@@ -11,7 +11,7 @@ from scipy.optimize import minimize
 __all__ = ["DifferentiableKMeans"]
 
 
-class DifferentiableKMeans():
+class DifferentiableKMeans:
     """
     Differentiable k-means clustering using a custom kernel function.
 

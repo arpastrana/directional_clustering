@@ -29,7 +29,6 @@ class CosineKMeans(KMeans):
         # set appropiate distance function
         self.distance_func = distance_cosine
 
-
 class CosineAbsoluteKMeans(KMeans):
     """
     K-means clustering using absolute cosine distance as the association metric.
@@ -41,6 +40,7 @@ class CosineAbsoluteKMeans(KMeans):
     vector_field : `directional_clustering.fields.VectorField`
         The vector field to cluster.
     """
+
     def __init__(self, mesh, vector_field):
         # initialize parent class constructor
         super(CosineAbsoluteKMeans, self).__init__(mesh, vector_field)

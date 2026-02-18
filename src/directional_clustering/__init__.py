@@ -18,8 +18,8 @@ directional_clustering
 
 from __future__ import print_function
 
+import compas
 import os
-import sys
 
 
 __copyright__ = "Princeton University"

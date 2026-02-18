@@ -23,6 +23,7 @@ from __future__ import print_function
 
 # from .<module> import *
 from .align import *
+from .normalize import *
 from .smooth import *
 from .stress import *
 from .strain import *

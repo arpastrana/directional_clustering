@@ -1,14 +1,11 @@
 import numpy as np
 
-from compas.artists import Artist
-
 from compas.geometry import length_vector
 
 from compas_plotters import draw_xpoints_xy
 from compas_plotters import draw_xlines_xy
 from compas_plotters.artists import MeshArtist
 
-from directional_clustering.mesh import MeshPlus
 from directional_clustering.plotters import line_sdl
 
 
@@ -97,7 +94,3 @@ class MeshPlusArtist(MeshArtist):
             return draw_xlines_xy(lines, self.plotter.axes)
 
         return draw_xlines_xy(lines, self.plotter.axes)
-
-
-# Register artist
-Artist.register(MeshPlus, MeshPlusArtist, context="Plotter")
