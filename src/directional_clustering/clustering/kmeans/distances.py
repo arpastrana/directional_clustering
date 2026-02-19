@@ -92,7 +92,7 @@ def distance_cosine_abs(A, B, row_wise=False):
     return 1.0 - np.abs(cosine_similarity(A, B, row_wise))
 
 
-def distance_euclidean(A, B):
+def distance_euclidean(A, B, **kwargs):
     """
     Computes the Euclidean distance between two arrays.
 
@@ -114,6 +114,8 @@ def distance_euclidean(A, B):
     between A[r, :] and B[c, :].
     """
     # TODO: Test this function.
+    A = np.atleast_2d(A)
+    B = np.atleast_2d(B)
     R = np.sum(A * A, axis=1, keepdims=True)
     C = np.sum(B * B, axis=1, keepdims=True)
     C = np.transpose(C)
