@@ -102,7 +102,7 @@ def centroids_estimate(X, k, assoc):
     return W
 
 
-def centroids_associate(X, W, dist_func, loss_func):
+def centroids_associate(X, W, dist_func, loss_func=None):
     """
     Parameters
     ----------
@@ -112,14 +112,16 @@ def centroids_associate(X, W, dist_func, loss_func):
         2D array where rows are the k centroids.
     dist_func : `function`
         A function to calculate distances between vectors and centroids.
-    loss_func : `function`
+    loss_func : `function`, optional
         A function to compute a scalar penalty.
         The penalty is derived from the distance between input vectors and clustered vectors.
+        Defaults to `None`.
 
     Returns
     -------
-    loss : `float`
-        The mean squared distance to all nearest centroids
+    loss : `float`, optional
+        The mean squared distance to all nearest centroids.
+        Only returned if `loss_func` is provided.
     closest_k : `np.array`, (n,)
         The closest k-centroid for every example in X.
     """
@@ -131,6 +133,10 @@ def centroids_associate(X, W, dist_func, loss_func):
 
     # find closest indices
     closest_k = np.argmin(distances, axis=1)  # shape (n, )
+
+    # if no loss function is provided, return only the closest indices
+    if loss_func is None:
+        return closest_k
 
     # get distance to closest centroid
     closest_dist = distances[np.arange(len(closest_k)), closest_k]

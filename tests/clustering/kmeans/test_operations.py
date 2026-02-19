@@ -80,9 +80,7 @@ def test_centroids_associate_cosine(cosine_array, cosine_centroids):
     """
     Assigns labels to three vectors based on two redundant centroids.
     """
-    _, closest = centroids_associate(cosine_array,
-                                     cosine_centroids,
-                                     distance_cosine)
+    closest = centroids_associate(cosine_array, cosine_centroids, distance_cosine)
 
     assert np.allclose(closest, np.array([0, 1, 1])), closest
 
