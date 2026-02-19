@@ -153,6 +153,39 @@ class Field(AbstractField):
 
         return vf
 
+    @classmethod
+    def from_mesh(cls, mesh, name):
+        """
+        Extracts a field from the faces of a mesh.
+
+        Parameters
+        ----------
+        mesh : `directional_clustering.mesh.MeshPlus`
+            A mesh.
+        name : `str`
+            The name of the face attribute to query.
+
+        Returns
+        -------
+        field : `Field`
+            A field.
+
+        Notes
+        -----
+        Every item in the field is stored with the mesh face keys as access keys.
+        """
+        field = cls()
+
+        for fkey in mesh.faces():
+            item = mesh.face_attribute(fkey, name)
+
+            msg = "Attribute {} is not defined on face {}!".format(name, fkey)
+            assert item is not None, msg
+
+            field[fkey] = item
+
+        return field
+
 
 if __name__ == "__main__":
     pass

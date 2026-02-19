@@ -100,17 +100,17 @@ def test_vector_field_from_sequence(vectors_3d):
     assert vector_field.size() == len(vectors_3d)
 
 
-def test_vector_field_from_mesh_faces(mesh):
+def test_vector_field_from_mesh(mesh):
     """
     Adds all the vectors stored as face attributes in a mesh.
     """
-    vector_field = VectorField.from_mesh_faces(mesh, "my_vector_field")
+    vector_field = VectorField.from_mesh(mesh, "my_vector_field")
     assert vector_field.size() == mesh.number_of_faces()
 
 
-def test_vector_field_from_mesh_faces_fails(mesh):
+def test_vector_field_from_mesh_fails(mesh):
     """
     Attempts to create a vector field from an unexisting attribute.
     """
     with pytest.raises(AssertionError):
-        VectorField.from_mesh_faces(mesh, "unexisting_field")
+        VectorField.from_mesh(mesh, "unexisting_field")
