@@ -11,28 +11,31 @@ from directional_clustering.clustering import distance_cosine
 # Tests
 # ==============================================================================
 
-def test_loss(variational_kmeans):
+def test_loss(variational_kmeans, n_clusters, iters, tol, seed_array):
     """
     Verifies that the clustering loss is zero for a test vector field.
     """
-    variational_kmeans.cluster()
+    variational_kmeans.seeds = seed_array
+    variational_kmeans.cluster(n_clusters, iters, tol, early_stopping=False)
     assert variational_kmeans.loss == 0.0
 
 
-def test_clustered_field_type(variational_kmeans):
+def test_clustered_field_type(variational_kmeans, n_clusters, iters, tol, seed_array):
     """
     Asserts that the type of the clustered field is correct.
     """
-    variational_kmeans.cluster()
+    variational_kmeans.seeds = seed_array
+    variational_kmeans.cluster(n_clusters, iters, tol, early_stopping=False)
 
     assert isinstance(variational_kmeans.clustered_field, VectorField)
 
 
-def test_clustered_field_entries(variational_kmeans):
+def test_clustered_field_entries(variational_kmeans, n_clusters, iters, tol, seed_array):
     """
     Tests that the clustered field contains the right vectors.
     """
-    variational_kmeans.cluster()
+    variational_kmeans.seeds = seed_array
+    variational_kmeans.cluster(n_clusters, iters, tol, early_stopping=False)
     clustered = variational_kmeans.clustered_field
 
     assert isinstance(clustered, VectorField)
@@ -43,11 +46,12 @@ def test_clustered_field_entries(variational_kmeans):
     assert np.allclose(np.array(clustered.vector(2)), np.array([0.0, sqrt_2, sqrt_2]))
 
 
-def test_labels(variational_kmeans):
+def test_labels(variational_kmeans, n_clusters, iters, tol, seed_array):
     """
     Checks that the vectors are associated with the right centroid.
     """
-    variational_kmeans.cluster()
+    variational_kmeans.seeds = seed_array
+    variational_kmeans.cluster(n_clusters, iters, tol, early_stopping=False)
     labels = variational_kmeans.labels
 
     assert labels[0] == 1

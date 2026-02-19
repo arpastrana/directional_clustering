@@ -134,33 +134,32 @@ def tol():
 
 
 @pytest.fixture
-def kmeans(mesh, vector_field, n_clusters, iters, tol):
+def kmeans(mesh, vector_field):
     """
     An instance of KMeans.
     """
-    return KMeans(mesh, vector_field, n_clusters, iters, tol)
+    return KMeans(mesh, vector_field)
 
 
 @pytest.fixture
-def cosine_kmeans(mesh, vector_field, n_clusters, iters, tol):
+def cosine_kmeans(mesh, vector_field):
     """
     An instance of CosineKMeans.
     """
-    return CosineKMeans(mesh, vector_field, n_clusters, iters, tol)
+    return CosineKMeans(mesh, vector_field)
 
 
 @pytest.fixture
-def variational_kmeans(mesh, vector_field, n_clusters, iters, tol):
+def variational_kmeans(mesh, vector_field):
     """
     An instance of VariationalKMeans.
     """
-    return VariationalKMeans(mesh, vector_field, n_clusters, iters, tol)
+    return VariationalKMeans(mesh, vector_field)
 
 
 @pytest.fixture
-def diff_cosine_kmeans(mesh, vector_field, n_clusters, iters, tol):
+def diff_cosine_kmeans(mesh, vector_field):
     """
     An instance of DifferentiableCosineKMeans.
     """
-    t = 1.0  # attention temperature
-    return DifferentiableCosineKMeans(mesh, vector_field, n_clusters, iters, tol, t)
+    return DifferentiableCosineKMeans(mesh, vector_field)

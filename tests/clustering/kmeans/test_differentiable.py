@@ -16,21 +16,22 @@ def test_distance_function(diff_cosine_kmeans):
     assert isinstance(diff_cosine_kmeans.distance_func, type(distance_cosine))
 
 
+def test_clustered_field_type(diff_cosine_kmeans, n_clusters, iters, tol):
+    """
+    Asserts that the type of the clustered field is correct.
+    """
+    diff_cosine_kmeans.seed(n_clusters)
+    diff_cosine_kmeans.cluster(n_clusters, iters, tol, early_stopping=False, tau=1.0)
+
+    assert isinstance(diff_cosine_kmeans.clustered_field, VectorField)
+
+
 # def test_loss(diff_cosine_kmeans):
 #     """
 #     Verifies that the clustering loss is zero for the test vector field.
 #     """
 #     diff_cosine_kmeans.cluster()
 #     assert diff_cosine_kmeans.loss == 0.0
-
-
-def test_clustered_field_type(diff_cosine_kmeans):
-    """
-    Asserts that the type of the clustered field is correct.
-    """
-    diff_cosine_kmeans.cluster()
-
-    assert isinstance(diff_cosine_kmeans.clustered_field, VectorField)
 
 
 # def test_clustered_field_entries(diff_cosine_kmeans):

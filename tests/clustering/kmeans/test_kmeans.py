@@ -33,12 +33,25 @@ def test_static_clustering(dist_func, kmeans, vector_array, seed_array, n_cluste
     """
     Checks that the clusters formed are correct based on a distance function.
     """
-    result = kmeans._cluster(vector_array, seed_array, dist_func, iters, tol)
-    assert len(result) == 3
+    result = kmeans._cluster(
+        vector_array,
+        seed_array,
+        dist_func,
+        loss_func=lambda x: x,
+        n_clusters=n_clusters,
+        iters=iters,
+        tol=tol,
+        early_stopping=False,
+        is_seeding=False)
+
+    # Expected length of result is 4
+    assert len(result) == 4
 
     # unpack result
-    labels, centers, losses = result
-    # test laels
+    labels, centers, _, _ = result
+
+    # test labels
     assert labels.tolist() == [0, 0, 1], centers
+
     # assert centers
     assert centers.tolist() == [[0.0, 0.0, 1.5], [0.0, 2.0, 0.0]]
