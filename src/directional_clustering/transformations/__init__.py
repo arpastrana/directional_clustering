@@ -28,7 +28,8 @@ from .smooth import *
 from .stress import *
 from .strain import *
 from .work import *
-from .volume import *
+from .reinforcement import *
+from .merge import *
 
 import compas
 if not compas.IPY:
