@@ -103,14 +103,14 @@ def generate_connected_regions_adjacency(mesh, regions):
     return region_adjacency
 
 
-def compute_cluster_labels_from_regions(mesh, regions):
+def compute_cluster_labels_from_regions(labels, regions):
     """
     Computes the cluster labels from the regions.
 
     Parameters
     ----------
-    mesh : `directional_clustering.mesh.MeshPlus`
-        The mesh to compute the cluster labels from.
+    labels : `dict` of `int` to `int`
+        A mapping from face key to cluster label.
     regions : `dict` of `int` to `set` of `int`
         A map from a region key to the face keys of the region.
 
@@ -121,7 +121,7 @@ def compute_cluster_labels_from_regions(mesh, regions):
     """
     rkeys_to_labels = {}
     for rkey, region in regions.items():
-        region_labels = set(mesh.face_attribute(fkey, "cluster") for fkey in region)
+        region_labels = set(labels[fkey] for fkey in region)
         assert len(region_labels) == 1, "Region contains faces from different clusters"
         rkeys_to_labels[rkey] = region_labels.pop()
 
@@ -160,7 +160,7 @@ def merge_regions(mesh, regions, region_adjacency, min_area_ratio, max_iters=100
     part_adjacency : `dict` of `int` to `set` of `int`
         A map from a part key to the part keys of its neighbors.
     min_area_ratio : `float`
-        The minimum area ratio of a part to merge it with its smallest neighbor.
+        The minimum area ratio of a part to merge it with its neighbor.
     max_iters : `int`, optional
         The maximum number of iterations to perform. Defaults to 100.
 
@@ -181,35 +181,35 @@ def merge_regions(mesh, regions, region_adjacency, min_area_ratio, max_iters=100
         rkeys = [rkey for rkey in regions.keys() if rkeys_areas[rkey] <= min_area]
 
         if len(rkeys) == 0:
-            break
+            return regions
 
         sorted_rkeys = sorted(rkeys, key=lambda x: rkeys_areas[x])
 
         for rkey in sorted_rkeys:
-
-            # Find smallest neighbor
-            # TODO: Use largest neighbor?
             nbrs = region_adjacency[rkey]
-            smallest_nbr = min(nbrs, key=lambda x: rkeys_areas[x])
+            # TODO: Use smallest or largest neighbor?
+            # smallest_nbr = min(nbrs, key=lambda x: rkeys_areas[x])
+            nbr_to_join = max(nbrs, key=lambda x: rkeys_areas[x])
 
-            # Merge part faces into smallest neighbor's faces
+            # Merge region faces into neighbor's faces
             region = regions[rkey]
-            regions[smallest_nbr].update(region)
+            regions[nbr_to_join].update(region)
             for _rkey in region_adjacency[rkey]:
-                if _rkey != smallest_nbr:
-                    region_adjacency[smallest_nbr].add(_rkey)
+                if _rkey != nbr_to_join:
+                    region_adjacency[nbr_to_join].add(_rkey)
 
             # Recompute part adjacency
             for nbr in nbrs:
                 region_adjacency[nbr].remove(rkey)
-                if nbr != smallest_nbr:
-                    region_adjacency[nbr].add(smallest_nbr)
+                if nbr != nbr_to_join:
+                    region_adjacency[nbr].add(nbr_to_join)
 
             # Delete region
             del regions[rkey]
             del region_adjacency[rkey]
             break
 
+    print("Warning: Exceeded max number of iterations. Returning current regions.")
     return regions
 
 
@@ -294,15 +294,22 @@ def merge_clusters(mesh, labels, centroids=None, min_area_ratio=0.01, max_iters=
 
     face_adjacency = compute_face_adjacency_clusters(mesh, labels)
     regions = generate_connected_regions(face_adjacency)
+    for rkey, region in regions.items():
+        print(f"Region {rkey} has area ratio {_compute_region_area(mesh, region) / mesh.area():.3f}")
+
     region_adjacency = generate_connected_regions_adjacency(mesh, regions)
 
     # Compute cluster labels from regions
-    rkeys_to_labels = compute_cluster_labels_from_regions(mesh, regions)
-
+    rkeys_to_labels = compute_cluster_labels_from_regions(labels, regions)
     new_regions = merge_regions(mesh, regions, region_adjacency, min_area_ratio, max_iters)
 
+    if len(new_regions) < len(regions):
+        labels = compute_face_clusters_from_regions(new_regions, rkeys_to_labels)
+        print(f"Merged {len(regions) - len(new_regions)} regions!")
+    else:
+        print("No regions merged...")
+
     # Merged data
-    labels = compute_face_clusters_from_regions(new_regions, rkeys_to_labels)
     if centroids is not None:
         vector_field = compute_vector_field_from_clusters(labels, centroids)
         return labels, vector_field
@@ -336,7 +343,7 @@ if __name__ == "__main__":
     labels = mesh.cluster_labels("cluster")
 
     # Merging?
-    min_area_ratio = 3 / 25.0
+    min_area_ratio = 9 / 25.0
     labels = merge_clusters(mesh, labels, min_area_ratio=min_area_ratio)
 
     # Visualization

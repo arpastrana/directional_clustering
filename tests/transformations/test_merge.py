@@ -7,6 +7,7 @@ from directional_clustering.transformations import generate_connected_regions_ad
 from directional_clustering.transformations import generate_connected_regions
 from directional_clustering.transformations import merge_regions
 
+
 @pytest.fixture
 def mesh():
     """
@@ -77,7 +78,7 @@ def test_regions_adjacency(mesh, labels, regions_adjacency_truth):
 
 
 @pytest.mark.parametrize("min_area_ratio, result", ([0.0, 5], [1.0, 4], [3.0, 3], [7.0, 2]))
-def test_merge_parts_area(mesh, labels, min_area_ratio, result):
+def test_merge_regions_area(mesh, labels, min_area_ratio, result):
     regions = generate_regions(mesh, labels)
     regions_adjacency = generate_regions_adjacency(mesh, labels)
 
