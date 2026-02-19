@@ -36,10 +36,9 @@ class VariationalKMeans(KMeans):
     [1] Cohen-Steiner, D., Alliez, P., Desbrun, M. (2004). Variational Shape Approximation.
     RR-5371, INRIA. 2004, pp.29. inria-00070632
     """
-    def __init__(self, mesh, vector_field, n_clusters, iters, tol):
+    def __init__(self, mesh, vector_field):
         # parent class constructor
-        args = mesh, vector_field, n_clusters, iters, tol
-        super(VariationalKMeans, self).__init__(*args)
+        super(VariationalKMeans, self).__init__(mesh, vector_field)
 
         # internal flag to control cluster splitting heuristic
         self.merge_split = True
