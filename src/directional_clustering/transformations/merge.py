@@ -97,8 +97,9 @@ def generate_connected_regions_adjacency(mesh, regions):
                 region_adjacency[rkey].add(qkey)
 
     # Check that each part has at least one neighbor. No islands allowed.
-    for rkey, nbrs in region_adjacency.items():
-        assert len(nbrs) > 0, "Region has no neighbors"
+    if len(region_adjacency) > 1:
+        for rkey, nbrs in region_adjacency.items():
+            assert len(nbrs) > 0, "Region has no neighbors"
 
     return region_adjacency
 

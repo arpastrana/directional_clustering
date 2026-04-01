@@ -282,6 +282,11 @@ class KMeans(ClusteringAlgorithm):
         """
         losses = []
         losses_field = []
+        if iters == 0:
+            labels = np.full(X.shape[0], n_clusters - 1, dtype=np.int32)
+            losses = [-1.0]
+            losses_field = [-1.0]
+
         for i in range(iters):
 
             # assign labels
