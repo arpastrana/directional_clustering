@@ -4,7 +4,7 @@
 
 Directional clustering of vector fields on meshes.
 
-![Clustered stress field on a perimeter-supported slab](data/images/five_clusters.png)
+![Modular beam layouts for various planar structure](structures.png)
 
 ## Introduction
 
